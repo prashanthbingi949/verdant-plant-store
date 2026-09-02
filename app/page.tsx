@@ -1,69 +1,117 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { motion, useMotionValue, useSpring } from "framer-motion";
+
+const collections = [
+  { eyebrow: "01 / EASY CARE", title: "Indoor plants", note: "Calm, green companions for every room." },
+  { eyebrow: "02 / SUN LOVERS", title: "Outdoor plants", note: "Bring a little wildness to balconies and gardens." },
+  { eyebrow: "03 / MINIATURE", title: "Succulents", note: "Small shapes with a lot of personality." },
+];
+
+const products = [
+  { name: "Monstera Deliciosa", meta: "Statement plant · 12\" pot", price: "₹1,899", tone: "moss" },
+  { name: "Snake Plant", meta: "Low light · 10\" pot", price: "₹899", tone: "sage" },
+  { name: "Jade Plant", meta: "Desk friendly · 6\" pot", price: "₹649", tone: "lime" },
+];
+
+function LeafMark({ className = "" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M38.4 7.2C24.2 8.4 12 15.1 9.6 27.4c-1.2 6.2 1.8 11.1 7 12.1 8.2 1.5 16.7-5.2 19.1-13.7 1.5-5.2 1.6-11 2.7-18.6Z" fill="currentColor" />
+      <path d="M10.4 38.1c6.2-8.2 12-13 21.2-17.6" fill="none" stroke="var(--cream)" strokeWidth="2" strokeLinecap="round" opacity=".7" />
+    </svg>
+  );
+}
+
+function BotanicalShape({ tone }: { tone: string }) {
+  return (
+    <div className={`botanical-card botanical-${tone}`}>
+      <div className="botanical-glow" />
+      <svg viewBox="0 0 420 360" className="plant-art" aria-hidden="true">
+        <path d="M205 318c9-48 9-94 0-143" fill="none" stroke="var(--forest)" strokeWidth="7" strokeLinecap="round" />
+        <path d="M205 216c-39-42-74-55-116-43 13 40 49 69 116 43Z" fill="var(--leaf)" />
+        <path d="M211 183c28-55 68-81 119-79 4 49-26 91-119 79Z" fill="var(--leaf-deep)" />
+        <path d="M202 254c-52-26-92-18-119 16 33 29 75 31 119-16Z" fill="var(--leaf-soft)" />
+        <path d="M210 272c36-42 75-50 114-34-11 39-48 64-114 34Z" fill="var(--leaf)" />
+        <path d="M207 151c-13-49 3-87 42-113 25 37 15 77-42 113Z" fill="var(--lime)" />
+        <path d="M176 318c-12 16-16 24-16 29h92c-1-5-5-13-16-29H176Z" fill="var(--pot)" />
+        <path d="M165 346h102" stroke="var(--forest)" strokeWidth="7" strokeLinecap="round" opacity=".45" />
+      </svg>
+      <span className="plant-spark spark-one" />
+      <span className="plant-spark spark-two" />
+    </div>
+  );
+}
+
+function Icon({ name }: { name: "search" | "heart" | "bag" | "arrow" | "menu" | "close" }) {
+  const common = { width: 20, height: 20, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+  if (name === "search") return <svg {...common}><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg>;
+  if (name === "heart") return <svg {...common}><path d="M20.8 8.8c0 5.1-8.8 10.2-8.8 10.2S3.2 13.9 3.2 8.8A4.8 4.8 0 0 1 12 6.1a4.8 4.8 0 0 1 8.8 2.7Z" /></svg>;
+  if (name === "bag") return <svg {...common}><path d="M6.7 8.5h10.6l.8 11H5.9l.8-11Z" /><path d="M9 9V6.4a3 3 0 0 1 6 0V9" /></svg>;
+  if (name === "arrow") return <svg {...common}><path d="M5 12h13" /><path d="m13 7 5 5-5 5" /></svg>;
+  if (name === "menu") return <svg {...common}><path d="M4 7h16M4 12h16M4 17h16" /></svg>;
+  return <svg {...common}><path d="m6 6 12 12M18 6 6 18" /></svg>;
+}
 
 export default function Home() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [cart, setCart] = useState(0);
+  const [liked, setLiked] = useState<number[]>([]);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const sx = useSpring(mx, { stiffness: 80, damping: 20 });
+  const sy = useSpring(my, { stiffness: 80, damping: 20 });
+
+  useEffect(() => {
+    const handleMove = (event: MouseEvent) => {
+      if (!heroRef.current) return;
+      const rect = heroRef.current.getBoundingClientRect();
+      mx.set(((event.clientX - rect.left) / rect.width - 0.5) * 18);
+      my.set(((event.clientY - rect.top) / rect.height - 0.5) * 18);
+    };
+    window.addEventListener("mousemove", handleMove);
+    return () => window.removeEventListener("mousemove", handleMove);
+  }, [mx, my]);
+
+  const toggleLike = (index: number) => setLiked((items) => items.includes(index) ? items.filter((item) => item !== index) : [...items, index]);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="verdant-site">
+      <div className="topline"><span>FREE DELIVERY ON ORDERS OVER ₹1,499</span><span className="topline-dot" /><span>GROW SOMETHING GOOD</span></div>
+
+      <header className="site-header">
+        <a className="brand" href="#top" aria-label="Verdant home"><span className="brand-mark"><LeafMark /></span><span>VERDANT</span></a>
+        <nav className="desktop-nav" aria-label="Primary navigation"><a href="#shop">Shop</a><a href="#collections">Collections</a><a href="#care">Plant care</a><a href="#story">Our story</a></nav>
+        <div className="header-actions"><button aria-label="Search" className="icon-button" onClick={() => setSearchOpen(true)}><Icon name="search" /></button><a aria-label="Account" className="account-link" href="#account">Account</a><button aria-label="Cart" className="cart-button"><Icon name="bag" /><span>{cart}</span></button><button className="mobile-menu-button" aria-label={menuOpen ? "Close menu" : "Open menu"} onClick={() => setMenuOpen((open) => !open)}><Icon name={menuOpen ? "close" : "menu"} /></button></div>
+      </header>
+
+      {menuOpen && <div className="mobile-menu"><a href="#shop" onClick={() => setMenuOpen(false)}>Shop</a><a href="#collections" onClick={() => setMenuOpen(false)}>Collections</a><a href="#care" onClick={() => setMenuOpen(false)}>Plant care</a><a href="#story" onClick={() => setMenuOpen(false)}>Our story</a><a href="#account" onClick={() => setMenuOpen(false)}>Account</a></div>}
+
+      {searchOpen && <div className="search-overlay" role="dialog" aria-modal="true" aria-label="Search"><button className="search-close" aria-label="Close search" onClick={() => setSearchOpen(false)}><Icon name="close" /></button><div><p className="eyebrow">SEARCH THE COLLECTION</p><input autoFocus placeholder="Try “monstera” or “planter”…" /></div></div>}
+
+      <section className="hero" id="top" ref={heroRef}>
+        <div className="hero-noise" />
+        <div className="hero-copy"><motion.p className="eyebrow" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .7 }}>PLANTS · POTS · GARDEN LIFE</motion.p><motion.h1 initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .8, delay: .08 }}>Bring <em>nature</em><br />home.</motion.h1><motion.p className="hero-text" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .7, delay: .18 }}>Thoughtful plants and beautiful objects for spaces that feel more alive.</motion.p><motion.div className="hero-ctas" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .7, delay: .28 }}><a className="button button-lime" href="#shop">Explore plants <Icon name="arrow" /></a><a className="text-link" href="#collections">Find your plant <Icon name="arrow" /></a></motion.div><div className="hero-meta"><span>01</span><span className="hero-rule" /><span>CURATED FOR SLOW LIVING</span></div></div>
+        <motion.div className="hero-visual" style={{ x: sx, y: sy }}><div className="hero-ring ring-one" /><div className="hero-ring ring-two" /><BotanicalShape tone="hero" /><span className="floating-word word-one">grow</span><span className="floating-word word-two">breathe</span><span className="floating-dot dot-one" /><span className="floating-dot dot-two" /></motion.div>
+        <div className="hero-bottom"><span>SCROLL TO GROW</span><span className="scroll-line" /></div>
+      </section>
+
+      <section className="marquee"><div>PLANT MORE JOY · PLANT MORE JOY · PLANT MORE JOY · PLANT MORE JOY · </div></section>
+
+      <section className="section collections-section" id="collections"><div className="section-heading"><div><p className="eyebrow">THE VERDANT EDIT</p><h2>Choose your <em>green.</em></h2></div><p>From first-time plant parents to lifelong gardeners, there is a little something growing here for everyone.</p></div><div className="collection-grid">{collections.map((item, index) => <motion.a href="#shop" className="collection-card" key={item.title} whileHover={{ y: -8 }} transition={{ type: "spring", stiffness: 280, damping: 22 }}><div className="collection-copy"><span>{item.eyebrow}</span><h3>{item.title}</h3><p>{item.note}</p><span className="round-arrow"><Icon name="arrow" /></span></div><div className={`collection-art art-${index + 1}`}><BotanicalShape tone={`collection-${index + 1}`} /></div></motion.a>)}</div></section>
+
+      <section className="section shop-section" id="shop"><div className="section-heading compact"><div><p className="eyebrow">MOST LOVED</p><h2>Little <em>legends.</em></h2></div><a className="text-link" href="#shop">View all plants <Icon name="arrow" /></a></div><div className="product-grid">{products.map((product, index) => <article className="product-card" key={product.name}><div className="product-image"><button className={`wish ${liked.includes(index) ? "is-liked" : ""}`} onClick={() => toggleLike(index)} aria-label={`Wishlist ${product.name}`}><Icon name="heart" /></button><BotanicalShape tone={product.tone} /><span className="product-badge">BEST SELLER</span></div><div className="product-info"><div><p>{product.meta}</p><h3>{product.name}</h3></div><div className="product-buy"><strong>{product.price}</strong><button onClick={() => setCart((count) => count + 1)}>Add +</button></div></div></article>)}</div></section>
+
+      <section className="story-section" id="story"><div className="story-art"><div className="story-card"><span>EST. 2026</span><div className="story-circle"><LeafMark /></div><strong>Good things<br />take root.</strong></div><span className="story-stem" /></div><div className="story-copy"><p className="eyebrow">THE VERDANT WAY</p><h2>More than a store.<br /><em>A little ritual.</em></h2><p>We believe plants change a room, then slowly change the way the room feels. Verdant is a place for that transformation — one stem, one pot, one sunny corner at a time.</p><a className="button button-dark" href="#care">Explore plant care <Icon name="arrow" /></a></div></section>
+
+      <section className="care-section" id="care"><div className="care-heading"><p className="eyebrow">PLANT CARE, MADE SIMPLE</p><h2>Less guesswork.<br /><em>More growing.</em></h2><p>Practical guides for water, light, soil and everything in between.</p></div><div className="care-list"><a href="#care"><span>01</span><strong>Watering without overthinking</strong><Icon name="arrow" /></a><a href="#care"><span>02</span><strong>Finding the right light</strong><Icon name="arrow" /></a><a href="#care"><span>03</span><strong>Repotting, root to leaf</strong><Icon name="arrow" /></a><a href="#care"><span>04</span><strong>Build your own green corner</strong><Icon name="arrow" /></a></div></section>
+
+      <section className="newsletter"><div><p className="eyebrow">A NOTE FROM VERDANT</p><h2>Grow slowly.<br /><em>Stay curious.</em></h2></div><form onSubmit={(event) => event.preventDefault()}><label htmlFor="email">Plant tips, new arrivals and good things — occasionally.</label><div className="email-row"><input id="email" type="email" placeholder="Your email address" required /><button className="button button-lime" type="submit">Join us <Icon name="arrow" /></button></div></form></section>
+
+      <footer className="footer" id="account"><div className="footer-brand"><a className="brand light" href="#top"><span className="brand-mark"><LeafMark /></span><span>VERDANT</span></a><p>Thoughtful plants and beautiful objects for a greener everyday.</p></div><div className="footer-col"><span>SHOP</span><a href="#shop">Indoor plants</a><a href="#shop">Succulents</a><a href="#shop">Planters</a><a href="#shop">Plant care</a></div><div className="footer-col"><span>ABOUT</span><a href="#story">Our story</a><a href="#care">Care journal</a><a href="#account">Account</a><a href="#top">Contact</a></div><div className="footer-end"><span>© 2026 VERDANT</span><span>MADE FOR SLOW GROWERS</span></div></footer>
+    </main>
   );
 }
