@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import VerdantSpotlightHero from "@/components/verdant-spotlight-hero";
+import { useState } from "react";
+import { motion } from "framer-motion";
 
 const collections = [
   { eyebrow: "01 / EASY CARE", title: "Indoor plants", note: "Calm, green companions for every room." },
@@ -44,60 +45,21 @@ function BotanicalShape({ tone }: { tone: string }) {
   );
 }
 
-function Icon({ name }: { name: "search" | "heart" | "bag" | "arrow" | "menu" | "close" }) {
+function Icon({ name }: { name: "heart" | "arrow" }) {
   const common = { width: 20, height: 20, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
-  if (name === "search") return <svg {...common}><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg>;
   if (name === "heart") return <svg {...common}><path d="M20.8 8.8c0 5.1-8.8 10.2-8.8 10.2S3.2 13.9 3.2 8.8A4.8 4.8 0 0 1 12 6.1a4.8 4.8 0 0 1 8.8 2.7Z" /></svg>;
-  if (name === "bag") return <svg {...common}><path d="M6.7 8.5h10.6l.8 11H5.9l.8-11Z" /><path d="M9 9V6.4a3 3 0 0 1 6 0V9" /></svg>;
-  if (name === "arrow") return <svg {...common}><path d="M5 12h13" /><path d="m13 7 5 5-5 5" /></svg>;
-  if (name === "menu") return <svg {...common}><path d="M4 7h16M4 12h16M4 17h16" /></svg>;
-  return <svg {...common}><path d="m6 6 12 12M18 6 6 18" /></svg>;
+  return <svg {...common}><path d="M5 12h13" /><path d="m13 7 5 5-5 5" /></svg>;
 }
 
 export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [cart, setCart] = useState(0);
   const [liked, setLiked] = useState<number[]>([]);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const sx = useSpring(mx, { stiffness: 80, damping: 20 });
-  const sy = useSpring(my, { stiffness: 80, damping: 20 });
-
-  useEffect(() => {
-    const handleMove = (event: MouseEvent) => {
-      if (!heroRef.current) return;
-      const rect = heroRef.current.getBoundingClientRect();
-      mx.set(((event.clientX - rect.left) / rect.width - 0.5) * 18);
-      my.set(((event.clientY - rect.top) / rect.height - 0.5) * 18);
-    };
-    window.addEventListener("mousemove", handleMove);
-    return () => window.removeEventListener("mousemove", handleMove);
-  }, [mx, my]);
 
   const toggleLike = (index: number) => setLiked((items) => items.includes(index) ? items.filter((item) => item !== index) : [...items, index]);
 
   return (
     <main className="verdant-site">
-      <div className="topline"><span>FREE DELIVERY ON ORDERS OVER ₹1,499</span><span className="topline-dot" /><span>GROW SOMETHING GOOD</span></div>
-
-      <header className="site-header">
-        <a className="brand" href="#top" aria-label="Verdant home"><span className="brand-mark"><LeafMark /></span><span>VERDANT</span></a>
-        <nav className="desktop-nav" aria-label="Primary navigation"><a href="#shop">Shop</a><a href="#collections">Collections</a><a href="#care">Plant care</a><a href="#story">Our story</a></nav>
-        <div className="header-actions"><button aria-label="Search" className="icon-button" onClick={() => setSearchOpen(true)}><Icon name="search" /></button><a aria-label="Account" className="account-link" href="#account">Account</a><button aria-label="Cart" className="cart-button"><Icon name="bag" /><span>{cart}</span></button><button className="mobile-menu-button" aria-label={menuOpen ? "Close menu" : "Open menu"} onClick={() => setMenuOpen((open) => !open)}><Icon name={menuOpen ? "close" : "menu"} /></button></div>
-      </header>
-
-      {menuOpen && <div className="mobile-menu"><a href="#shop" onClick={() => setMenuOpen(false)}>Shop</a><a href="#collections" onClick={() => setMenuOpen(false)}>Collections</a><a href="#care" onClick={() => setMenuOpen(false)}>Plant care</a><a href="#story" onClick={() => setMenuOpen(false)}>Our story</a><a href="#account" onClick={() => setMenuOpen(false)}>Account</a></div>}
-
-      {searchOpen && <div className="search-overlay" role="dialog" aria-modal="true" aria-label="Search"><button className="search-close" aria-label="Close search" onClick={() => setSearchOpen(false)}><Icon name="close" /></button><div><p className="eyebrow">SEARCH THE COLLECTION</p><input autoFocus placeholder="Try “monstera” or “planter”…" /></div></div>}
-
-      <section className="hero" id="top" ref={heroRef}>
-        <div className="hero-noise" />
-        <div className="hero-copy"><motion.p className="eyebrow" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .7 }}>PLANTS · POTS · GARDEN LIFE</motion.p><motion.h1 initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .8, delay: .08 }}>Bring <em>nature</em><br />home.</motion.h1><motion.p className="hero-text" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .7, delay: .18 }}>Thoughtful plants and beautiful objects for spaces that feel more alive.</motion.p><motion.div className="hero-ctas" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .7, delay: .28 }}><a className="button button-lime" href="#shop">Explore plants <Icon name="arrow" /></a><a className="text-link" href="#collections">Find your plant <Icon name="arrow" /></a></motion.div><div className="hero-meta"><span>01</span><span className="hero-rule" /><span>CURATED FOR SLOW LIVING</span></div></div>
-        <motion.div className="hero-visual" style={{ x: sx, y: sy }}><div className="hero-ring ring-one" /><div className="hero-ring ring-two" /><BotanicalShape tone="hero" /><span className="floating-word word-one">grow</span><span className="floating-word word-two">breathe</span><span className="floating-dot dot-one" /><span className="floating-dot dot-two" /></motion.div>
-        <div className="hero-bottom"><span>SCROLL TO GROW</span><span className="scroll-line" /></div>
-      </section>
+      <VerdantSpotlightHero />
 
       <section className="marquee"><div>PLANT MORE JOY · PLANT MORE JOY · PLANT MORE JOY · PLANT MORE JOY · </div></section>
 
