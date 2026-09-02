@@ -1,0 +1,110 @@
+/* Verdant responsive refinement layer */
+
+.three-scene { pointer-events: auto; }
+
+@media (min-width: 1201px) {
+  .hero { min-height: clamp(700px, 78vh, 820px); }
+  .hero-copy { padding-top: 10px; }
+  .hero-visual { min-height: 590px; }
+  .three-scene { inset: -4% -2% -4% -2%; }
+}
+
+@media (min-width: 981px) and (max-width: 1200px) {
+  .site-header { padding-inline: 32px; }
+  .desktop-nav { gap: 22px; font-size: 12px; }
+  .hero {
+    grid-template-columns: minmax(0, .98fr) minmax(420px, 1.02fr);
+    padding-inline: 48px;
+    gap: 8px;
+  }
+  .hero h1 { font-size: clamp(62px, 7.2vw, 94px); }
+  .hero-visual { min-height: 500px; }
+  .three-scene { inset: -2% -5% -3% -5%; }
+  .section { width: min(100% - 64px, 1180px); }
+}
+
+@media (max-width: 980px) {
+  .hero { overflow: hidden; }
+  .hero-visual { overflow: visible; }
+  .three-scene { inset: 0; }
+  .hero-ring { width: min(76vw, 560px); }
+}
+
+@media (min-width: 641px) and (max-width: 980px) {
+  .site-header { padding: 18px 26px; }
+  .hero { padding: 62px 36px 78px; }
+  .hero h1 { font-size: clamp(64px, 10.2vw, 96px); }
+  .hero-text { max-width: 520px; }
+  .hero-visual { min-height: 520px; }
+  .hero .botanical-card { width: min(84vw, 600px); height: min(84vw, 600px); }
+  .collection-grid, .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .collection-card:last-child, .product-card:last-child { grid-column: 1 / -1; }
+  .collection-card { min-height: 440px; }
+  .product-image { min-height: 520px; }
+  .story-art { min-height: 560px; }
+  .newsletter { grid-template-columns: 1fr 1fr; }
+  .footer { grid-template-columns: 1.6fr 1fr 1fr; }
+}
+
+@media (max-width: 640px) {
+  .topline { min-height: 30px; }
+  .topline span:nth-of-type(1) { overflow: hidden; text-overflow: ellipsis; }
+  .site-header { min-height: 68px; }
+  .brand { font-size: 13px; }
+  .brand-mark, .brand-mark svg { width: 21px; height: 21px; }
+  .hero { min-height: auto; }
+  .hero-copy { padding-bottom: 8px; }
+  .hero h1 { max-width: 6ch; }
+  .hero-ctas { gap: 12px; }
+  .button { min-height: 46px; padding-inline: 17px; }
+  .hero-bottom { bottom: 17px; }
+  .scroll-line { width: 76px; }
+  .hero-visual { min-height: min(95vw, 470px); margin-top: -6px; }
+  .hero .botanical-card { width: 104vw; height: 104vw; transform: translateY(-1%); }
+  .three-scene { inset: -5% -8% -5% -8%; }
+  .word-one { right: 7%; top: 16%; }
+  .word-two { left: 4%; bottom: 14%; }
+  .hero-ring { width: 102vw; }
+  .marquee div { font-size: 9px; padding-block: 12px; }
+  .collection-grid, .product-grid { grid-template-columns: 1fr; }
+  .collection-card, .product-image { min-height: 380px; }
+  .section-heading.compact { grid-template-columns: 1fr; align-items: start; }
+  .section-heading.compact > .text-link { margin-top: -10px; }
+  .product-info { gap: 10px; }
+  .product-info h3 { font-size: 17px; }
+  .story-art { min-height: 430px; }
+  .story-card { transform: rotate(-3deg); }
+  .story-copy > p:not(.eyebrow) { font-size: 14px; }
+  .care-section { gap: 46px; }
+  .newsletter { gap: 36px; }
+  .footer-col a { font-size: 11px; }
+}
+
+@media (max-width: 390px) {
+  .header-actions .icon-button { display: none; }
+  .hero { padding-inline: 16px; }
+  .hero h1 { font-size: 58px; }
+  .hero-text { font-size: 14px; }
+  .hero-meta { gap: 8px; font-size: 8px; }
+  .hero-rule { width: 34px; }
+  .hero-visual { min-height: 350px; }
+  .three-scene { inset: -7% -12% -6% -12%; }
+  .collection-card { min-height: 350px; }
+  .product-image { min-height: 350px; }
+  .care-list a { grid-template-columns: 28px 1fr 18px; }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .desktop-nav a:hover, .account-link:hover, .icon-button:hover, .cart-button:hover, .mobile-menu-button:hover,
+  .button:hover, .care-list a:hover, .product-buy button:hover, .wish:hover, .collection-card:hover .round-arrow { transform: none; }
+  .mobile-menu { animation: mobileMenuIn .18s ease-out; }
+}
+
+@keyframes mobileMenuIn {
+  from { opacity: 0; transform: translateY(-7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-menu { animation: none; }
+}
