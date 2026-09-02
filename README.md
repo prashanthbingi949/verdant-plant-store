@@ -1,37 +1,36 @@
-# Verdant Plant Store
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Premium, interactive gardening and plant ecommerce website template.
+## Getting Started
 
-## Project Vision
+First, run the development server:
 
-Verdant is being built as a reusable commercial website system for plant stores, nurseries, gardening brands, flower businesses, garden decor stores, and related businesses.
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-The planned platform will include:
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-- Premium responsive storefront
-- Product catalogue and product pages
-- Shopping cart and checkout
-- Customer authentication and accounts
-- Wishlist and reviews
-- Custom admin dashboard and CMS
-- Product, order, customer and content management
-- Razorpay payment integration
-- Interactive Three.js botanical experiences
-- SEO, accessibility and performance best practices
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## Design Direction
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-The visual identity is inspired by a dark botanical palette with luminous lime accents and warm cream surfaces.
+## Learn More
 
-Core palette:
+To learn more about Next.js, take a look at the following resources:
 
-- Forest: `#202D20`
-- Deep Olive: `#293728`
-- Lime: `#DDF27A`
-- Pale Lime: `#ECF98D`
-- Cream: `#F4F5E9`
-- Black: `#101510`
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## Status
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-Project foundation initialized. Feature development will proceed incrementally and be kept production-focused.
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
