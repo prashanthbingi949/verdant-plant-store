@@ -39,69 +39,25 @@ function ArrowIcon() {
   );
 }
 
-function RevealLayer({ image, cursorX, cursorY }: { image: string; cursorX: number; cursorY: number }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [size, setSize] = useState({ width: 1, height: 1 });
-  const [mask, setMask] = useState("");
-
-  useEffect(() => {
-    const resize = () => setSize({ width: window.innerWidth, height: window.innerHeight });
-    resize();
-    window.addEventListener("resize", resize);
-    return () => window.removeEventListener("resize", resize);
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || cursorX < -100 || cursorY < -100) return;
-
-    canvas.width = size.width;
-    canvas.height = size.height;
-    const context = canvas.getContext("2d");
-    if (!context) return;
-
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    const gradient = context.createRadialGradient(cursorX, cursorY, 0, cursorX, cursorY, SPOTLIGHT_R);
-    gradient.addColorStop(0, "rgba(255,255,255,1)");
-    gradient.addColorStop(0.4, "rgba(255,255,255,1)");
-    gradient.addColorStop(0.6, "rgba(255,255,255,.75)");
-    gradient.addColorStop(0.75, "rgba(255,255,255,.4)");
-    gradient.addColorStop(0.88, "rgba(255,255,255,.12)");
-    gradient.addColorStop(1, "rgba(255,255,255,0)");
-    context.fillStyle = gradient;
-    context.beginPath();
-    context.arc(cursorX, cursorY, SPOTLIGHT_R, 0, Math.PI * 2);
-    context.fill();
-
-    const dataUrl = canvas.toDataURL("image/png");
-    setMask(`url(${dataUrl})`);
-  }, [cursorX, cursorY, size]);
-
-  return (
-    <>
-      <canvas ref={canvasRef} width={size.width} height={size.height} className="absolute inset-0 pointer-events-none hidden" />
-      <div
-        className="absolute inset-0 z-30 pointer-events-none bg-center bg-cover bg-no-repeat"
-        style={{
-          backgroundImage: `url(${image})`,
-          maskImage: mask,
-          WebkitMaskImage: mask,
-          maskSize: "100% 100%",
-          WebkitMaskSize: "100% 100%",
-        }}
-      />
-    </>
-  );
-}
-
 export default function VerdantSpotlightHero() {
+  const heroRef = useRef<HTMLElement>(null);
+  const revealRef = useRef<HTMLDivElement>(null);
   const mouse = useRef({ x: -999, y: -999 });
   const smooth = useRef({ x: -999, y: -999 });
   const rafRef = useRef<number | null>(null);
-  const [cursorPos, setCursorPos] = useState({ x: -999, y: -999 });
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
+    const hero = heroRef.current;
+    const reveal = revealRef.current;
+    if (!hero || !reveal) return;
+
+    const setSpotlight = (x: number, y: number) => {
+      const mask = `radial-gradient(circle ${SPOTLIGHT_R}px at ${x}px ${y}px, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 40%, rgba(255,255,255,.75) 60%, rgba(255,255,255,.4) 75%, rgba(255,255,255,.12) 88%, rgba(255,255,255,0) 100%)`;
+      reveal.style.setProperty("-webkit-mask-image", mask);
+      reveal.style.setProperty("mask-image", mask);
+    };
+
     const onMouseMove = (event: MouseEvent) => {
       mouse.current.x = event.clientX;
       mouse.current.y = event.clientY;
@@ -110,29 +66,50 @@ export default function VerdantSpotlightHero() {
     const tick = () => {
       smooth.current.x += (mouse.current.x - smooth.current.x) * 0.1;
       smooth.current.y += (mouse.current.y - smooth.current.y) * 0.1;
-      setCursorPos({ x: smooth.current.x, y: smooth.current.y });
+      if (smooth.current.x > -500 && smooth.current.y > -500) {
+        setSpotlight(smooth.current.x, smooth.current.y);
+      }
       rafRef.current = requestAnimationFrame(tick);
     };
 
-    window.addEventListener("mousemove", onMouseMove);
+    hero.addEventListener("mousemove", onMouseMove, { passive: true });
     rafRef.current = requestAnimationFrame(tick);
 
     return () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      hero.removeEventListener("mousemove", onMouseMove);
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
   }, []);
 
   return (
-    <section className="verdant-spotlight relative w-full overflow-hidden h-screen bg-black" style={{ height: "100dvh" }}>
-      <div className="absolute inset-0 z-10 bg-center bg-cover bg-no-repeat hero-zoom" style={{ backgroundImage: `url(${BG_IMAGE_1})` }} />
+    <section
+      ref={heroRef}
+      className="verdant-spotlight relative w-full overflow-hidden bg-black h-screen"
+      style={{
+        height: "100dvh",
+        minHeight: "560px",
+        fontFamily: "Inter, Arial, sans-serif",
+      }}
+    >
+      <div
+        className="absolute inset-0 z-10 bg-center bg-cover bg-no-repeat hero-zoom"
+        style={{ backgroundImage: `url(${BG_IMAGE_1})` }}
+      />
       <div className="absolute inset-0 z-[12] bg-gradient-to-b from-black/30 via-black/5 to-black/45 pointer-events-none" />
-      <RevealLayer image={BG_IMAGE_2} cursorX={cursorPos.x} cursorY={cursorPos.y} />
+      <div
+        ref={revealRef}
+        className="absolute inset-0 z-30 bg-center bg-cover bg-no-repeat pointer-events-none"
+        style={{
+          backgroundImage: `url(${BG_IMAGE_2})`,
+          maskSize: "100% 100%",
+          WebkitMaskSize: "100% 100%",
+        }}
+      />
 
       <nav className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between p-4 sm:p-5 text-white">
         <a href="#top" className="flex items-center gap-2.5">
           <LogoMark />
-          <span className="text-xl sm:text-2xl font-playfair italic">Verdant</span>
+          <span className="text-xl sm:text-2xl italic" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>Verdant</span>
         </a>
 
         <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 bg-white/15 backdrop-blur-md border border-white/25 rounded-full px-2 py-2 items-center gap-1 shadow-2xl">
@@ -151,23 +128,16 @@ export default function VerdantSpotlightHero() {
 
       {menuOpen && (
         <div className="fixed top-[76px] left-4 right-4 z-[95] md:hidden rounded-3xl border border-white/20 bg-black/65 backdrop-blur-xl p-3 text-white shadow-2xl">
-          {[
-            ["Shop", "#shop"],
-            ["Collections", "#collections"],
-            ["Plant Care", "#care"],
-            ["Our Story", "#story"],
-            ["Journal", "#account"],
-          ].map(([label, href]) => (
-            <a key={label} href={href} onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 text-base text-white/90 hover:bg-white/10">
-              {label}
-            </a>
-          ))}
+          {["Shop", "Collections", "Plant Care", "Our Story", "Journal"].map((label) => {
+            const href = label === "Shop" ? "#shop" : label === "Collections" ? "#collections" : label === "Plant Care" ? "#care" : label === "Our Story" ? "#story" : "#account";
+            return <a key={label} href={href} onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 text-base text-white/90 hover:bg-white/10">{label}</a>;
+          })}
         </div>
       )}
 
-      <div className="absolute top-[15%] left-0 right-0 z-50 flex flex-col items-center text-center px-5 pointer-events-none hero-copy-safe">
+      <div className="absolute top-[14%] left-0 right-0 z-50 flex flex-col items-center text-center px-5 pointer-events-none">
         <h1 className="text-white leading-[0.95] max-w-5xl">
-          <span className="block font-playfair italic font-normal text-5xl sm:text-7xl md:text-8xl hero-anim hero-reveal" style={{ animationDelay: "0.25s", letterSpacing: "-0.05em" }}>Grow something</span>
+          <span className="block italic font-normal text-5xl sm:text-7xl md:text-8xl hero-anim hero-reveal" style={{ animationDelay: "0.25s", letterSpacing: "-0.05em", fontFamily: "Georgia, 'Times New Roman', serif" }}>Grow something</span>
           <span className="block font-normal text-5xl sm:text-7xl md:text-8xl -mt-1 hero-anim hero-reveal" style={{ animationDelay: "0.42s", letterSpacing: "-0.08em" }}>worth keeping.</span>
         </h1>
       </div>
@@ -178,7 +148,7 @@ export default function VerdantSpotlightHero() {
 
       <div className="absolute bottom-10 sm:bottom-24 left-5 right-5 sm:left-auto sm:right-10 md:right-14 z-50 max-w-full sm:max-w-[290px] flex flex-col items-start gap-4 sm:gap-5 hero-anim hero-fade" style={{ animationDelay: "0.85s" }}>
         <p className="text-xs sm:text-sm text-white/80 leading-relaxed">Move your cursor across the garden to reveal another layer of the world — a small, tactile moment designed to make the store feel alive.</p>
-        <a href="#shop" className="bg-[#ddf27a] hover:bg-[#c9e55f] text-[#101510] text-sm font-medium px-7 py-3 rounded-full transition-all hover:scale-[1.03] active:scale-95 hover:shadow-lg hover:shadow-lime-300/20 inline-flex items-center gap-2">
+        <a href="#shop" className="bg-[#ddf27a] hover:bg-[#c9e55f] text-[#101510] text-sm font-medium px-7 py-3 rounded-full transition-all hover:scale-[1.03] active:scale-95 hover:shadow-lg hover:shadow-lime-300/20 inline-flex items-center gap-2 pointer-events-auto">
           Explore plants <ArrowIcon />
         </a>
       </div>
