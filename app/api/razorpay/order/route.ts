@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isSupabaseConfigured, supabaseInsert } from "@/lib/supabase-admin";
 
 const PRODUCTS: Record<string, { name: string; price: number }> = {
   "monstera-deliciosa": { name: "Monstera Deliciosa", price: 1899 },
@@ -25,6 +26,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const rawItems = Array.isArray(body?.items) ? body.items : [];
+    const customer = body?.customer ?? {};
 
     if (rawItems.length === 0) {
       return NextResponse.json({ error: "Your cart is empty." }, { status: 400 });
@@ -79,9 +81,35 @@ export async function POST(request: Request) {
       );
     }
 
+    const orderId = razorpayData.id as string;
+
+    if (isSupabaseConfigured()) {
+      const result = await supabaseInsert("orders", {
+        order_id: orderId,
+        payment_id: null,
+        customer_name: String(customer?.name ?? "").trim() || null,
+        email: String(customer?.email ?? "").trim() || null,
+        phone: String(customer?.phone ?? "").trim() || null,
+        address: String(customer?.address ?? "").trim() || null,
+        city: String(customer?.city ?? "").trim() || null,
+        state: String(customer?.state ?? "").trim() || null,
+        pincode: String(customer?.pin ?? "").trim() || null,
+        amount: total,
+        payment_status: "created",
+        items: lineItems,
+      });
+
+      if (!result.response?.ok) {
+        return NextResponse.json(
+          { error: "Payment order was created, but the order could not be saved. Please try again." },
+          { status: 500 },
+        );
+      }
+    }
+
     return NextResponse.json({
       key: keyId,
-      orderId: razorpayData.id,
+      orderId,
       amount: razorpayData.amount,
       currency: razorpayData.currency,
       receipt,
