@@ -19,6 +19,7 @@ type Order = {
   pincode: string | null;
   amount: number | null;
   payment_status: string | null;
+  order_status: string | null;
   items: Array<{ id: string; name: string; price: number; quantity: number }> | null;
 };
 
@@ -57,7 +58,7 @@ export default async function AdminOrdersPage() {
           <div>
             <p className="text-[10px] font-bold tracking-[.2em] text-black/45">VERDANT ADMIN</p>
             <h1 className="mt-3 text-5xl font-semibold tracking-[-.055em] sm:text-6xl">Orders <em className="font-serif font-normal">at a glance.</em></h1>
-            <p className="mt-4 max-w-xl text-sm leading-6 text-black/55">Review paid orders, customer details, payment IDs and what needs to ship next.</p>
+            <p className="mt-4 max-w-xl text-sm leading-6 text-black/55">Review payments, customer details, order status and what needs to ship next.</p>
           </div>
           <div className="rounded-2xl border border-black/10 bg-white/50 px-4 py-3 text-sm"><span className="font-bold">{orders.length}</span> total orders</div>
         </div>
@@ -71,7 +72,7 @@ export default async function AdminOrdersPage() {
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Stat label="Total orders" value={orders.length.toLocaleString("en-IN")} />
           <Stat label="Paid orders" value={paidOrders.length.toLocaleString("en-IN")} />
-          <Stat label="Pending" value={pendingOrders.length.toLocaleString("en-IN")} />
+          <Stat label="Pending payment" value={pendingOrders.length.toLocaleString("en-IN")} />
           <Stat label="Paid revenue" value={`₹${revenue.toLocaleString("en-IN")}`} />
         </div>
 
