@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "node:crypto";
-import { isSupabaseConfigured, supabaseUpdate } from "@/lib/supabase-admin";
+import { isSupabaseConfigured, supabaseSelect, supabaseUpdate } from "@/lib/supabase-admin";
+import { sendOrderConfirmationEmail } from "@/lib/order-notifications";
 
 export async function POST(request: Request) {
   const secret = process.env.RAZORPAY_KEY_SECRET;
@@ -35,7 +36,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ verified: false, error: "Invalid payment signature." }, { status: 400 });
     }
 
+    let confirmation = null;
+
     if (isSupabaseConfigured()) {
+      const existing = await supabaseSelect(
+        "orders",
+        `select=*&order_id=eq.${encodeURIComponent(orderId)}&limit=1`,
+      );
+
+      if (!existing.response?.ok) {
+        return NextResponse.json(
+          { verified: true, orderSaved: false, error: "Payment verified, but the order could not be loaded." },
+          { status: 500 },
+        );
+      }
+
+      const order = Array.isArray(existing.data) ? existing.data[0] : null;
+      if (!order) {
+        return NextResponse.json(
+          { verified: true, orderSaved: false, error: "Payment verified, but the order record was not found." },
+          { status: 500 },
+        );
+      }
+
+      const wasAlreadyPaid = order.payment_status === "paid";
+
       const result = await supabaseUpdate(
         "orders",
         `order_id=eq.${encodeURIComponent(orderId)}`,
@@ -52,9 +77,24 @@ export async function POST(request: Request) {
           { status: 500 },
         );
       }
+
+      if (!wasAlreadyPaid) {
+        confirmation = await sendOrderConfirmationEmail({
+          order_id: order.order_id ?? orderId,
+          payment_id: paymentId,
+          customer_name: order.customer_name ?? null,
+          email: order.email ?? null,
+          phone: order.phone ?? null,
+          amount: order.amount ?? null,
+        });
+      }
     }
 
-    return NextResponse.json({ verified: true, orderSaved: isSupabaseConfigured() });
+    return NextResponse.json({
+      verified: true,
+      orderSaved: isSupabaseConfigured(),
+      confirmation,
+    });
   } catch {
     return NextResponse.json({ error: "Unable to verify payment." }, { status: 500 });
   }
