@@ -101,7 +101,8 @@ export default function OrderConfirmationPage() {
               <Step active={status === "shipped" || status === "delivered"} title="Shipped" text="You'll receive an email when it is on the way." />
               <Step active={status === "delivered"} title="Delivered" text="Enjoy your new piece of green." />
             </div>
-            <Link href="/shop" className="mt-7 inline-flex w-full items-center justify-center rounded-full bg-[#ddf27a] px-6 py-3 text-sm font-bold text-[#101510]">Continue shopping</Link>
+            <Link href={`/order-tracking?order=${encodeURIComponent(order.order_id)}&payment=${encodeURIComponent(order.payment_id)}`} className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-white/15 px-6 py-3 text-sm font-bold text-[#f4f5e9] hover:bg-white/5">Track this order</Link>
+            <Link href="/shop" className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-[#ddf27a] px-6 py-3 text-sm font-bold text-[#101510]">Continue shopping</Link>
           </aside>
         </div>
       </section>
