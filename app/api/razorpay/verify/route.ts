@@ -42,6 +42,7 @@ export async function POST(request: Request) {
         {
           payment_id: paymentId,
           payment_status: "paid",
+          order_status: "paid",
         },
       );
 
