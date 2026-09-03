@@ -15,12 +15,12 @@ export type Product = {
   tone: "moss" | "sage" | "lime";
   stock: number;
   active: boolean;
+  image_url?: string | null;
+  image_urls?: string[];
 };
 
 export async function getProducts(includeInactive = false) {
-  const query = includeInactive
-    ? "select=*&order=created_at.asc"
-    : "select=*&active=eq.true&order=created_at.asc";
+  const query = includeInactive ? "select=*&order=created_at.asc" : "select=*&active=eq.true&order=created_at.asc";
   const result = await supabaseSelect("products", query);
   if (!result.configured || !result.response?.ok || !Array.isArray(result.data)) return [] as Product[];
   return result.data as Product[];
