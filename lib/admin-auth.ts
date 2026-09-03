@@ -30,6 +30,10 @@ export function isValidAdminToken(token: string | undefined) {
   return a.length === b.length && crypto.timingSafeEqual(a, b) && value === "authenticated";
 }
 
+export function verifyAdminToken(token: string | undefined) {
+  return isValidAdminToken(token);
+}
+
 export function adminCookieName() {
   return COOKIE_NAME;
 }
