@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
+import TrackingProgress from "./tracking-progress";
 
 type Item = { id: string; name: string; price: number; quantity: number };
 type Order = {
@@ -15,9 +16,7 @@ type Order = {
   items: Item[] | null;
 };
 
-const statuses = ["paid", "packed", "shipped", "delivered"] as const;
-
-type OrderStatus = (typeof statuses)[number];
+type OrderStatus = "awaiting_payment" | "paid" | "packed" | "shipped" | "delivered" | "cancelled";
 
 export default function OrderTrackingPage() {
   const [orderId, setOrderId] = useState("");
@@ -83,7 +82,7 @@ export default function OrderTrackingPage() {
           <div className="grid gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
             <label className="text-sm">Order ID<input value={orderId} onChange={(event) => setOrderId(event.target.value)} placeholder="order_…" className="mt-2 h-12 w-full rounded-2xl border border-black/10 bg-[#f4f5e9] px-4 outline-none focus:border-black/25" /></label>
             <label className="text-sm">Payment ID<input value={paymentId} onChange={(event) => setPaymentId(event.target.value)} placeholder="pay_…" className="mt-2 h-12 w-full rounded-2xl border border-black/10 bg-[#f4f5e9] px-4 outline-none focus:border-black/25" /></label>
-            <button disabled={loading} className="h-12 rounded-full bg-[#202d20] px-6 text-sm font-bold text-[#f4f5e9] disabled:opacity-60">{loading ? "Checking…" : "Track order"}</button>
+            <button type="submit" disabled={loading} className="h-12 rounded-full bg-[#202d20] px-6 text-sm font-bold text-[#f4f5e9] disabled:opacity-60">{loading ? "Checking…" : "Track order"}</button>
           </div>
           {error && <p role="alert" className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-800">{error}</p>}
         </form>
@@ -95,8 +94,7 @@ export default function OrderTrackingPage() {
 }
 
 function TrackingResult({ order }: { order: Order }) {
-  const rawStatus = order.payment_status === "paid" ? order.order_status || "paid" : "awaiting_payment";
-  const statusIndex = rawStatus === "awaiting_payment" ? -1 : Math.max(0, statuses.indexOf(rawStatus as OrderStatus));
+  const rawStatus: OrderStatus = order.payment_status === "paid" ? (order.order_status as OrderStatus) || "paid" : "awaiting_payment";
   const statusLabel = rawStatus.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
   const items = Array.isArray(order.items) ? order.items : [];
 
@@ -112,12 +110,7 @@ function TrackingResult({ order }: { order: Order }) {
           <div className="rounded-full bg-white/10 px-4 py-2 text-sm font-bold capitalize">{statusLabel}</div>
         </div>
 
-        <div className="mt-9 grid gap-3 sm:grid-cols-4">
-          {statuses.map((status, index) => {
-            const complete = statusIndex >= index;
-            return <div key={status} className={`rounded-2xl p-4 ${complete ? "bg-[#ddf27a] text-[#101510]" : "bg-white/5 text-white/40"}`}><p className="text-xs font-bold">{complete ? "✓" : "0"}</p><p className="mt-2 text-sm font-semibold capitalize">{status}</p></div>;
-          })}
-        </div>
+        <TrackingProgress status={rawStatus} />
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[1fr_.65fr]">
