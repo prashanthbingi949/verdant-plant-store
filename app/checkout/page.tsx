@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/components/cart-provider";
 
 type RazorpaySuccess = {
@@ -52,10 +53,10 @@ async function loadRazorpay(): Promise<boolean> {
 }
 
 export default function CheckoutPage() {
+  const router = useRouter();
   const { items, subtotal, delivery, total, clearCart } = useCart();
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState<RazorpaySuccess | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -97,9 +98,7 @@ export default function CheckoutPage() {
       });
 
       const orderData = await orderResponse.json();
-      if (!orderResponse.ok) {
-        throw new Error(orderData.error || "Unable to create the Razorpay order.");
-      }
+      if (!orderResponse.ok) throw new Error(orderData.error || "Unable to create the Razorpay order.");
 
       const key = orderData.key as string | undefined;
       if (!key) throw new Error("Razorpay Key ID is not configured on the server.");
@@ -113,41 +112,28 @@ export default function CheckoutPage() {
         description: "Verdant plant order",
         order_id: orderData.orderId,
         prefill: { name: `${firstName} ${lastName}`.trim(), email, contact: phone },
-        notes: {
-          address,
-          city,
-          state,
-          pin,
-          receipt: orderData.receipt,
-        },
+        notes: { address, city, state, pin, receipt: orderData.receipt },
         theme: { color: "#202d20" },
         handler: async (response) => {
           try {
             const verifyResponse = await fetch("/api/razorpay/verify", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                ...response,
-                order_id: orderData.orderId,
-              }),
+              body: JSON.stringify({ ...response, order_id: orderData.orderId }),
             });
 
             const verifyData = await verifyResponse.json();
-            if (!verifyResponse.ok || !verifyData.verified) {
-              throw new Error(verifyData.error || "Payment verification failed.");
-            }
+            if (!verifyResponse.ok || !verifyData.verified) throw new Error(verifyData.error || "Payment verification failed.");
 
             clearCart();
-            setSuccess(response);
+            router.replace(`/order-confirmation?order=${encodeURIComponent(response.razorpay_order_id)}&payment=${encodeURIComponent(response.razorpay_payment_id)}`);
           } catch (verificationError) {
             setError(verificationError instanceof Error ? verificationError.message : "Payment verification failed.");
           } finally {
             setProcessing(false);
           }
         },
-        modal: {
-          ondismiss: () => setProcessing(false),
-        },
+        modal: { ondismiss: () => setProcessing(false) },
       });
 
       razorpay.open();
@@ -157,18 +143,12 @@ export default function CheckoutPage() {
     }
   }
 
-  if (items.length === 0 && !success) {
+  if (items.length === 0) {
     return (
       <main className="min-h-screen bg-[#f4f5e9] text-[#101510]">
         <header className="border-b border-black/10 px-5 py-4 sm:px-8"><div className="mx-auto flex max-w-7xl items-center justify-between"><Link href="/" className="text-sm font-extrabold tracking-[.14em]">VERDANT</Link><Link href="/shop" className="rounded-full bg-[#ddf27a] px-4 py-2 text-sm font-bold">Browse plants</Link></div></header>
         <section className="mx-auto max-w-xl px-5 py-28 text-center sm:px-8"><p className="text-[10px] font-bold tracking-[.2em] text-black/45">CHECKOUT</p><h1 className="mt-4 text-5xl font-semibold tracking-[-.055em] sm:text-6xl">Your bag is empty.</h1><p className="mt-5 text-sm leading-7 text-black/55">Add a plant before heading to checkout.</p><Link href="/shop" className="mt-8 inline-flex rounded-full bg-[#202d20] px-7 py-3 text-sm font-bold text-[#f4f5e9]">Continue shopping</Link></section>
       </main>
-    );
-  }
-
-  if (success) {
-    return (
-      <main className="min-h-screen bg-[#f4f5e9] text-[#101510]"><section className="mx-auto max-w-2xl px-5 py-24 text-center sm:px-8"><div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#ddf27a] text-2xl">✓</div><p className="mt-7 text-[10px] font-bold tracking-[.2em] text-black/45">PAYMENT SUCCESSFUL</p><h1 className="mt-4 text-5xl font-semibold tracking-[-.055em]">Thank you.</h1><p className="mx-auto mt-5 max-w-lg text-sm leading-7 text-black/55">Your payment has been verified successfully. Keep these details for your records.</p><div className="mx-auto mt-8 max-w-md rounded-3xl border border-black/10 bg-white/50 p-6 text-left text-sm"><div className="flex justify-between gap-4 py-2"><span className="text-black/45">Order ID</span><span className="break-all font-semibold">{success.razorpay_order_id}</span></div><div className="flex justify-between gap-4 py-2"><span className="text-black/45">Payment ID</span><span className="break-all font-semibold">{success.razorpay_payment_id}</span></div></div><Link href="/shop" className="mt-8 inline-flex rounded-full bg-[#202d20] px-7 py-3 text-sm font-bold text-[#f4f5e9]">Continue shopping</Link></section></main>
     );
   }
 
