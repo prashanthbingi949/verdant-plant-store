@@ -96,6 +96,7 @@ export async function POST(request: Request) {
         pincode: String(customer?.pin ?? "").trim() || null,
         amount: total,
         payment_status: "created",
+        order_status: "awaiting_payment",
         items: lineItems,
       });
 
