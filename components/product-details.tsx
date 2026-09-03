@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useCart } from "@/components/cart-provider";
 
 type Product = {
   name: string;
@@ -42,10 +43,23 @@ function PlantRender({ tone, large = false }: { tone: Product["tone"]; large?: b
 }
 
 export default function ProductDetails({ product }: { product: Product }) {
+  const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
-  const [added, setAdded] = useState(false);
   const [activeTab, setActiveTab] = useState<"about" | "care">("about");
+  const [added, setAdded] = useState(false);
   const total = useMemo(() => product.price * quantity, [product.price, quantity]);
+
+  const handleAdd = () => {
+    addItem({
+      id: product.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+      name: product.name,
+      price: product.price,
+      tone: product.tone,
+      size: product.size,
+      category: product.category,
+    }, quantity);
+    setAdded(true);
+  };
 
   return (
     <main className="min-h-screen bg-[#f4f5e9] text-[#101510]">
@@ -53,7 +67,7 @@ export default function ProductDetails({ product }: { product: Product }) {
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <Link href="/" className="text-sm font-extrabold tracking-[.14em]">VERDANT</Link>
           <nav className="hidden items-center gap-6 text-sm md:flex"><Link href="/" className="opacity-70 hover:opacity-100">Home</Link><Link href="/shop" className="font-semibold">Shop</Link><Link href="/#care" className="opacity-70 hover:opacity-100">Plant care</Link></nav>
-          <Link href="/shop" className="rounded-full bg-[#ddf27a] px-4 py-2 text-sm font-bold">Back to plants</Link>
+          <Link href="/cart" className="rounded-full bg-[#ddf27a] px-4 py-2 text-sm font-bold">View bag</Link>
         </div>
       </header>
 
@@ -67,7 +81,7 @@ export default function ProductDetails({ product }: { product: Product }) {
           <div className="mt-9 flex items-end gap-4"><strong className="text-3xl tracking-[-.04em]">₹{product.price.toLocaleString("en-IN")}</strong><span className="pb-1 text-xs text-black/45">taxes calculated at checkout</span></div>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <div className="flex h-12 w-fit items-center rounded-full border border-black/12 bg-white/45 p-1"><button onClick={() => setQuantity((value) => Math.max(1, value - 1))} className="h-10 w-10 rounded-full text-lg">−</button><span className="w-8 text-center text-sm font-bold">{quantity}</span><button onClick={() => setQuantity((value) => value + 1)} className="h-10 w-10 rounded-full text-lg">+</button></div>
-            <button onClick={() => setAdded(true)} className="flex h-12 flex-1 items-center justify-center rounded-full bg-[#202d20] px-6 text-sm font-bold text-[#f4f5e9] transition hover:translate-y-[-1px]">{added ? `Added · ₹${total.toLocaleString("en-IN")}` : "Add to bag"}</button>
+            <button onClick={handleAdd} className="flex h-12 flex-1 items-center justify-center rounded-full bg-[#202d20] px-6 text-sm font-bold text-[#f4f5e9] transition hover:translate-y-[-1px]">{added ? `Added · ₹${total.toLocaleString("en-IN")}` : "Add to bag"}</button>
           </div>
           <div className="mt-12 border-t border-black/10">
             <div className="flex gap-7 border-b border-black/10"><button onClick={() => setActiveTab("about")} className={`py-4 text-sm font-bold ${activeTab === "about" ? "border-b-2 border-[#202d20]" : "text-black/45"}`}>About</button><button onClick={() => setActiveTab("care")} className={`py-4 text-sm font-bold ${activeTab === "care" ? "border-b-2 border-[#202d20]" : "text-black/45"}`}>Plant care</button></div>
