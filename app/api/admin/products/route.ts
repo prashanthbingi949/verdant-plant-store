@@ -34,6 +34,8 @@ export async function POST(request: Request) {
 
 function normalizeProduct(body: Record<string, unknown>, slug: string) {
   const details = Array.isArray(body.details) ? body.details : [];
+  const imageUrls = Array.isArray(body.image_urls) ? body.image_urls.filter((value: unknown) => typeof value === "string").slice(0, 8) : [];
+  const imageUrl = typeof body.image_url === "string" ? body.image_url.trim() || null : imageUrls[0] || null;
   return {
     slug,
     name: String(body.name || "New Plant").trim(),
@@ -46,6 +48,8 @@ function normalizeProduct(body: Record<string, unknown>, slug: string) {
     tone: ["moss", "sage", "lime"].includes(String(body.tone)) ? String(body.tone) : "moss",
     stock: Math.max(0, Math.round(Number(body.stock) || 0)),
     active: body.active !== false,
+    image_url: imageUrl,
+    image_urls: imageUrls,
   };
 }
 
