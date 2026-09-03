@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./responsive.css";
+import { CartProvider } from "@/components/cart-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,7 +16,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Verdant — Plants, Pots & Garden Life",
-  description: "Thoughtful plants and beautiful objects for spaces that feel more alive.",
+  description:
+    "Thoughtful plants and beautiful objects for spaces that feel more alive.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -24,7 +26,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <CartProvider>{children}</CartProvider>
+      </body>
     </html>
   );
 }
