@@ -2,6 +2,18 @@ import { NextResponse } from "next/server";
 import { isSupabaseConfigured, supabaseInsert } from "@/lib/supabase-admin";
 import { getProductBySlug } from "@/lib/products";
 
+function validEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function validPhone(value: string) {
+  return /^\+?[0-9\s()-]{10,15}$/.test(value);
+}
+
+function validPin(value: string) {
+  return /^\d{6}$/.test(value);
+}
+
 export async function POST(request: Request) {
   const keyId = process.env.RAZORPAY_KEY_ID;
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -14,6 +26,22 @@ export async function POST(request: Request) {
     const customer = body?.customer ?? {};
     if (rawItems.length === 0) return NextResponse.json({ error: "Your cart is empty." }, { status: 400 });
     if (!isSupabaseConfigured()) return NextResponse.json({ error: "Product catalog is not configured." }, { status: 500 });
+
+    const customerName = String(customer?.name ?? "").trim();
+    const email = String(customer?.email ?? "").trim();
+    const phone = String(customer?.phone ?? "").trim();
+    const address = String(customer?.address ?? "").trim();
+    const city = String(customer?.city ?? "").trim();
+    const state = String(customer?.state ?? "").trim();
+    const pin = String(customer?.pin ?? "").trim();
+
+    if (!customerName || customerName.length > 120) return NextResponse.json({ error: "Please enter a valid name." }, { status: 400 });
+    if (!validEmail(email) || email.length > 254) return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
+    if (!validPhone(phone)) return NextResponse.json({ error: "Please enter a valid phone number." }, { status: 400 });
+    if (!address || address.length > 300) return NextResponse.json({ error: "Please enter a valid delivery address." }, { status: 400 });
+    if (!city || city.length > 100) return NextResponse.json({ error: "Please enter a valid city." }, { status: 400 });
+    if (!state || state.length > 100) return NextResponse.json({ error: "Please enter a valid state." }, { status: 400 });
+    if (!validPin(pin)) return NextResponse.json({ error: "Please enter a valid 6-digit PIN code." }, { status: 400 });
 
     let subtotal = 0;
     const lineItems: Array<{ id: string; quantity: number; name: string; price: number }> = [];
@@ -51,13 +79,13 @@ export async function POST(request: Request) {
     const result = await supabaseInsert("orders", {
       order_id: orderId,
       payment_id: null,
-      customer_name: String(customer?.name ?? "").trim() || null,
-      email: String(customer?.email ?? "").trim() || null,
-      phone: String(customer?.phone ?? "").trim() || null,
-      address: String(customer?.address ?? "").trim() || null,
-      city: String(customer?.city ?? "").trim() || null,
-      state: String(customer?.state ?? "").trim() || null,
-      pincode: String(customer?.pin ?? "").trim() || null,
+      customer_name: customerName || null,
+      email: email || null,
+      phone: phone || null,
+      address: address || null,
+      city: city || null,
+      state: state || null,
+      pincode: pin || null,
       amount: total,
       payment_status: "created",
       order_status: "awaiting_payment",
