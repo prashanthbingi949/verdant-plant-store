@@ -18,3 +18,4 @@ as $$
 $$;
 
 revoke all on function public.decrement_product_stock(text, integer) from public;
+grant execute on function public.decrement_product_stock(text, integer) to service_role;
