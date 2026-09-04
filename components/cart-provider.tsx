@@ -10,6 +10,7 @@ export type CartItem = {
   tone: "moss" | "sage" | "lime";
   size: string;
   category: string;
+  image_url?: string | null;
 };
 
 type CartContextValue = {
@@ -58,7 +59,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           const existing = current.find((entry) => entry.id === item.id);
           if (existing) {
             return current.map((entry) =>
-              entry.id === item.id ? { ...entry, quantity: entry.quantity + quantity } : entry,
+              entry.id === item.id ? { ...entry, ...item, quantity: entry.quantity + quantity } : entry,
             );
           }
           return [...current, { ...item, quantity }];
