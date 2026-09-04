@@ -31,11 +31,7 @@ function sessionExpiry() {
 }
 
 export async function createCustomer(name: string, email: string, password: string) {
-  const result = await supabaseInsert("customers", {
-    name,
-    email: email.toLowerCase(),
-    password_hash: hashPassword(password),
-  });
+  const result = await supabaseInsert("customers", { name, email: email.toLowerCase(), password_hash: hashPassword(password) });
   if (!result.response?.ok) return { ok: false, error: result.data?.message || "Unable to create your account." };
   const customer = Array.isArray(result.data) ? result.data[0] : null;
   if (!customer?.id) return { ok: false, error: "Unable to create your account." };
@@ -56,21 +52,10 @@ export async function verifyCustomerPassword(email: string, password: string) {
 
 export async function startCustomerSession(customerId: string) {
   const token = crypto.randomBytes(32).toString("base64url");
-  const result = await supabaseInsert("customer_sessions", {
-    customer_id: customerId,
-    token_hash: hashToken(token),
-    expires_at: sessionExpiry(),
-  });
+  const result = await supabaseInsert("customer_sessions", { customer_id: customerId, token_hash: hashToken(token), expires_at: sessionExpiry() });
   if (!result.response?.ok) return false;
-
   const cookieStore = await cookies();
-  cookieStore.set(COOKIE_NAME, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: SESSION_DAYS * 24 * 60 * 60,
-  });
+  cookieStore.set(COOKIE_NAME, token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: SESSION_DAYS * 24 * 60 * 60 });
   return true;
 }
 
@@ -79,38 +64,22 @@ export async function getCurrentCustomer() {
   const token = cookieStore.get(COOKIE_NAME)?.value;
   if (!token) return null;
 
-  const result = await supabaseSelect(
-    "customer_sessions",
-    `select=customer_id,expires_at&token_hash=eq.${hashToken(token)}&limit=1`,
-  );
-  const session = Array.isArray(result.data) ? result.data[0] : null;
-  if (!session?.customer_id || !session.expires_at || new Date(session.expires_at) <= new Date()) {
-    return null;
-  }
+  const sessionResult = await supabaseSelect("customer_sessions", `select=customer_id,expires_at&token_hash=eq.${hashToken(token)}&limit=1`);
+  const session = Array.isArray(sessionResult.data) ? sessionResult.data[0] : null;
+  if (!session?.customer_id || !session.expires_at || new Date(session.expires_at) <= new Date()) return null;
 
-  const customerResult = await supabaseSelect(
-    "customers",
-    `select=id,name,email,created_at& id=eq.${encodeURIComponent(String(session.customer_id))}&limit=1`.replace("& id", "&id"),
-  );
-  return Array.isArray(customerResult.data) ? customerResult.data[0] ?? null : null;
-}
+  const customerResult = await supabaseSelect("customers", `select=id,name,email,phone,address,city,state,pincode,created_at&customer_id=eq.${encodeURIComponent(String(session.customer_id))}&limit=1`);
+  const badCustomerQuery = !customerResult.response?.ok && customerResult.data;
+  if (badCustomerQuery) return null;
+  if (Array.isArray(customerResult.data) && customerResult.data[0]) return customerResult.data[0];
 
-export async function getCurrentCustomerId() {
-  const customer = await getCurrentCustomer();
-  return customer?.id ? String(customer.id) : null;
+  const fallback = await supabaseSelect("customers", `select=id,name,email,phone,address,city,state,pincode,created_at&id=eq.${encodeURIComponent(String(session.customer_id))}&limit=1`);
+  return Array.isArray(fallback.data) ? fallback.data[0] ?? null : null;
 }
 
 export async function clearCustomerSession() {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
-  if (token) {
-    await supabaseRest(`/rest/v1/customer_sessions?token_hash=eq.${hashToken(token)}`, { method: "DELETE" });
-  }
-  cookieStore.set(COOKIE_NAME, "", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 0,
-  });
+  if (token) await supabaseRest(`/rest/v1/customer_sessions?token_hash=eq.${hashToken(token)}`, { method: "DELETE" });
+  cookieStore.set(COOKIE_NAME, "", { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 0 });
 }
