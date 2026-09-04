@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 const BG_IMAGE_1 =
@@ -66,9 +67,7 @@ export default function VerdantSpotlightHero() {
     const tick = () => {
       smooth.current.x += (mouse.current.x - smooth.current.x) * 0.1;
       smooth.current.y += (mouse.current.y - smooth.current.y) * 0.1;
-      if (smooth.current.x > -500 && smooth.current.y > -500) {
-        setSpotlight(smooth.current.x, smooth.current.y);
-      }
+      if (smooth.current.x > -500 && smooth.current.y > -500) setSpotlight(smooth.current.x, smooth.current.y);
       rafRef.current = requestAnimationFrame(tick);
     };
 
@@ -82,75 +81,45 @@ export default function VerdantSpotlightHero() {
   }, []);
 
   return (
-    <section
-      ref={heroRef}
-      className="verdant-spotlight relative w-full overflow-hidden bg-black h-screen"
-      style={{
-        height: "100dvh",
-        minHeight: "560px",
-        fontFamily: "Inter, Arial, sans-serif",
-      }}
-    >
-      <div
-        className="absolute inset-0 z-10 bg-center bg-cover bg-no-repeat hero-zoom"
-        style={{ backgroundImage: `url(${BG_IMAGE_1})` }}
-      />
+    <section ref={heroRef} className="verdant-spotlight relative w-full overflow-hidden bg-black h-screen" style={{ height: "100dvh", minHeight: "560px", fontFamily: "Inter, Arial, sans-serif" }}>
+      <div className="absolute inset-0 z-10 bg-center bg-cover bg-no-repeat hero-zoom" style={{ backgroundImage: `url(${BG_IMAGE_1})` }} />
       <div className="absolute inset-0 z-[12] bg-gradient-to-b from-black/30 via-black/5 to-black/45 pointer-events-none" />
-      <div
-        ref={revealRef}
-        className="absolute inset-0 z-30 bg-center bg-cover bg-no-repeat pointer-events-none"
-        style={{
-          backgroundImage: `url(${BG_IMAGE_2})`,
-          maskSize: "100% 100%",
-          WebkitMaskSize: "100% 100%",
-        }}
-      />
+      <div ref={revealRef} className="absolute inset-0 z-30 bg-center bg-cover bg-no-repeat pointer-events-none" style={{ backgroundImage: `url(${BG_IMAGE_2})`, maskSize: "100% 100%", WebkitMaskSize: "100% 100%" }} />
 
       <nav className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between p-4 sm:p-5 text-white">
-        <a href="#top" className="flex items-center gap-2.5">
-          <LogoMark />
-          <span className="text-xl sm:text-2xl italic" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>Verdant</span>
-        </a>
+        <Link href="/" className="flex items-center gap-2.5"><LogoMark /><span className="text-xl sm:text-2xl italic" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>Verdant</span></Link>
 
         <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 bg-white/15 backdrop-blur-md border border-white/25 rounded-full px-2 py-2 items-center gap-1 shadow-2xl">
-          <a href="#shop" className="bg-white text-gray-900 px-4 py-1.5 rounded-full text-sm font-medium">Shop</a>
+          <Link href="/shop" className="bg-white text-gray-900 px-4 py-1.5 rounded-full text-sm font-medium">Shop</Link>
           <a href="#collections" className="text-white/80 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-white/20 hover:text-white transition-colors">Collections</a>
           <a href="#care" className="text-white/80 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-white/20 hover:text-white transition-colors">Plant Care</a>
           <a href="#story" className="text-white/80 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-white/20 hover:text-white transition-colors">Our Story</a>
-          <a href="#account" className="text-white/80 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-white/20 hover:text-white transition-colors">Journal</a>
+          <a href="#care" className="text-white/80 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-white/20 hover:text-white transition-colors">Journal</a>
         </div>
 
-        <a href="#account" className="hidden md:block bg-white text-gray-900 text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-gray-100 transition-colors">Sign Up</a>
-        <button onClick={() => setMenuOpen((open) => !open)} className="md:hidden w-10 h-10 grid place-items-center rounded-full bg-white/15 backdrop-blur-md border border-white/20" aria-label={menuOpen ? "Close menu" : "Open menu"}>
-          <MenuIcon open={menuOpen} />
-        </button>
+        <a href="#newsletter" className="hidden md:block bg-white text-gray-900 text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-gray-100 transition-colors">Sign Up</a>
+        <button onClick={() => setMenuOpen((open) => !open)} className="md:hidden w-10 h-10 grid place-items-center rounded-full bg-white/15 backdrop-blur-md border border-white/20" aria-label={menuOpen ? "Close menu" : "Open menu"}><MenuIcon open={menuOpen} /></button>
       </nav>
 
       {menuOpen && (
         <div className="fixed top-[76px] left-4 right-4 z-[95] md:hidden rounded-3xl border border-white/20 bg-black/65 backdrop-blur-xl p-3 text-white shadow-2xl">
-          {["Shop", "Collections", "Plant Care", "Our Story", "Journal"].map((label) => {
-            const href = label === "Shop" ? "#shop" : label === "Collections" ? "#collections" : label === "Plant Care" ? "#care" : label === "Our Story" ? "#story" : "#account";
-            return <a key={label} href={href} onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 text-base text-white/90 hover:bg-white/10">{label}</a>;
-          })}
+          <Link href="/shop" onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 text-base text-white/90 hover:bg-white/10">Shop</Link>
+          <a href="#collections" onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 text-base text-white/90 hover:bg-white/10">Collections</a>
+          <a href="#care" onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 text-base text-white/90 hover:bg-white/10">Plant Care</a>
+          <a href="#story" onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 text-base text-white/90 hover:bg-white/10">Our Story</a>
+          <a href="#care" onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 text-base text-white/90 hover:bg-white/10">Journal</a>
         </div>
       )}
 
       <div className="absolute top-[14%] left-0 right-0 z-50 flex flex-col items-center text-center px-5 pointer-events-none">
-        <h1 className="text-white leading-[0.95] max-w-5xl">
-          <span className="block italic font-normal text-5xl sm:text-7xl md:text-8xl hero-anim hero-reveal" style={{ animationDelay: "0.25s", letterSpacing: "-0.05em", fontFamily: "Georgia, 'Times New Roman', serif" }}>Grow something</span>
-          <span className="block font-normal text-5xl sm:text-7xl md:text-8xl -mt-1 hero-anim hero-reveal" style={{ animationDelay: "0.42s", letterSpacing: "-0.08em" }}>worth keeping.</span>
-        </h1>
+        <h1 className="text-white leading-[0.95] max-w-5xl"><span className="block italic font-normal text-5xl sm:text-7xl md:text-8xl hero-anim hero-reveal" style={{ animationDelay: "0.25s", letterSpacing: "-0.05em", fontFamily: "Georgia, 'Times New Roman', serif" }}>Grow something</span><span className="block font-normal text-5xl sm:text-7xl md:text-8xl -mt-1 hero-anim hero-reveal" style={{ animationDelay: "0.42s", letterSpacing: "-0.08em" }}>worth keeping.</span></h1>
       </div>
 
-      <div className="hidden sm:block absolute bottom-14 left-10 md:left-14 z-50 max-w-[270px] hero-anim hero-fade" style={{ animationDelay: "0.7s" }}>
-        <p className="text-sm text-white/80 leading-relaxed">Bring a little life indoors. Thoughtfully selected plants, pots, and everyday rituals for spaces that feel calm, warm, and alive.</p>
-      </div>
+      <div className="hidden sm:block absolute bottom-14 left-10 md:left-14 z-50 max-w-[270px] hero-anim hero-fade" style={{ animationDelay: "0.7s" }}><p className="text-sm text-white/80 leading-relaxed">Bring a little life indoors. Thoughtfully selected plants, pots, and everyday rituals for spaces that feel calm, warm, and alive.</p></div>
 
       <div className="absolute bottom-10 sm:bottom-24 left-5 right-5 sm:left-auto sm:right-10 md:right-14 z-50 max-w-full sm:max-w-[290px] flex flex-col items-start gap-4 sm:gap-5 hero-anim hero-fade" style={{ animationDelay: "0.85s" }}>
         <p className="text-xs sm:text-sm text-white/80 leading-relaxed">Move your cursor across the garden to reveal another layer of the world — a small, tactile moment designed to make the store feel alive.</p>
-        <a href="#shop" className="bg-[#ddf27a] hover:bg-[#c9e55f] text-[#101510] text-sm font-medium px-7 py-3 rounded-full transition-all hover:scale-[1.03] active:scale-95 hover:shadow-lg hover:shadow-lime-300/20 inline-flex items-center gap-2 pointer-events-auto">
-          Explore plants <ArrowIcon />
-        </a>
+        <Link href="/shop" className="bg-[#ddf27a] hover:bg-[#c9e55f] text-[#101510] text-sm font-medium px-7 py-3 rounded-full transition-all hover:scale-[1.03] active:scale-95 hover:shadow-lg hover:shadow-lime-300/20 inline-flex items-center gap-2 pointer-events-auto">Explore plants <ArrowIcon /></Link>
       </div>
     </section>
   );
