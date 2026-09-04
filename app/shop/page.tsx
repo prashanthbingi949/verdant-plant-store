@@ -20,7 +20,7 @@ const fallbackProducts: Product[] = [
 function PlantIllustration({ tone, imageUrl, name }: { tone: string; imageUrl?: string | null; name: string }) {
   const palette: Record<string, [string, string, string]> = { moss: ["#5d7d45", "#78945b", "#b7b09e"], sage: ["#6f8d63", "#9eaf8e", "#d0cab7"], lime: ["#8ea64d", "#b6ca5e", "#c5bfad"] };
   const [a, b, pot] = palette[tone] ?? palette.moss;
-  if (imageUrl) return <img src={imageUrl} alt={name} className="h-full w-full object-cover" />;
+  if (imageUrl) return <img src={imageUrl} alt={name} className="h-full w-full object-contain p-3 sm:p-5" />;
   return <svg viewBox="0 0 360 320" className="h-full w-full" aria-hidden="true"><defs><radialGradient id={`glow-${tone}`} cx="50%" cy="38%" r="65%"><stop offset="0" stopColor="#f0f6c5" stopOpacity=".45" /><stop offset="1" stopColor="#f0f6c5" stopOpacity="0" /></radialGradient></defs><rect width="360" height="320" fill={`url(#glow-${tone})`} /><ellipse cx="180" cy="286" rx="82" ry="16" fill="#101510" fillOpacity=".12" /><path d="M180 270V118" stroke="#344a30" strokeWidth="8" strokeLinecap="round" /><path d="M177 175c-56-49-94-45-120-18 19 48 70 67 120 18Z" fill={a} /><path d="M184 151c26-59 68-71 112-56-7 49-47 83-112 56Z" fill={b} /><path d="M178 215c-47-35-81-26-103 4 25 34 61 41 103-4Z" fill={b} fillOpacity=".85" /><path d="M185 224c38-38 75-41 99-20-16 36-52 51-99 20Z" fill={a} fillOpacity=".9" /><path d="M181 116c-7-44 15-76 55-91 19 39 0 72-55 91Z" fill={b} /><path d="M124 274h112l-11 27h-90l-11-27Z" fill={pot} /><ellipse cx="180" cy="274" rx="56" ry="10" fill="#8d8879" fillOpacity=".85" /><ellipse cx="180" cy="272" rx="45" ry="7" fill="#514735" /></svg>;
 }
 
