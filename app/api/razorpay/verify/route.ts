@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "node:crypto";
-import { isSupabaseConfigured, supabaseSelect, supabaseUpdate } from "@/lib/supabase-admin";
+import { isSupabaseConfigured, supabaseRest, supabaseSelect, supabaseUpdate } from "@/lib/supabase-admin";
 import { sendOrderConfirmationEmail } from "@/lib/order-notifications";
-import { getProductBySlug } from "@/lib/products";
 
 export async function POST(request: Request) {
   const secret = process.env.RAZORPAY_KEY_SECRET;
@@ -37,10 +36,18 @@ export async function POST(request: Request) {
         for (const item of orderItems) {
           const slug = typeof item?.id === "string" ? item.id : "";
           const quantity = Number(item?.quantity || 0);
-          if (!slug || quantity < 1) continue;
-          const product = await getProductBySlug(slug);
-          if (product) {
-            await supabaseUpdate("products", `slug=eq.${encodeURIComponent(slug)}`, { stock: Math.max(0, product.stock - quantity), updated_at: new Date().toISOString() });
+          if (!slug || !Number.isInteger(quantity) || quantity < 1) continue;
+
+          const stockResponse = await supabaseRest("/rest/v1/rpc/decrement_product_stock", {
+            method: "POST",
+            body: JSON.stringify({ p_slug: slug, p_quantity: quantity }),
+            headers: { Prefer: "return=representation" },
+          });
+          const stockData = stockResponse ? await stockResponse.json().catch(() => null) : null;
+          const stockUpdated = Boolean(stockResponse?.ok) && stockData !== null && stockData !== undefined && stockData !== false;
+          if (!stockUpdated) {
+            await supabaseUpdate("orders", `order_id=eq.${encodeURIComponent(orderId)}`, { order_status: "inventory_issue" });
+            return NextResponse.json({ verified: true, orderSaved: true, inventoryIssue: true, error: "Payment was verified, but stock could not be reserved. Please contact Verdant support with your order ID." }, { status: 409 });
           }
         }
 
