@@ -50,15 +50,21 @@ export default function CartPage() {
       </header>
 
       <section className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between"><div><p className="text-[10px] font-bold tracking-[.2em] text-black/45">VERDANT BAG</p><h1 className="mt-3 text-5xl font-semibold tracking-[-.055em] sm:text-7xl">Things taking <em className="font-serif font-normal">root.</em></h1></div><button onClick={clearCart} className="self-start text-sm font-semibold text-black/45 underline decoration-black/20 underline-offset-4 hover:text-black">Clear bag</button></div>
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between"><div><p className="text-[10px] font-bold tracking-[.2em] text-black/45">VERDANT BAG</p><h1 className="mt-3 text-5xl font-semibold tracking-[-.055em] sm:text-7xl">Things taking <em className="font-serif font-normal">root.</em></h1></div><button type="button" onClick={clearCart} className="self-start text-sm font-semibold text-black/45 underline decoration-black/20 underline-offset-4 hover:text-black">Clear bag</button></div>
 
         <div className="mt-12 grid gap-10 lg:grid-cols-[1.35fr_.65fr]">
           <div className="space-y-4">
             {items.map((item) => (
               <article key={item.id} className="rounded-[28px] border border-black/10 bg-white/40 p-4 sm:p-5">
                 <div className="flex gap-4 sm:gap-6">
-                  <div className="h-36 w-32 shrink-0 overflow-hidden rounded-2xl bg-[#dde6cf] sm:h-44 sm:w-40"><PlantThumb tone={item.tone} /></div>
-                  <div className="min-w-0 flex-1 py-1"><div className="flex items-start justify-between gap-3"><div><p className="text-[10px] tracking-wide text-black/45">{item.category} · {item.size}</p><h2 className="mt-1 text-xl font-semibold tracking-[-.03em] sm:text-2xl">{item.name}</h2></div><button onClick={() => removeItem(item.id)} className="text-xs text-black/45 hover:text-black" aria-label={`Remove ${item.name}`}>Remove</button></div><p className="mt-2 text-sm text-black/50">₹{item.price.toLocaleString("en-IN")} each</p><div className="mt-6 flex items-center justify-between gap-4"><div className="flex h-10 items-center rounded-full border border-black/10 bg-[#f4f5e9] p-1"><button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="h-8 w-8 rounded-full">−</button><span className="w-7 text-center text-sm font-bold">{item.quantity}</span><button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="h-8 w-8 rounded-full">+</button></div><strong>₹{(item.price * item.quantity).toLocaleString("en-IN")}</strong></div></div>
+                  <div className="flex h-36 w-32 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#dde6cf] sm:h-44 sm:w-40">
+                    {item.image_url ? (
+                      <img src={item.image_url} alt={item.name} className="h-full w-full object-contain p-2" />
+                    ) : (
+                      <PlantThumb tone={item.tone} />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1 py-1"><div className="flex items-start justify-between gap-3"><div><p className="text-[10px] tracking-wide text-black/45">{item.category} · {item.size}</p><h2 className="mt-1 text-xl font-semibold tracking-[-.03em] sm:text-2xl">{item.name}</h2></div><button type="button" onClick={() => removeItem(item.id)} className="text-xs text-black/45 hover:text-black" aria-label={`Remove ${item.name}`}>Remove</button></div><p className="mt-2 text-sm text-black/50">₹{item.price.toLocaleString("en-IN")} each</p><div className="mt-6 flex items-center justify-between gap-4"><div className="flex h-10 items-center rounded-full border border-black/10 bg-[#f4f5e9] p-1"><button type="button" onClick={() => updateQuantity(item.id, item.quantity - 1)} className="h-8 w-8 rounded-full" aria-label={`Decrease ${item.name} quantity`}>−</button><span className="w-7 text-center text-sm font-bold">{item.quantity}</span><button type="button" onClick={() => updateQuantity(item.id, item.quantity + 1)} className="h-8 w-8 rounded-full" aria-label={`Increase ${item.name} quantity`}>+</button></div><strong>₹{(item.price * item.quantity).toLocaleString("en-IN")}</strong></div></div>
                 </div>
               </article>
             ))}
