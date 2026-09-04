@@ -24,6 +24,7 @@ export default function OrderTrackingPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showLookup, setShowLookup] = useState(true);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -31,12 +32,16 @@ export default function OrderTrackingPage() {
     const initialPayment = params.get("payment") || "";
     if (initialOrder) setOrderId(initialOrder);
     if (initialPayment) setPaymentId(initialPayment);
-    if (initialOrder && initialPayment) lookup(initialOrder, initialPayment);
+    if (initialOrder && initialPayment) {
+      setShowLookup(false);
+      lookup(initialOrder, initialPayment);
+    }
   }, []);
 
   async function lookup(currentOrder = orderId.trim(), currentPayment = paymentId.trim()) {
     if (!currentOrder || !currentPayment) {
       setError("Enter both your Order ID and Payment ID.");
+      setShowLookup(true);
       return;
     }
 
@@ -49,9 +54,11 @@ export default function OrderTrackingPage() {
       const data = await response.json().catch(() => null);
       if (!response.ok) throw new Error(data?.error || "We couldn't find that order.");
       setOrder(data.order as Order);
+      setShowLookup(false);
       window.history.replaceState({}, "", `/order-tracking?order=${encodeURIComponent(currentOrder)}&payment=${encodeURIComponent(currentPayment)}`);
     } catch (lookupError) {
       setError(lookupError instanceof Error ? lookupError.message : "Unable to find your order.");
+      setShowLookup(true);
     } finally {
       setLoading(false);
     }
@@ -60,6 +67,15 @@ export default function OrderTrackingPage() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     lookup();
+  }
+
+  function handleTrackAnother() {
+    setOrder(null);
+    setError("");
+    setOrderId("");
+    setPaymentId("");
+    setShowLookup(true);
+    window.history.replaceState({}, "", "/order-tracking");
   }
 
   return (
@@ -78,22 +94,22 @@ export default function OrderTrackingPage() {
           <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-black/55">Enter the Order ID and Payment ID from your confirmation email to see the latest status.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="mx-auto mt-9 rounded-[28px] border border-black/10 bg-white/55 p-5 sm:p-6">
+        {showLookup && <form onSubmit={handleSubmit} className="mx-auto mt-9 rounded-[28px] border border-black/10 bg-white/55 p-5 sm:p-6">
           <div className="grid gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
             <label className="text-sm">Order ID<input value={orderId} onChange={(event) => setOrderId(event.target.value)} placeholder="order_…" className="mt-2 h-12 w-full rounded-2xl border border-black/10 bg-[#f4f5e9] px-4 outline-none focus:border-black/25" /></label>
             <label className="text-sm">Payment ID<input value={paymentId} onChange={(event) => setPaymentId(event.target.value)} placeholder="pay_…" className="mt-2 h-12 w-full rounded-2xl border border-black/10 bg-[#f4f5e9] px-4 outline-none focus:border-black/25" /></label>
             <button type="submit" disabled={loading} className="h-12 rounded-full bg-[#202d20] px-6 text-sm font-bold text-[#f4f5e9] disabled:opacity-60">{loading ? "Checking…" : "Track order"}</button>
           </div>
           {error && <p role="alert" className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-800">{error}</p>}
-        </form>
+        </form>}
 
-        {order && <TrackingResult order={order} />}
+        {order && <TrackingResult order={order} onTrackAnother={handleTrackAnother} />}
       </section>
     </main>
   );
 }
 
-function TrackingResult({ order }: { order: Order }) {
+function TrackingResult({ order, onTrackAnother }: { order: Order; onTrackAnother: () => void }) {
   const rawStatus: OrderStatus = order.payment_status === "paid" ? (order.order_status as OrderStatus) || "paid" : "awaiting_payment";
   const statusLabel = rawStatus.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
   const items = Array.isArray(order.items) ? order.items : [];
@@ -129,6 +145,10 @@ function TrackingResult({ order }: { order: Order }) {
           <p className="mt-1 break-all text-sm text-black/55">{order.email || ""}</p>
           <div className="mt-7 rounded-2xl border border-black/10 bg-black/[.025] p-4 text-sm leading-6 text-black/55">Your status is updated by Verdant as your order moves through packing, shipping and delivery.</div>
         </aside>
+      </div>
+
+      <div className="flex justify-center pt-1">
+        <button type="button" onClick={onTrackAnother} className="rounded-full border border-[#202d20]/30 px-5 py-2.5 text-sm font-bold text-[#202d20] hover:bg-[#202d20] hover:text-[#f4f5e9]">Track another order</button>
       </div>
     </div>
   );
