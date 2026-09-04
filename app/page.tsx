@@ -13,9 +13,9 @@ const collections = [
 ];
 
 const products = [
-  { id: "monstera-deliciosa", name: "Monstera Deliciosa", meta: "Statement plant · 12\\" pot", price: 1899, tone: "moss" as const, size: "12\\" pot", category: "Indoor plants" },
-  { id: "snake-plant", name: "Snake Plant", meta: "Low light · 10\\" pot", price: 899, tone: "sage" as const, size: "10\\" pot", category: "Indoor plants" },
-  { id: "jade-plant", name: "Jade Plant", meta: "Desk friendly · 6\\" pot", price: 649, tone: "lime" as const, size: "6\\" pot", category: "Succulents" },
+  { id: "monstera-deliciosa", name: "Monstera Deliciosa", meta: 'Statement plant · 12" pot', price: 1899, tone: "moss" as const, size: '12" pot', category: "Indoor plants" },
+  { id: "snake-plant", name: "Snake Plant", meta: 'Low light · 10" pot', price: 899, tone: "sage" as const, size: '10" pot', category: "Indoor plants" },
+  { id: "jade-plant", name: "Jade Plant", meta: 'Desk friendly · 6" pot', price: 649, tone: "lime" as const, size: '6" pot', category: "Succulents" },
 ];
 
 function LeafMark({ className = "" }: { className?: string }) {
