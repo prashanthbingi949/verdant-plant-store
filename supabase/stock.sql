@@ -10,36 +10,36 @@ as $$
 declare
   item jsonb;
   affected integer;
-  slug text;
-  quantity integer;
+  v_slug text;
+  v_quantity integer;
 begin
   if jsonb_typeof(p_items) <> 'array' or jsonb_array_length(p_items) = 0 then
     raise exception 'Invalid order items';
   end if;
 
-  -- Lock/update products in a deterministic order to reduce deadlock risk.
+  -- Update products in a deterministic order to reduce deadlock risk.
   for item in
     select value
     from jsonb_array_elements(p_items)
     order by value->>'id'
   loop
-    slug := item->>'id';
-    quantity := (item->>'quantity')::integer;
+    v_slug := item->>'id';
+    v_quantity := (item->>'quantity')::integer;
 
-    if slug is null or slug = '' or quantity is null or quantity < 1 or quantity > 20 then
+    if v_slug is null or v_slug = '' or v_quantity is null or v_quantity < 1 or v_quantity > 20 then
       raise exception 'Invalid order item';
     end if;
 
-    update products
-    set stock = stock - quantity,
+    update public.products
+    set stock = stock - v_quantity,
         updated_at = now()
-    where products.slug = decrement_order_stock.slug
+    where public.products.slug = v_slug
       and active = true
-      and stock >= quantity;
+      and stock >= v_quantity;
 
     get diagnostics affected = row_count;
     if affected <> 1 then
-      raise exception 'Insufficient stock for %', slug;
+      raise exception 'Insufficient stock for %', v_slug;
     end if;
   end loop;
 
