@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import VerdantSpotlightHero from "@/components/verdant-spotlight-hero";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useCart } from "@/components/cart-provider";
 
 const collections = [
   { eyebrow: "01 / EASY CARE", title: "Indoor plants", note: "Calm, green companions for every room." },
@@ -11,9 +13,9 @@ const collections = [
 ];
 
 const products = [
-  { name: "Monstera Deliciosa", meta: "Statement plant · 12\" pot", price: "₹1,899", tone: "moss" },
-  { name: "Snake Plant", meta: "Low light · 10\" pot", price: "₹899", tone: "sage" },
-  { name: "Jade Plant", meta: "Desk friendly · 6\" pot", price: "₹649", tone: "lime" },
+  { id: "monstera-deliciosa", name: "Monstera Deliciosa", meta: "Statement plant · 12\\" pot", price: 1899, tone: "moss" as const, size: "12\\" pot", category: "Indoor plants" },
+  { id: "snake-plant", name: "Snake Plant", meta: "Low light · 10\\" pot", price: 899, tone: "sage" as const, size: "10\\" pot", category: "Indoor plants" },
+  { id: "jade-plant", name: "Jade Plant", meta: "Desk friendly · 6\\" pot", price: 649, tone: "lime" as const, size: "6\\" pot", category: "Succulents" },
 ];
 
 function LeafMark({ className = "" }: { className?: string }) {
@@ -52,10 +54,25 @@ function Icon({ name }: { name: "heart" | "arrow" }) {
 }
 
 export default function Home() {
-  const [cart, setCart] = useState(0);
+  const { addItem } = useCart();
   const [liked, setLiked] = useState<number[]>([]);
+  const [added, setAdded] = useState<number[]>([]);
 
   const toggleLike = (index: number) => setLiked((items) => items.includes(index) ? items.filter((item) => item !== index) : [...items, index]);
+
+  const handleAdd = (index: number) => {
+    const product = products[index];
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      tone: product.tone,
+      size: product.size,
+      category: product.category,
+      image_url: null,
+    }, 1);
+    setAdded((items) => items.includes(index) ? items : [...items, index]);
+  };
 
   return (
     <main className="verdant-site">
@@ -63,17 +80,17 @@ export default function Home() {
 
       <section className="marquee"><div>PLANT MORE JOY · PLANT MORE JOY · PLANT MORE JOY · PLANT MORE JOY · </div></section>
 
-      <section className="section collections-section" id="collections"><div className="section-heading"><div><p className="eyebrow">THE VERDANT EDIT</p><h2>Choose your <em>green.</em></h2></div><p>From first-time plant parents to lifelong gardeners, there is a little something growing here for everyone.</p></div><div className="collection-grid">{collections.map((item, index) => <motion.a href="#shop" className="collection-card" key={item.title} whileHover={{ y: -8 }} transition={{ type: "spring", stiffness: 280, damping: 22 }}><div className="collection-copy"><span>{item.eyebrow}</span><h3>{item.title}</h3><p>{item.note}</p><span className="round-arrow"><Icon name="arrow" /></span></div><div className={`collection-art art-${index + 1}`}><BotanicalShape tone={`collection-${index + 1}`} /></div></motion.a>)}</div></section>
+      <section className="section collections-section" id="collections"><div className="section-heading"><div><p className="eyebrow">THE VERDANT EDIT</p><h2>Choose your <em>green.</em></h2></div><p>From first-time plant parents to lifelong gardeners, there is a little something growing here for everyone.</p></div><div className="collection-grid">{collections.map((item, index) => <motion.a href="/shop" className="collection-card" key={item.title} whileHover={{ y: -8 }} transition={{ type: "spring", stiffness: 280, damping: 22 }}><div className="collection-copy"><span>{item.eyebrow}</span><h3>{item.title}</h3><p>{item.note}</p><span className="round-arrow"><Icon name="arrow" /></span></div><div className={`collection-art art-${index + 1}`}><BotanicalShape tone={`collection-${index + 1}`} /></div></motion.a>)}</div></section>
 
-      <section className="section shop-section" id="shop"><div className="section-heading compact"><div><p className="eyebrow">MOST LOVED</p><h2>Little <em>legends.</em></h2></div><a className="text-link" href="#shop">View all plants <Icon name="arrow" /></a></div><div className="product-grid">{products.map((product, index) => <article className="product-card" key={product.name}><div className="product-image"><button className={`wish ${liked.includes(index) ? "is-liked" : ""}`} onClick={() => toggleLike(index)} aria-label={`Wishlist ${product.name}`}><Icon name="heart" /></button><BotanicalShape tone={product.tone} /><span className="product-badge">BEST SELLER</span></div><div className="product-info"><div><p>{product.meta}</p><h3>{product.name}</h3></div><div className="product-buy"><strong>{product.price}</strong><button onClick={() => setCart((count) => count + 1)}>Add +</button></div></div></article>)}</div></section>
+      <section className="section shop-section" id="shop"><div className="section-heading compact"><div><p className="eyebrow">MOST LOVED</p><h2>Little <em>legends.</em></h2></div><Link className="text-link" href="/shop">View all plants <Icon name="arrow" /></Link></div><div className="product-grid">{products.map((product, index) => <article className="product-card" key={product.name}><div className="product-image"><button type="button" className={`wish ${liked.includes(index) ? "is-liked" : ""}`} onClick={() => toggleLike(index)} aria-label={`Wishlist ${product.name}`}><Icon name="heart" /></button><Link href={`/shop/${product.id}`} className="block h-full"><BotanicalShape tone={product.tone} /></Link><span className="product-badge">BEST SELLER</span></div><div className="product-info"><div><p>{product.meta}</p><Link href={`/shop/${product.id}`}><h3>{product.name}</h3></Link></div><div className="product-buy"><strong>₹{product.price.toLocaleString("en-IN")}</strong><button type="button" onClick={() => handleAdd(index)}>{added.includes(index) ? "Added ✓" : "Add +"}</button></div></div></article>)}</div></section>
 
       <section className="story-section" id="story"><div className="story-art"><div className="story-card"><span>EST. 2026</span><div className="story-circle"><LeafMark /></div><strong>Good things<br />take root.</strong></div><span className="story-stem" /></div><div className="story-copy"><p className="eyebrow">THE VERDANT WAY</p><h2>More than a store.<br /><em>A little ritual.</em></h2><p>We believe plants change a room, then slowly change the way the room feels. Verdant is a place for that transformation — one stem, one pot, one sunny corner at a time.</p><a className="button button-dark" href="#care">Explore plant care <Icon name="arrow" /></a></div></section>
 
       <section className="care-section" id="care"><div className="care-heading"><p className="eyebrow">PLANT CARE, MADE SIMPLE</p><h2>Less guesswork.<br /><em>More growing.</em></h2><p>Practical guides for water, light, soil and everything in between.</p></div><div className="care-list"><a href="#care"><span>01</span><strong>Watering without overthinking</strong><Icon name="arrow" /></a><a href="#care"><span>02</span><strong>Finding the right light</strong><Icon name="arrow" /></a><a href="#care"><span>03</span><strong>Repotting, root to leaf</strong><Icon name="arrow" /></a><a href="#care"><span>04</span><strong>Build your own green corner</strong><Icon name="arrow" /></a></div></section>
 
-      <section className="newsletter"><div><p className="eyebrow">A NOTE FROM VERDANT</p><h2>Grow slowly.<br /><em>Stay curious.</em></h2></div><form onSubmit={(event) => event.preventDefault()}><label htmlFor="email">Plant tips, new arrivals and good things — occasionally.</label><div className="email-row"><input id="email" type="email" placeholder="Your email address" required /><button className="button button-lime" type="submit">Join us <Icon name="arrow" /></button></div></form></section>
+      <section className="newsletter" id="newsletter"><div><p className="eyebrow">A NOTE FROM VERDANT</p><h2>Grow slowly.<br /><em>Stay curious.</em></h2></div><form onSubmit={(event) => event.preventDefault()}><label htmlFor="email">Plant tips, new arrivals and good things — occasionally.</label><div className="email-row"><input id="email" type="email" placeholder="Your email address" required /><button className="button button-lime" type="submit">Join us <Icon name="arrow" /></button></div></form></section>
 
-      <footer className="footer" id="account"><div className="footer-brand"><a className="brand light" href="#top"><span className="brand-mark"><LeafMark /></span><span>VERDANT</span></a><p>Thoughtful plants and beautiful objects for a greener everyday.</p></div><div className="footer-col"><span>SHOP</span><a href="#shop">Indoor plants</a><a href="#shop">Succulents</a><a href="#shop">Planters</a><a href="#shop">Plant care</a></div><div className="footer-col"><span>ABOUT</span><a href="#story">Our story</a><a href="#care">Care journal</a><a href="#account">Account</a><a href="#top">Contact</a></div><div className="footer-end"><span>© 2026 VERDANT</span><span>MADE FOR SLOW GROWERS</span></div></footer>
+      <footer className="footer" id="account"><div className="footer-brand"><Link className="brand light" href="/"><span className="brand-mark"><LeafMark /></span><span>VERDANT</span></Link><p>Thoughtful plants and beautiful objects for a greener everyday.</p></div><div className="footer-col"><span>SHOP</span><Link href="/shop">Indoor plants</Link><Link href="/shop">Succulents</Link><Link href="/shop">Planters</Link><Link href="#care">Plant care</Link></div><div className="footer-col"><span>ABOUT</span><Link href="#story">Our story</Link><Link href="#care">Care journal</Link><Link href="#newsletter">Account</Link><Link href="#newsletter">Contact</Link></div><div className="footer-end"><span>© 2026 VERDANT</span><span>MADE FOR SLOW GROWERS</span></div></footer>
     </main>
   );
 }
