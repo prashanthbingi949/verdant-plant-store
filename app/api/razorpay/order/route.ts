@@ -1,23 +1,15 @@
 import { NextResponse } from "next/server";
 import { isSupabaseConfigured, supabaseInsert } from "@/lib/supabase-admin";
 import { getProductBySlug } from "@/lib/products";
+import { getCurrentCustomer } from "@/lib/customer-auth";
 
-function validEmail(value: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
-function validPhone(value: string) {
-  return /^\+?[0-9\s()-]{10,15}$/.test(value);
-}
-
-function validPin(value: string) {
-  return /^\d{6}$/.test(value);
-}
+function validEmail(value: string) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value); }
+function validPhone(value: string) { return /^\+?[0-9\s()-]{10,15}$/.test(value); }
+function validPin(value: string) { return /^\d{6}$/.test(value); }
 
 export async function POST(request: Request) {
   const keyId = process.env.RAZORPAY_KEY_ID;
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
-
   if (!keyId || !keySecret) return NextResponse.json({ error: "Razorpay is not configured. Add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to .env.local." }, { status: 500 });
 
   try {
@@ -28,13 +20,12 @@ export async function POST(request: Request) {
     if (!isSupabaseConfigured()) return NextResponse.json({ error: "Product catalog is not configured." }, { status: 500 });
 
     const customerName = String(customer?.name ?? "").trim();
-    const email = String(customer?.email ?? "").trim();
+    const email = String(customer?.email ?? "").trim().toLowerCase();
     const phone = String(customer?.phone ?? "").trim();
     const address = String(customer?.address ?? "").trim();
     const city = String(customer?.city ?? "").trim();
     const state = String(customer?.state ?? "").trim();
     const pin = String(customer?.pin ?? "").trim();
-
     if (!customerName || customerName.length > 120) return NextResponse.json({ error: "Please enter a valid name." }, { status: 400 });
     if (!validEmail(email) || email.length > 254) return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
     if (!validPhone(phone)) return NextResponse.json({ error: "Please enter a valid phone number." }, { status: 400 });
@@ -45,16 +36,13 @@ export async function POST(request: Request) {
 
     let subtotal = 0;
     const lineItems: Array<{ id: string; quantity: number; name: string; price: number }> = [];
-
     for (const rawItem of rawItems) {
       const id = typeof rawItem?.id === "string" ? rawItem.id : "";
       const quantity = Number(rawItem?.quantity);
       if (!id || !Number.isInteger(quantity) || quantity < 1 || quantity > 20) return NextResponse.json({ error: "Invalid cart item." }, { status: 400 });
-
       const product = await getProductBySlug(id);
       if (!product || !product.active) return NextResponse.json({ error: "One of the products in your cart is no longer available." }, { status: 400 });
       if (product.stock < quantity) return NextResponse.json({ error: `${product.name} has only ${product.stock} item${product.stock === 1 ? "" : "s"} left in stock.` }, { status: 400 });
-
       subtotal += product.price * quantity;
       lineItems.push({ id: product.slug, quantity, name: product.name, price: product.price });
     }
@@ -71,21 +59,22 @@ export async function POST(request: Request) {
       body: JSON.stringify({ amount, currency: "INR", receipt, notes: { store: "Verdant", item_count: String(lineItems.reduce((sum, item) => sum + item.quantity, 0)) } }),
       cache: "no-store",
     });
-
     const razorpayData = await razorpayResponse.json();
     if (!razorpayResponse.ok) return NextResponse.json({ error: razorpayData?.error?.description || "Razorpay order creation failed." }, { status: razorpayResponse.status });
 
     const orderId = razorpayData.id as string;
+    const currentCustomer = await getCurrentCustomer();
     const result = await supabaseInsert("orders", {
       order_id: orderId,
+      customer_id: currentCustomer?.id ?? null,
       payment_id: null,
-      customer_name: customerName || null,
-      email: email || null,
-      phone: phone || null,
-      address: address || null,
-      city: city || null,
-      state: state || null,
-      pincode: pin || null,
+      customer_name: customerName,
+      email,
+      phone,
+      address,
+      city,
+      state,
+      pincode: pin,
       amount: total,
       payment_status: "created",
       order_status: "awaiting_payment",
