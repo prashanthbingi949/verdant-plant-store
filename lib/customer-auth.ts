@@ -5,9 +5,7 @@ import { supabaseInsert, supabaseRest, supabaseSelect } from "@/lib/supabase-adm
 const COOKIE_NAME = "verdant-customer";
 const SESSION_DAYS = 30;
 
-function hashToken(token: string) {
-  return crypto.createHash("sha256").update(token).digest("hex");
-}
+function hashToken(token: string) { return crypto.createHash("sha256").update(token).digest("hex"); }
 
 function hashPassword(password: string) {
   const salt = crypto.randomBytes(16).toString("hex");
@@ -24,11 +22,7 @@ function verifyPassword(password: string, stored: string) {
   return expected.length === actual.length && crypto.timingSafeEqual(expected, actual);
 }
 
-function sessionExpiry() {
-  const date = new Date();
-  date.setDate(date.getDate() + SESSION_DAYS);
-  return date.toISOString();
-}
+function sessionExpiry() { const date = new Date(); date.setDate(date.getDate() + SESSION_DAYS); return date.toISOString(); }
 
 export async function createCustomer(name: string, email: string, password: string) {
   const result = await supabaseInsert("customers", { name, email: email.toLowerCase(), password_hash: hashPassword(password) });
@@ -63,18 +57,11 @@ export async function getCurrentCustomer() {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
   if (!token) return null;
-
   const sessionResult = await supabaseSelect("customer_sessions", `select=customer_id,expires_at&token_hash=eq.${hashToken(token)}&limit=1`);
   const session = Array.isArray(sessionResult.data) ? sessionResult.data[0] : null;
   if (!session?.customer_id || !session.expires_at || new Date(session.expires_at) <= new Date()) return null;
-
-  const customerResult = await supabaseSelect("customers", `select=id,name,email,phone,address,city,state,pincode,created_at&customer_id=eq.${encodeURIComponent(String(session.customer_id))}&limit=1`);
-  const badCustomerQuery = !customerResult.response?.ok && customerResult.data;
-  if (badCustomerQuery) return null;
-  if (Array.isArray(customerResult.data) && customerResult.data[0]) return customerResult.data[0];
-
-  const fallback = await supabaseSelect("customers", `select=id,name,email,phone,address,city,state,pincode,created_at&id=eq.${encodeURIComponent(String(session.customer_id))}&limit=1`);
-  return Array.isArray(fallback.data) ? fallback.data[0] ?? null : null;
+  const customerResult = await supabaseSelect("customers", `select=id,name,email,phone,address,city,state,pincode,created_at&id=eq.${encodeURIComponent(String(session.customer_id))}&limit=1`);
+  return Array.isArray(customerResult.data) ? customerResult.data[0] ?? null : null;
 }
 
 export async function clearCustomerSession() {
