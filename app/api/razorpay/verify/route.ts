@@ -33,22 +33,17 @@ export async function POST(request: Request) {
 
       if (!wasAlreadyPaid) {
         const orderItems = Array.isArray(order.items) ? order.items : [];
-        for (const item of orderItems) {
-          const slug = typeof item?.id === "string" ? item.id : "";
-          const quantity = Number(item?.quantity || 0);
-          if (!slug || !Number.isInteger(quantity) || quantity < 1) continue;
+        const stockResponse = await supabaseRest("/rest/v1/rpc/decrement_order_stock", {
+          method: "POST",
+          body: JSON.stringify({ p_items: orderItems }),
+          headers: { Prefer: "return=representation" },
+        });
+        const stockData = stockResponse ? await stockResponse.json().catch(() => null) : null;
+        const stockUpdated = Boolean(stockResponse?.ok) && stockData === true;
 
-          const stockResponse = await supabaseRest("/rest/v1/rpc/decrement_product_stock", {
-            method: "POST",
-            body: JSON.stringify({ p_slug: slug, p_quantity: quantity }),
-            headers: { Prefer: "return=representation" },
-          });
-          const stockData = stockResponse ? await stockResponse.json().catch(() => null) : null;
-          const stockUpdated = Boolean(stockResponse?.ok) && stockData !== null && stockData !== undefined && stockData !== false;
-          if (!stockUpdated) {
-            await supabaseUpdate("orders", `order_id=eq.${encodeURIComponent(orderId)}`, { order_status: "inventory_issue" });
-            return NextResponse.json({ verified: true, orderSaved: true, inventoryIssue: true, error: "Payment was verified, but stock could not be reserved. Please contact Verdant support with your order ID." }, { status: 409 });
-          }
+        if (!stockUpdated) {
+          await supabaseUpdate("orders", `order_id=eq.${encodeURIComponent(orderId)}`, { order_status: "inventory_issue" });
+          return NextResponse.json({ verified: true, orderSaved: true, inventoryIssue: true, error: "Payment was verified, but stock could not be reserved. Please contact Verdant support with your order ID." }, { status: 409 });
         }
 
         confirmation = await sendOrderConfirmationEmail({
