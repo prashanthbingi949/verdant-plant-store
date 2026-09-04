@@ -6,9 +6,20 @@ create table if not exists public.customers (
   name text not null,
   email text not null unique,
   password_hash text not null,
+  phone text,
+  address text,
+  city text,
+  state text,
+  pincode text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.customers add column if not exists phone text;
+alter table public.customers add column if not exists address text;
+alter table public.customers add column if not exists city text;
+alter table public.customers add column if not exists state text;
+alter table public.customers add column if not exists pincode text;
 
 create table if not exists public.customer_sessions (
   id uuid primary key default gen_random_uuid(),
