@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { isSupabaseConfigured, supabaseInsert } from "@/lib/supabase-admin";
-import { getProductBySlug } from "@/lib/products";
 import { getCurrentCustomer } from "@/lib/customer-auth";
+import { isSupabaseConfigured, supabaseInsert, supabaseUpdate } from "@/lib/supabase-admin";
+import { getProductBySlug } from "@/lib/products";
 
 function validEmail(value: string) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value); }
 function validPhone(value: string) { return /^\+?[0-9\s()-]{10,15}$/.test(value); }
@@ -52,7 +52,6 @@ export async function POST(request: Request) {
     const amount = Math.round(total * 100);
     const receipt = `verdant_${Date.now()}`;
     const authorization = Buffer.from(`${keyId}:${keySecret}`).toString("base64");
-
     const razorpayResponse = await fetch("https://api.razorpay.com/v1/orders", {
       method: "POST",
       headers: { Authorization: `Basic ${authorization}`, "Content-Type": "application/json" },
@@ -80,8 +79,20 @@ export async function POST(request: Request) {
       order_status: "awaiting_payment",
       items: lineItems,
     });
-
     if (!result.response?.ok) return NextResponse.json({ error: "Payment order was created, but the order could not be saved. Please try again." }, { status: 500 });
+
+    if (currentCustomer?.id) {
+      await supabaseUpdate("customers", `id=eq.${encodeURIComponent(String(currentCustomer.id))}`, {
+        name: customerName,
+        phone,
+        address,
+        city,
+        state,
+        pincode: pin,
+        updated_at: new Date().toISOString(),
+      });
+    }
+
     return NextResponse.json({ key: keyId, orderId, amount: razorpayData.amount, currency: razorpayData.currency, receipt, subtotal, delivery, total });
   } catch {
     return NextResponse.json({ error: "Unable to create payment order." }, { status: 500 });
