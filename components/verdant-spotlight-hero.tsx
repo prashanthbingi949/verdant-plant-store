@@ -47,6 +47,7 @@ export default function VerdantSpotlightHero() {
   const smooth = useRef({ x: -999, y: -999 });
   const rafRef = useRef<number | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const hero = heroRef.current;
@@ -71,14 +72,35 @@ export default function VerdantSpotlightHero() {
       rafRef.current = requestAnimationFrame(tick);
     };
 
+    const onScroll = () => setScrolled(window.scrollY > window.innerHeight * 0.72);
+
     hero.addEventListener("mousemove", onMouseMove, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
     rafRef.current = requestAnimationFrame(tick);
 
     return () => {
       hero.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("scroll", onScroll);
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
   }, []);
+
+  const navClass = scrolled
+    ? "fixed top-0 left-0 right-0 z-[100] flex items-center justify-between p-4 sm:p-5 text-[#101510] transition-colors duration-300"
+    : "fixed top-0 left-0 right-0 z-[100] flex items-center justify-between p-4 sm:p-5 text-white transition-colors duration-300";
+  const navPillClass = scrolled
+    ? "hidden md:flex absolute left-1/2 -translate-x-1/2 bg-[#f4f5e9]/95 backdrop-blur-md border border-black/10 rounded-full px-2 py-2 items-center gap-1 shadow-lg"
+    : "hidden md:flex absolute left-1/2 -translate-x-1/2 bg-white/15 backdrop-blur-md border border-white/25 rounded-full px-2 py-2 items-center gap-1 shadow-2xl";
+  const secondaryLinkClass = scrolled
+    ? "text-[#202d20]/70 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-black/5 hover:text-[#202d20] transition-colors"
+    : "text-white/80 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-white/20 hover:text-white transition-colors";
+  const signUpClass = scrolled
+    ? "hidden md:block bg-[#202d20] text-[#f4f5e9] text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-[#101510] transition-colors"
+    : "hidden md:block bg-white text-gray-900 text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-gray-100 transition-colors";
+  const mobileButtonClass = scrolled
+    ? "md:hidden w-10 h-10 grid place-items-center rounded-full bg-black/5 border border-black/10"
+    : "md:hidden w-10 h-10 grid place-items-center rounded-full bg-white/15 backdrop-blur-md border border-white/20";
 
   return (
     <section ref={heroRef} className="verdant-spotlight relative w-full overflow-hidden bg-black h-screen" style={{ height: "100dvh", minHeight: "560px", fontFamily: "Inter, Arial, sans-serif" }}>
@@ -86,28 +108,28 @@ export default function VerdantSpotlightHero() {
       <div className="absolute inset-0 z-[12] bg-gradient-to-b from-black/30 via-black/5 to-black/45 pointer-events-none" />
       <div ref={revealRef} className="absolute inset-0 z-30 bg-center bg-cover bg-no-repeat pointer-events-none" style={{ backgroundImage: `url(${BG_IMAGE_2})`, maskSize: "100% 100%", WebkitMaskSize: "100% 100%" }} />
 
-      <nav className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between p-4 sm:p-5 text-white">
+      <nav className={navClass}>
         <Link href="/" className="flex items-center gap-2.5"><LogoMark /><span className="text-xl sm:text-2xl italic" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>Verdant</span></Link>
 
-        <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 bg-white/15 backdrop-blur-md border border-white/25 rounded-full px-2 py-2 items-center gap-1 shadow-2xl">
-          <Link href="/shop" className="bg-white text-gray-900 px-4 py-1.5 rounded-full text-sm font-medium">Shop</Link>
-          <a href="#collections" className="text-white/80 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-white/20 hover:text-white transition-colors">Collections</a>
-          <a href="#care" className="text-white/80 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-white/20 hover:text-white transition-colors">Plant Care</a>
-          <a href="#story" className="text-white/80 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-white/20 hover:text-white transition-colors">Our Story</a>
-          <a href="#care" className="text-white/80 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-white/20 hover:text-white transition-colors">Journal</a>
+        <div className={navPillClass}>
+          <Link href="/shop" className={scrolled ? "bg-[#202d20] text-[#f4f5e9] px-4 py-1.5 rounded-full text-sm font-medium" : "bg-white text-gray-900 px-4 py-1.5 rounded-full text-sm font-medium"}>Shop</Link>
+          <a href="#collections" className={secondaryLinkClass}>Collections</a>
+          <a href="#care" className={secondaryLinkClass}>Plant Care</a>
+          <a href="#story" className={secondaryLinkClass}>Our Story</a>
+          <a href="#care" className={secondaryLinkClass}>Journal</a>
         </div>
 
-        <a href="#newsletter" className="hidden md:block bg-white text-gray-900 text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-gray-100 transition-colors">Sign Up</a>
-        <button onClick={() => setMenuOpen((open) => !open)} className="md:hidden w-10 h-10 grid place-items-center rounded-full bg-white/15 backdrop-blur-md border border-white/20" aria-label={menuOpen ? "Close menu" : "Open menu"}><MenuIcon open={menuOpen} /></button>
+        <a href="#newsletter" className={signUpClass}>Sign Up</a>
+        <button onClick={() => setMenuOpen((open) => !open)} className={mobileButtonClass} aria-label={menuOpen ? "Close menu" : "Open menu"}><MenuIcon open={menuOpen} /></button>
       </nav>
 
       {menuOpen && (
-        <div className="fixed top-[76px] left-4 right-4 z-[95] md:hidden rounded-3xl border border-white/20 bg-black/65 backdrop-blur-xl p-3 text-white shadow-2xl">
-          <Link href="/shop" onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 text-base text-white/90 hover:bg-white/10">Shop</Link>
-          <a href="#collections" onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 text-base text-white/90 hover:bg-white/10">Collections</a>
-          <a href="#care" onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 text-base text-white/90 hover:bg-white/10">Plant Care</a>
-          <a href="#story" onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 text-base text-white/90 hover:bg-white/10">Our Story</a>
-          <a href="#care" onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 text-base text-white/90 hover:bg-white/10">Journal</a>
+        <div className={scrolled ? "fixed top-[76px] left-4 right-4 z-[95] md:hidden rounded-3xl border border-black/10 bg-[#f4f5e9]/95 backdrop-blur-xl p-3 text-[#202d20] shadow-2xl" : "fixed top-[76px] left-4 right-4 z-[95] md:hidden rounded-3xl border border-white/20 bg-black/65 backdrop-blur-xl p-3 text-white shadow-2xl"}>
+          <Link href="/shop" onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 text-base opacity-90 hover:bg-black/5">Shop</Link>
+          <a href="#collections" onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 text-base opacity-90 hover:bg-black/5">Collections</a>
+          <a href="#care" onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 text-base opacity-90 hover:bg-black/5">Plant Care</a>
+          <a href="#story" onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 text-base opacity-90 hover:bg-black/5">Our Story</a>
+          <a href="#care" onClick={() => setMenuOpen(false)} className="block rounded-2xl px-4 py-3 text-base opacity-90 hover:bg-black/5">Journal</a>
         </div>
       )}
 
