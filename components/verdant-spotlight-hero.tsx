@@ -91,13 +91,13 @@ export default function VerdantSpotlightHero() {
     : "fixed top-0 left-0 right-0 z-[100] flex items-center justify-between p-4 sm:p-5 text-white transition-colors duration-300";
   const navPillClass = scrolled
     ? "hidden md:flex absolute left-1/2 -translate-x-1/2 bg-[#f4f5e9]/95 backdrop-blur-md border border-black/10 rounded-full px-2 py-2 items-center gap-1 shadow-lg"
-    : "hidden md:flex absolute left-1/2 -translate-x-1/2 bg-white/15 backdrop-blur-md border border-white/25 rounded-full px-2 py-2 items-center gap-1 shadow-2xl";
+    : "hidden md:flex absolute left-1/2 -translate-x-1/2 bg-black/55 backdrop-blur-md border border-white/30 rounded-full px-2 py-2 items-center gap-1 shadow-2xl";
   const secondaryLinkClass = scrolled
-    ? "text-[#202d20]/70 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-black/5 hover:text-[#202d20] transition-colors"
-    : "text-white/80 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-white/20 hover:text-white transition-colors";
+    ? "!text-[#202d20] px-4 py-1.5 rounded-full text-sm font-semibold hover:bg-black/5 hover:text-[#202d20] transition-colors"
+    : "!text-white px-4 py-1.5 rounded-full text-sm font-semibold hover:bg-white/20 hover:text-white transition-colors";
   const signUpClass = scrolled
-    ? "hidden md:block bg-[#202d20] text-[#f4f5e9] text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-[#101510] transition-colors"
-    : "hidden md:block bg-white text-gray-900 text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-gray-100 transition-colors";
+    ? "hidden md:block !bg-[#202d20] !text-[#f4f5e9] text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-[#101510] transition-colors"
+    : "hidden md:block !bg-white !text-[#101510] text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-gray-100 transition-colors";
   const mobileButtonClass = scrolled
     ? "md:hidden w-10 h-10 grid place-items-center rounded-full bg-black/5 border border-black/10"
     : "md:hidden w-10 h-10 grid place-items-center rounded-full bg-white/15 backdrop-blur-md border border-white/20";
@@ -112,14 +112,14 @@ export default function VerdantSpotlightHero() {
         <Link href="/" className="flex items-center gap-2.5"><LogoMark /><span className="text-xl sm:text-2xl italic" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>Verdant</span></Link>
 
         <div className={navPillClass}>
-          <Link href="/shop" className={scrolled ? "bg-[#202d20] text-[#f4f5e9] px-4 py-1.5 rounded-full text-sm font-medium" : "bg-white text-gray-900 px-4 py-1.5 rounded-full text-sm font-medium"}>Shop</Link>
+          <Link href="/shop" className={scrolled ? "!bg-[#202d20] !text-[#f4f5e9] px-4 py-1.5 rounded-full text-sm font-semibold" : "!bg-white !text-[#101510] px-4 py-1.5 rounded-full text-sm font-semibold"}>Shop</Link>
           <a href="#collections" className={secondaryLinkClass}>Collections</a>
           <a href="#care" className={secondaryLinkClass}>Plant Care</a>
           <a href="#story" className={secondaryLinkClass}>Our Story</a>
           <a href="#care" className={secondaryLinkClass}>Journal</a>
         </div>
 
-        <a href="#newsletter" className={signUpClass}>Sign Up</a>
+        <Link href="/signup" className={signUpClass}>Sign Up</Link>
         <button onClick={() => setMenuOpen((open) => !open)} className={mobileButtonClass} aria-label={menuOpen ? "Close menu" : "Open menu"}><MenuIcon open={menuOpen} /></button>
       </nav>
 
