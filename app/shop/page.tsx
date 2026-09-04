@@ -28,8 +28,20 @@ function Pill({ active, children, onClick }: { active: boolean; children: React.
 
 export default function ShopPage() {
   const [products, setProducts] = useState<Product[]>(fallbackProducts);
-  const [category, setCategory] = useState("All"); const [level, setLevel] = useState("All"); const [query, setQuery] = useState(""); const [sort, setSort] = useState("featured");
+  const [category, setCategory] = useState("All");
+  const [level, setLevel] = useState("All");
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState("featured");
   const { itemCount } = useCart();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const requestedCategory = params.get("category");
+    if (requestedCategory && ["Indoor plants", "Outdoor plants", "Succulents"].includes(requestedCategory)) {
+      setCategory(requestedCategory);
+    }
+  }, []);
+
   useEffect(() => { fetch("/api/products", { cache: "no-store" }).then((r) => r.ok ? r.json() : null).then((data) => { if (Array.isArray(data?.products) && data.products.length) setProducts(data.products); }).catch(() => {}); }, []);
   const filtered = useMemo(() => [...products.filter((product) => (category === "All" || product.category === category) && (level === "All" || product.level.toLowerCase().includes(level.toLowerCase())) && `${product.name} ${product.description}`.toLowerCase().includes(query.toLowerCase()))].sort((a, b) => sort === "low" ? a.price - b.price : sort === "high" ? b.price - a.price : a.slug.localeCompare(b.slug)), [category, level, products, query, sort]);
   return <main className="min-h-screen bg-[#f4f5e9] text-[#101510]"><header className="sticky top-0 z-40 border-b border-black/10 bg-[#f4f5e9]/90 px-5 py-4 backdrop-blur-xl sm:px-8"><div className="mx-auto flex max-w-7xl items-center justify-between gap-5"><Link href="/" className="text-sm font-extrabold tracking-[0.14em]">VERDANT</Link><nav className="hidden items-center gap-6 text-sm md:flex"><Link href="/" className="opacity-70 hover:opacity-100">Home</Link><span className="font-semibold">Shop</span><Link href="/#collections" className="opacity-70 hover:opacity-100">Collections</Link><Link href="/#care" className="opacity-70 hover:opacity-100">Plant care</Link></nav><Link href="/cart" className="rounded-full bg-[#ddf27a] px-4 py-2 text-sm font-bold">Bag ({itemCount})</Link></div></header>
