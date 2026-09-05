@@ -107,6 +107,17 @@
   font-size: 11px !important;
 }
 
+/* Next.js App Router works best when the root html element uses native
+   scrolling. Smooth root scrolling triggers route-transition warnings. */
+html {
+  scroll-behavior: auto !important;
+}
+
+/* Keep the hero from creating extra paint/layout work while scrolling. */
+.verdant-spotlight {
+  contain: layout paint;
+}
+
 @media (max-width: 980px) {
   .shop-section .product-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
