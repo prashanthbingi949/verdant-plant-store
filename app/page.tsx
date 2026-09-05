@@ -28,6 +28,19 @@ const realPlantImages: Record<string, string> = {
   "jade-plant": "https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=1200&q=88",
 };
 
+const fallbackFooterShop: LinkItem[] = [
+  { label: "Indoor plants", href: "/shop" },
+  { label: "Succulents", href: "/shop" },
+  { label: "Planters", href: "/shop" },
+  { label: "Plant care", href: "/pages/plant-care" },
+];
+const fallbackFooterAbout: LinkItem[] = [
+  { label: "Our story", href: "/#story" },
+  { label: "Care journal", href: "/pages/plant-care" },
+  { label: "Account", href: "/account" },
+  { label: "Contact", href: "/#newsletter" },
+];
+
 function LeafMark({ className = "" }: { className?: string }) {
   return <svg className={className} viewBox="0 0 48 48" aria-hidden="true"><path d="M38.4 7.2C24.2 8.4 12 15.1 9.6 27.4c-1.2 6.2 1.8 11.1 7 12.1 8.2 1.5 16.7-5.2 19.1-13.7 1.5-5.2 1.6-11 2.7-18.6Z" fill="currentColor" /><path d="M10.4 38.1c6.2-8.2 12-13 21.2-17.6" fill="none" stroke="var(--cream)" strokeWidth="2" strokeLinecap="round" opacity=".7" /></svg>;
 }
@@ -74,6 +87,8 @@ export default function Home() {
     : String(content("marquee").text || "PLANT MORE JOY").split("·").map((item: string) => item.trim()).filter(Boolean);
   const safeMarqueeItems = marqueeItems.length ? marqueeItems : ["PLANT MORE JOY"];
   const marqueeSequence = [...safeMarqueeItems, ...safeMarqueeItems, ...safeMarqueeItems, ...safeMarqueeItems, ...safeMarqueeItems, ...safeMarqueeItems];
+  const footerShopLinks = Array.isArray(footer.shop_links) && footer.shop_links.length ? footer.shop_links : fallbackFooterShop;
+  const footerAboutLinks = Array.isArray(footer.about_links) && footer.about_links.length ? footer.about_links : fallbackFooterAbout;
 
   const handleAdd = (product: CmsProduct) => {
     if (product.stock < 1) return;
@@ -85,7 +100,7 @@ export default function Home() {
   return <main className="verdant-site">
     <VerdantSpotlightHero />
 
-    {visible("marquee") && <section className="marquee"><div className="marquee-flow">{marqueeSequence.map((item: string, index: number) => <span key={`marquee-${index}`} className="marquee-item">{item}<b aria-hidden="true">•</b></span>)}</div></section>}
+    {visible("marquee") && <section className="marquee"><div className="marquee-flow" style={{ display: "flex", width: "max-content", minWidth: "max-content", animation: "marquee 24s linear infinite" }}>{marqueeSequence.map((item: string, index: number) => <span key={`marquee-${index}`} className="marquee-item" style={{ display: "inline-flex", alignItems: "center", flexShrink: 0, padding: "14px 24px" }}>{item}<b aria-hidden="true" style={{ display: "inline-block", padding: "0 24px" }}>•</b></span>)}</div></section>}
 
     {visible("collections") && <section className="section collections-section" id="collections"><div className="section-heading"><div><p className="eyebrow">{content("collections").eyebrow || "THE VERDANT EDIT"}</p><h2>{content("collections").title || "Choose your"} <em>{content("collections").emphasized_title || "green."}</em></h2></div><p>{content("collections").description || "From first-time plant parents to lifelong gardeners, there is a little something growing here for everyone."}</p></div><div className="collection-grid">{collections.map((item: LinkItem, index: number) => <motion.a href={item.href || "/shop"} className="collection-card" key={`${item.title || "collection"}-${index}`} whileHover={{ y: -8 }} transition={{ type: "spring", stiffness: 280, damping: 22 }}><div className="collection-copy"><span>{item.eyebrow}</span><h3>{item.title}</h3><p>{item.note}</p><span className="round-arrow"><Icon name="arrow" /></span></div><div className={`collection-art art-${index + 1}`}><BotanicalShape tone={`collection-${index + 1}`} alt={item.title || "Collection"} /></div></motion.a>)}</div></section>}
 
@@ -97,6 +112,6 @@ export default function Home() {
 
     {visible("newsletter") && <section className="newsletter" id="newsletter"><div><p className="eyebrow">{newsletter.eyebrow || "A NOTE FROM VERDANT"}</p><h2>{newsletter.title || "Grow slowly."}<br /><em>{newsletter.emphasized_title || "Stay curious."}</em></h2></div><form onSubmit={(event) => event.preventDefault()}><label htmlFor="email">{newsletter.description || "Plant tips, new arrivals and good things — occasionally."}</label><div className="email-row"><input id="email" type="email" placeholder={newsletter.placeholder || "Your email address"} /><button className="button button-lime" type="submit">{newsletter.button_label || "Join us"} <Icon name="arrow" /></button></div></form></section>}
 
-    {visible("footer") && <footer className="footer" id="account"><div className="footer-brand"><Link className="brand light" href="/"><span className="brand-mark"><LeafMark /></span><span>{"VERDANT"}</span></Link><p>{footer.description || "Thoughtful plants and beautiful objects for a greener everyday."}</p></div><div className="footer-col"><span>SHOP</span>{(footer.shop_links || []).map((item: LinkItem, index: number) => <Link href={item.href || "/shop"} key={`${item.label}-${index}`}>{item.label}</Link>)}</div><div className="footer-col"><span>ABOUT</span>{(footer.about_links || []).map((item: LinkItem, index: number) => <Link href={item.href || "#story"} key={`${item.label}-${index}`}>{item.label}</Link>)}</div><div className="footer-end"><span>{footer.copyright || "© 2026 VERDANT"}</span><span>{footer.tagline || "MADE FOR SLOW GROWERS"}</span></div></footer>}
+    {visible("footer") && <footer className="footer" id="account"><div className="footer-brand"><Link className="brand light" href="/"><span className="brand-mark"><LeafMark /></span><span>VERDANT</span></Link><p>{footer.description || "Thoughtful plants and beautiful objects for a greener everyday."}</p></div><div className="footer-col"><span>SHOP</span>{footerShopLinks.map((item: LinkItem, index: number) => <Link href={item.href || "/shop"} key={`${item.label || "shop"}-${index}`}>{item.label || "Shop"}</Link>)}</div><div className="footer-col"><span>ABOUT</span>{footerAboutLinks.map((item: LinkItem, index: number) => <Link href={item.href || "#story"} key={`${item.label || "about"}-${index}`}>{item.label || "About"}</Link>)}</div><div className="footer-end"><span>{footer.copyright || "© 2026 VERDANT"}</span><span>{footer.tagline || "MADE FOR SLOW GROWERS"}</span></div></footer>}
   </main>;
 }
