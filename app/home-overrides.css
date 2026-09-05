@@ -16,7 +16,6 @@
   overflow: hidden;
 }
 
-/* Keep the square tile fixed; animate only the image artwork inside it. */
 .shop-section .product-image img {
   display: block;
   width: 100%;
@@ -62,10 +61,13 @@
   padding: 7px 9px;
 }
 
-/* Premium compact story band. */
+/* Premium compact story band with soft rounded outer corners. */
 .story-section {
   gap: clamp(32px, 5vw, 72px) !important;
   padding: 58px clamp(24px, 6vw, 78px) !important;
+  border-radius: 34px !important;
+  margin: 0 clamp(14px, 2vw, 28px) !important;
+  overflow: hidden !important;
 }
 
 .story-art {
@@ -116,6 +118,7 @@
 
   .story-section {
     padding: 54px 24px !important;
+    border-radius: 30px !important;
   }
 
   .story-art {
@@ -130,6 +133,8 @@
 
   .story-section {
     padding: 44px 20px !important;
+    border-radius: 24px !important;
+    margin: 0 10px !important;
   }
 
   .story-art {
