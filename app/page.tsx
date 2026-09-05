@@ -7,14 +7,14 @@ import { useCart } from "@/components/cart-provider";
 import VerdantSpotlightHero from "@/components/verdant-spotlight-hero";
 
 type CmsSection = { section_key: string; content: Record<string, any>; active: boolean; sort_order: number };
-type CmsProduct = { id: string; slug: string; name: string; category: string; level: string; price: number; size: string; description: string; tone: "moss" | "sage" | "lime"; stock: number; active: boolean; image_url?: string | null; image_urls?: string[]; featured?: boolean; sort_order?: number; badge_text?: string };
+type CmsProduct = { id: string; slug: string; name: string; category: string; level: string; price: number; size: string; description: string; tone: "moss" | "sage" | "lime"; stock: number; active: boolean; featured: boolean; sort_order: number; badge_text?: string; image_url?: string | null; image_urls?: string[] };
 type LinkItem = { label?: string; title?: string; eyebrow?: string; note?: string; href?: string; number?: string };
 
 const fallbackProducts: CmsProduct[] = [
-  { id: "jade-plant", slug: "jade-plant", name: "Jade Plant", category: "Succulents", level: "Easy care", price: 649, size: '6" pot', description: "A compact succulent.", tone: "lime", stock: 20, active: true },
-  { id: "snake-plant", slug: "snake-plant", name: "Snake Plant", category: "Indoor plants", level: "Easy care", price: 899, size: '10" pot', description: "Architectural and resilient.", tone: "sage", stock: 20, active: true },
-  { id: "bird-of-paradise", slug: "bird-of-paradise", name: "Bird of Paradise", category: "Indoor plants", level: "Medium care", price: 2499, size: '14" pot', description: "A bold statement plant.", tone: "moss", stock: 20, active: true },
-  { id: "monstera-deliciosa", slug: "monstera-deliciosa", name: "Monstera Deliciosa", category: "Indoor plants", level: "Easy care", price: 1899, size: '12" pot', description: "A lush statement plant.", tone: "moss", stock: 20, active: true },
+  { id: "jade-plant", slug: "jade-plant", name: "Jade Plant", category: "Succulents", level: "Easy care", price: 649, size: '6" pot', description: "A compact succulent.", tone: "lime", stock: 20, active: true, featured: true, sort_order: 1 },
+  { id: "snake-plant", slug: "snake-plant", name: "Snake Plant", category: "Indoor plants", level: "Easy care", price: 899, size: '10" pot', description: "Architectural and resilient.", tone: "sage", stock: 20, active: true, featured: true, sort_order: 2 },
+  { id: "bird-of-paradise", slug: "bird-of-paradise", name: "Bird of Paradise", category: "Indoor plants", level: "Medium care", price: 2499, size: '14" pot', description: "A bold statement plant.", tone: "moss", stock: 20, active: true, featured: true, sort_order: 3 },
+  { id: "monstera-deliciosa", slug: "monstera-deliciosa", name: "Monstera Deliciosa", category: "Indoor plants", level: "Easy care", price: 1899, size: '12" pot', description: "A lush statement plant.", tone: "moss", stock: 20, active: true, featured: true, sort_order: 4 },
 ];
 
 const realPlantImages: Record<string, string> = {
@@ -71,7 +71,8 @@ export default function Home() {
   const section = (key: string) => sections.find((s) => s.section_key === key);
   const visible = (key: string) => section(key)?.active !== false;
   const content = (key: string) => section(key)?.content || {};
-  const featuredProducts = [...products.filter((p) => p.active && p.featured), ...products.filter((p) => p.active && !p.featured)].slice(0, 8);
+  const featuredPool = products.filter((p) => p.active && p.featured);
+  const featuredProducts = (featuredPool.length ? featuredPool : products.filter((p) => p.active)).slice(0, 8);
   const collections = Array.isArray(content("collections").items) && content("collections").items.length ? content("collections").items : fallbackCollections;
   const careItems = Array.isArray(content("care").items) && content("care").items.length ? content("care").items : [
     { number: "01", title: "Watering without overthinking", href: "/pages/plant-care" }, { number: "02", title: "Finding the right light", href: "/pages/plant-care" }, { number: "03", title: "Repotting, root to leaf", href: "/pages/plant-care" }, { number: "04", title: "Build your own green corner", href: "/pages/plant-care" },
