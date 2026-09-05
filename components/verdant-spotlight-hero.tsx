@@ -3,16 +3,25 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+type CmsSection = { section_key: string; content: Record<string, string>; active: boolean; sort_order: number };
+type NavItem = { id: string; label: string; href: string; location: "header" | "footer"; active: boolean; sort_order: number };
+
 const BG_IMAGE_1 = "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_195923_b0ba8ace-1d1d-4f2c-9a28-1ab84b330680.png&w=1280&q=85";
 const BG_IMAGE_2 = "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260609_201152_bba90a12-bf12-459f-91f0-51f237dbaf3b.png&w=1280&q=85";
 const SPOTLIGHT_R = 260;
 
-type CmsSection = { section_key: string; content: Record<string, string>; active: boolean; sort_order: number };
-type NavItem = { id: string; label: string; href: string; location: "header" | "footer"; active: boolean; sort_order: number };
-
 function LogoMark() { return <svg width="26" height="26" viewBox="0 0 256 256" fill="none" aria-hidden="true"><path d="M256 256H128L0 128h128L256 256Z" fill="currentColor" /><path d="M256 128H128L0 0h128l128 128Z" fill="currentColor" opacity=".72" /></svg>; }
 function MenuIcon({ open }: { open: boolean }) { return open ? <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg> : <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>; }
 function ArrowIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>; }
+function fallbackLabel(item: NavItem) {
+  const value = `${item.label || ""} ${item.href || ""} ${item.id || ""}`.toLowerCase();
+  if (value.includes("shop")) return "Shop";
+  if (value.includes("collection")) return "Collections";
+  if (value.includes("care")) return "Plant Care";
+  if (value.includes("story")) return "Our Story";
+  if (value.includes("journal")) return "Journal";
+  return item.label?.trim() || "Link";
+}
 
 export default function VerdantSpotlightHero() {
   const heroRef = useRef<HTMLElement>(null); const revealRef = useRef<HTMLDivElement>(null); const mouse = useRef({ x: -999, y: -999 }); const smooth = useRef({ x: -999, y: -999 }); const rafRef = useRef<number | null>(null);
@@ -49,7 +58,7 @@ export default function VerdantSpotlightHero() {
     { id: "story", label: "Our Story", href: "/#story", location: "header", active: true, sort_order: 40 },
     { id: "journal", label: "Journal", href: "/pages/plant-care", location: "header", active: true, sort_order: 50 },
   ];
-  const headerLinks = nav.length ? nav : fallbackNav;
+  const headerLinks = (nav.length ? nav : fallbackNav).map((item) => ({ ...item, label: fallbackLabel(item) }));
   const navClass = scrolled ? "fixed top-0 left-0 right-0 z-[100] flex items-center justify-between p-4 sm:p-5 text-[#101510] transition-colors duration-300" : "fixed top-0 left-0 right-0 z-[100] flex items-center justify-between p-4 sm:p-5 text-white transition-colors duration-300";
   const navPillClass = scrolled ? "hidden md:flex absolute left-1/2 -translate-x-1/2 bg-[#f4f5e9]/95 backdrop-blur-md border border-black/10 rounded-full px-2 py-2 items-center gap-1 shadow-lg" : "hidden md:flex absolute left-1/2 -translate-x-1/2 bg-black/55 backdrop-blur-md border border-white/30 rounded-full px-2 py-2 items-center gap-1 shadow-2xl";
   const secondaryLinkClass = scrolled ? "px-4 py-1.5 rounded-full text-sm font-semibold text-[#202d20] hover:bg-black/5 transition-colors" : "px-4 py-1.5 rounded-full text-sm font-semibold text-white hover:bg-white/20 transition-colors";
