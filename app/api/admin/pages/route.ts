@@ -9,13 +9,29 @@ const defaults = [
   { slug: "our-story", title: "Our story", excerpt: "Why Verdant exists.", content: [{ type: "paragraph", text: "We believe plants change a room, then slowly change the way the room feels." }], status: "published", sort_order: 10 },
   { slug: "plant-care", title: "Plant care", excerpt: "Simple guides for healthier plants.", content: [{ type: "heading", text: "Plant care, made simple" }, { type: "paragraph", text: "Water, light, soil and repotting without the guesswork." }], status: "published", sort_order: 20 },
 ];
+
+async function ensureDefaults() {
+  for (const page of defaults) {
+    const existing = await supabaseSelect("cms_pages", `select=id&slug=eq.${encodeURIComponent(page.slug)}&limit=1`);
+    if (!existing.configured || !existing.response?.ok) continue;
+    const rows = Array.isArray(existing.data) ? existing.data as { id: string }[] : [];
+    if (!rows[0]?.id) {
+      await supabaseInsert("cms_pages", { ...page, published_at: page.status === "published" ? new Date().toISOString() : null });
+    }
+  }
+}
+
 export async function GET() {
   if (!(await authorized())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const result = await supabaseSelect("cms_pages", "select=*&order=sort_order.asc,created_at.desc");
   if (!result.configured || !result.response?.ok) return NextResponse.json({ error: "Unable to load pages." }, { status: 502 });
-  const pages = Array.isArray(result.data) ? result.data : [];
-  return NextResponse.json({ pages: pages.length ? pages : defaults });
+
+  await ensureDefaults();
+  const refreshed = await supabaseSelect("cms_pages", "select=*&order=sort_order.asc,created_at.desc");
+  const pages = refreshed.configured && refreshed.response?.ok && Array.isArray(refreshed.data) ? refreshed.data : (Array.isArray(result.data) ? result.data : []);
+  return NextResponse.json({ pages });
 }
+
 export async function POST(request: Request) {
   if (!(await authorized())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
@@ -27,6 +43,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ page: Array.isArray(result.data) ? result.data[0] ?? null : null }, { status: 201 });
   } catch { return NextResponse.json({ error: "Invalid page data." }, { status: 400 }); }
 }
+
 export async function PATCH(request: Request) {
   if (!(await authorized())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
