@@ -4,6 +4,7 @@ import { adminCookieName, isValidAdminToken } from "@/lib/admin-auth";
 import { supabaseInsert, supabaseSelect, supabaseUpdate } from "@/lib/supabase-admin";
 
 type HomeSection = {
+  id?: string;
   section_key: string;
   content: Record<string, unknown>;
   active: boolean;
@@ -31,7 +32,9 @@ export async function GET() {
   const result = await supabaseSelect("home_content", "select=*&order=sort_order.asc");
   if (!result.configured || !result.response?.ok) return NextResponse.json({ error: "Unable to load homepage content." }, { status: 502 });
   const rows = Array.isArray(result.data) ? result.data as HomeSection[] : [];
-  return NextResponse.json({ sections: rows.length ? rows : defaults });
+  const saved = new Map(rows.map((row) => [row.section_key, row]));
+  const merged = defaults.map((fallback) => ({ ...fallback, ...(saved.get(fallback.section_key) || {}) })).concat(rows.filter((row) => !defaults.some((fallback) => fallback.section_key === row.section_key)));
+  return NextResponse.json({ sections: merged.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)) });
 }
 
 export async function PUT(request: Request) {
@@ -58,5 +61,3 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Invalid homepage section data." }, { status: 400 });
   }
 }
-
-export { defaults };
