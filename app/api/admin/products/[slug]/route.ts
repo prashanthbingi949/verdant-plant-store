@@ -4,6 +4,7 @@ import { adminCookieName, isValidAdminToken } from "@/lib/admin-auth";
 import { supabaseUpdate } from "@/lib/supabase-admin";
 
 const tones = ["moss", "sage", "lime"] as const;
+const productTypes = ["Plants", "Gardening Supplies"] as const;
 
 export async function PATCH(request: Request, context: { params: Promise<{ slug: string }> }) {
   const cookieStore = await cookies();
@@ -15,7 +16,9 @@ export async function PATCH(request: Request, context: { params: Promise<{ slug:
     const body = await request.json();
     const update: Record<string, unknown> = {};
     if (typeof body?.name === "string") update.name = body.name.trim();
+    if (typeof body?.product_type === "string" && productTypes.includes(body.product_type as (typeof productTypes)[number])) update.product_type = body.product_type;
     if (typeof body?.category === "string") update.category = body.category.trim();
+    if (typeof body?.subcategory === "string") update.subcategory = body.subcategory.trim();
     if (typeof body?.level === "string") update.level = body.level.trim();
     if (typeof body?.size === "string") update.size = body.size.trim();
     if (typeof body?.description === "string") update.description = body.description.trim();
@@ -23,6 +26,8 @@ export async function PATCH(request: Request, context: { params: Promise<{ slug:
     if (typeof body?.price === "number" && Number.isFinite(body.price)) update.price = Math.max(0, Math.round(body.price));
     if (typeof body?.stock === "number" && Number.isFinite(body.stock)) update.stock = Math.max(0, Math.round(body.stock));
     if (typeof body?.active === "boolean") update.active = body.active;
+    if (typeof body?.featured === "boolean") update.featured = body.featured;
+    if (typeof body?.sort_order === "number" && Number.isFinite(body.sort_order)) update.sort_order = Math.max(0, Math.round(body.sort_order));
     if (typeof body?.tone === "string" && tones.includes(body.tone as (typeof tones)[number])) update.tone = body.tone;
     if (typeof body?.image_url === "string" || body?.image_url === null) update.image_url = typeof body.image_url === "string" ? body.image_url.trim() || null : null;
     if (Array.isArray(body?.image_urls)) update.image_urls = body.image_urls.filter((value: unknown) => typeof value === "string").slice(0, 8);
