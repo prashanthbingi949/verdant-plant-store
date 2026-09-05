@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Balthazar&display=swap');
+
 .shop-section .product-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
   gap: 16px;
@@ -107,7 +109,7 @@
   font-size: 11px !important;
 }
 
-/* Keep the root page on native scrolling to avoid App Router transition warnings. */
+/* Root scrolling remains native for Next.js App Router route transitions. */
 html {
   scroll-behavior: auto !important;
 }
@@ -117,18 +119,15 @@ html {
   contain: layout paint;
 }
 
-/* Hero supporting copy: hide the extra interaction sentence and give the
-   CMS description a Quentin-like handwritten feel without shipping a font file. */
-.verdant-spotlight [class~="bottom-10"][class~="sm:bottom-24"] > p:first-child {
-  display: none !important;
-}
-
-.verdant-spotlight [class~="bottom-14"] > p {
-  font-family: "Quentin", "Segoe Script", "Brush Script MT", cursive !important;
-  font-size: clamp(18px, 1.6vw, 24px) !important;
-  line-height: 1.35 !important;
-  letter-spacing: .01em !important;
-  max-width: 360px !important;
+/* Hero supporting copy: readable Balthazar treatment. */
+.verdant-spotlight .hero-fade > p:first-child {
+  font-family: 'Balthazar', Georgia, serif !important;
+  font-style: normal !important;
+  font-size: clamp(17px, 1.45vw, 22px) !important;
+  line-height: 1.18 !important;
+  letter-spacing: 0.01em !important;
+  color: rgba(255,255,255,.92) !important;
+  text-shadow: 0 1px 14px rgba(0,0,0,.4);
 }
 
 @media (max-width: 980px) {
@@ -167,6 +166,12 @@ html {
 
   .story-card {
     width: min(82%, 300px) !important;
+  }
+
+  .verdant-spotlight .hero-fade > p:first-child {
+    font-size: 18px !important;
+    line-height: 1.15 !important;
+    max-width: 300px !important;
   }
 }
 
