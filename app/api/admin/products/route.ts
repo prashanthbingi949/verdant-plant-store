@@ -53,6 +53,7 @@ function normalizeProduct(body: Record<string, unknown>, slug: string) {
     active: body.active !== false,
     featured: body.featured === true,
     sort_order: Math.max(0, Math.round(Number(body.sort_order) || 0)),
+    badge_text: String(body.badge_text || "").trim(),
     image_url: imageUrl,
     image_urls: imageUrls,
   };
