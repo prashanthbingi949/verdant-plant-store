@@ -125,11 +125,11 @@ export default function AdminProductsClient({ products: initialProducts }: { pro
         window.location.href = "/admin/login";
         return;
       }
-      if (!response.ok) throw new Error(data?.error || "Unable to save product.");
+      if (!response.ok || !data?.product) throw new Error(data?.error || "Unable to save product.");
 
-      if (data?.product) setProducts((list) => list.map((item) => item.slug === product.slug ? data.product : item));
+      setProducts((list) => list.map((item) => item.slug === product.slug ? data.product : item));
       setDirty((list) => list.filter((slug) => slug !== product.slug));
-      setNotice(`${product.name} saved.`);
+      setNotice(`${data.product.name} saved.`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to save product.");
     } finally {
@@ -162,12 +162,12 @@ export default function AdminProductsClient({ products: initialProducts }: { pro
         window.location.href = "/admin/login";
         return;
       }
-      if (!response.ok) throw new Error(data?.error || "Unable to create product.");
+      if (!response.ok || !data?.product) throw new Error(data?.error || "Unable to create product.");
 
-      if (data?.product) setProducts((list) => [...list, data.product]);
+      setProducts((list) => [...list, data.product]);
       setDraft(emptyDraft);
       setCreating(false);
-      setNotice(`${data?.product?.name || payload.name} created.`);
+      setNotice(`${data.product.name} created.`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to create product.");
     } finally {
@@ -210,7 +210,7 @@ export default function AdminProductsClient({ products: initialProducts }: { pro
         <Field label="Product badge (optional)"><input value={draft.badge_text || ""} onChange={(e) => setDraft({ ...draft, badge_text: e.target.value })} placeholder="e.g. Best Seller, New, Limited" /></Field>
       </div>
 
-      <label className="mt-5 flex items-center gap-3 text-sm"><input type="checkbox" checked={draft.featured} onChange={(e) => setDraft({ ...draft, featured: e.target.checked })} /> Feature this product on the storefront</label>
+      <label className="mt-5 flex items-center gap-3 text-sm"><input type="checkbox" checked={draft.featured} onChange={(e) => setDraft({ ...draft, featured: e.target.checked })} /> Show in Most Loved section</label>
       <label className="mt-5 block text-sm">Description<textarea value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} rows={5} className="mt-2 min-h-32 w-full resize-y rounded-2xl border border-black/10 bg-[#f4f5e9] px-4 py-3 leading-6 outline-none" /></label>
 
       <ImageManager
@@ -239,7 +239,7 @@ export default function AdminProductsClient({ products: initialProducts }: { pro
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="truncate text-sm font-bold">{product.name}</h2>
                 <span className={`rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[.08em] ${product.active ? "bg-emerald-100 text-emerald-800" : "bg-black/10 text-black/45"}`}>{product.active ? "Live" : "Hidden"}</span>
-                {product.featured && <span className="rounded-full bg-[#ddf27a] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[.08em] text-[#202d20]">Featured</span>}
+                {product.featured && <span className="rounded-full bg-[#ddf27a] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[.08em] text-[#202d20]">Most Loved</span>}
                 {product.badge_text && <span className="rounded-full bg-white px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[.08em] text-black/60">{product.badge_text}</span>}
               </div>
               <p className="mt-1 text-xs text-black/45">{product.product_type} · {product.category}{product.subcategory ? ` · ${product.subcategory}` : ""}</p>
@@ -262,31 +262,14 @@ export default function AdminProductsClient({ products: initialProducts }: { pro
               <Field label="Sort order"><input type="number" min="0" value={product.sort_order || 0} onChange={(e) => update(product.slug, { sort_order: Math.max(0, Number(e.target.value)) })} /></Field>
               <Field label="Product badge (optional)"><input value={product.badge_text || ""} onChange={(e) => update(product.slug, { badge_text: e.target.value })} placeholder="e.g. Best Seller, New, Limited" /></Field>
             </div>
-
-            <div className="mt-5 flex flex-wrap gap-5 text-sm">
-              <label className="flex items-center gap-3"><input type="checkbox" checked={product.featured} onChange={(e) => update(product.slug, { featured: e.target.checked })} /> Featured</label>
-              <label className="flex items-center gap-3"><input type="checkbox" checked={product.active} onChange={(e) => update(product.slug, { active: e.target.checked })} /> Visible</label>
-            </div>
-
+            <div className="mt-5 flex flex-wrap gap-5 text-sm"><label className="flex items-center gap-3"><input type="checkbox" checked={product.featured} onChange={(e) => update(product.slug, { featured: e.target.checked })} /> Show in Most Loved section</label><label className="flex items-center gap-3"><input type="checkbox" checked={product.active} onChange={(e) => update(product.slug, { active: e.target.checked })} /> Visible</label></div>
             <label className="mt-5 block text-sm">Description<textarea value={product.description} onChange={(e) => update(product.slug, { description: e.target.value })} rows={5} className="mt-2 min-h-32 w-full resize-y rounded-2xl border border-black/10 bg-[#f4f5e9] px-4 py-3 leading-6 outline-none" /></label>
 
-            <ImageManager
-              slug={product.slug}
-              images={product.image_urls || (product.image_url ? [product.image_url] : [])}
-              uploading={uploading}
-              onUpload={(files) => uploadFiles(files, product.slug, "product", product)}
-              onPrimary={(url) => update(product.slug, { image_url: url })}
-              onRemove={(url) => update(product.slug, { image_url: product.image_url === url ? null : product.image_url, image_urls: (product.image_urls || []).filter((item) => item !== url) })}
-            />
+            <ImageManager slug={product.slug} images={product.image_urls || (product.image_url ? [product.image_url] : [])} uploading={uploading} onUpload={(files) => uploadFiles(files, product.slug, "product", product)} onPrimary={(url) => update(product.slug, { image_url: url })} onRemove={(url) => update(product.slug, { image_url: product.image_url === url ? null : product.image_url, image_urls: (product.image_urls || []).filter((item) => item !== url) })} />
 
             <div className="mt-6 flex items-center justify-end gap-3">
-              <span className={`text-xs font-semibold ${isDirty ? "text-black/45" : "text-emerald-700"}`}>{isDirty ? "Unsaved changes" : "All changes saved"}</span>
-              <button
-                type="button"
-                onClick={() => save(product)}
-                disabled={!isDirty || saving === product.slug || uploading}
-                className={`rounded-full px-5 py-3 text-sm font-bold ${isDirty ? "bg-[#202d20] text-[#f4f5e9]" : "bg-emerald-100 text-emerald-800"} disabled:cursor-default disabled:opacity-100`}
-              >
+              {isDirty && <span className="text-xs font-semibold text-amber-700">Unsaved changes</span>}
+              <button type="button" onClick={() => save(product)} disabled={!isDirty || saving === product.slug || uploading} className="rounded-full bg-[#202d20] px-5 py-3 text-sm font-bold text-[#f4f5e9] disabled:cursor-not-allowed disabled:opacity-40">
                 {saving === product.slug ? "Saving…" : isDirty ? "Save product" : "Saved ✓"}
               </button>
             </div>
@@ -297,66 +280,10 @@ export default function AdminProductsClient({ products: initialProducts }: { pro
   </section>;
 }
 
-function ImageManager({
-  slug,
-  images,
-  uploading,
-  onUpload,
-  onPrimary,
-  onRemove,
-}: {
-  slug: string;
-  images: string[];
-  uploading: boolean;
-  onUpload: (files: FileList | null) => void;
-  onPrimary: (url: string) => void;
-  onRemove: (url: string) => void;
-}) {
+function ImageManager({ slug, images, uploading, onUpload, onPrimary, onRemove }: { slug: string; images: string[]; uploading: boolean; onUpload: (files: FileList | null) => void; onPrimary: (url: string) => void; onRemove: (url: string) => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
-
-  return <div className="mt-6">
-    <div className="flex flex-wrap items-end justify-between gap-3">
-      <div>
-        <p className="text-sm font-semibold">Product images</p>
-        <p className="mt-1 text-xs text-black/45">Use clean transparent-background PNG/WebP/AVIF files when possible. Up to 8 images. The first or selected Primary image is used as the product's main image.</p>
-      </div>
-      <div>
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/png,image/webp,image/avif,image/jpeg"
-          multiple
-          className="sr-only"
-          onChange={(e) => { onUpload(e.target.files); e.currentTarget.value = ""; }}
-          disabled={uploading || !slug}
-        />
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          disabled={uploading || !slug}
-          className="rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-bold transition hover:bg-black/[.03] disabled:opacity-60"
-        >
-          {uploading ? "Uploading…" : "+ Add images"}
-        </button>
-      </div>
-    </div>
-
-    {images.length ? <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-      {images.map((url, index) => <div key={`${url}-${index}`} className="group relative overflow-hidden rounded-2xl border border-black/10 bg-[#e2e8d3] p-2">
-        <img src={url} alt={`Product image ${index + 1}`} className="aspect-square h-full w-full object-contain" />
-        <div className="absolute inset-x-2 bottom-2 flex gap-1 opacity-0 transition group-hover:opacity-100 focus-within:opacity-100">
-          <button type="button" onClick={() => onPrimary(url)} className={`flex-1 rounded-full px-2 py-2 text-[10px] font-bold shadow ${url === images[0] ? "bg-[#ddf27a] text-[#202d20]" : "bg-white/95"}`}>{url === images[0] ? "Primary" : "Set primary"}</button>
-          <button type="button" onClick={() => onRemove(url)} className="rounded-full bg-white/95 px-3 py-2 text-[10px] font-bold text-red-700 shadow">Remove</button>
-        </div>
-      </div>)}
-    </div> : <div className="mt-4 rounded-2xl border border-dashed border-black/15 bg-black/[.02] p-6 text-center text-xs text-black/40">No images uploaded yet.</div>}
-  </div>;
+  return <div className="mt-6"><div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-sm font-semibold">Product images</p><p className="mt-1 text-xs text-black/45">Use clean transparent-background PNG/WebP/AVIF files when possible. Up to 8 images. The first or selected Primary image is used as the product's main image.</p></div><button type="button" onClick={() => inputRef.current?.click()} disabled={uploading || !slug} className="rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-bold hover:bg-black/[.03] disabled:opacity-50">{uploading ? "Uploading…" : "+ Add images"}</button><input ref={inputRef} type="file" accept="image/png,image/webp,image/avif,image/jpeg" multiple className="hidden" onChange={(e) => { onUpload(e.target.files); e.currentTarget.value = ""; }} disabled={uploading || !slug} /></div>{images.length ? <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">{images.map((url, index) => <div key={url} className="group relative overflow-hidden rounded-2xl border border-black/10 bg-[#e2e8d3] p-2"><img src={url} alt={`Product image ${index + 1}`} className="aspect-square h-full w-full object-contain" /><div className="absolute inset-x-2 bottom-2 flex gap-1"><button type="button" onClick={() => onPrimary(url)} className={`flex-1 rounded-full px-2 py-2 text-[10px] font-bold shadow ${url === images[0] ? "bg-[#ddf27a] text-[#202d20]" : "bg-white/90"}`}>{url === images[0] ? "Primary" : "Set primary"}</button><button type="button" onClick={() => onRemove(url)} className="rounded-full bg-white/90 px-3 py-2 text-[10px] font-bold text-red-700 shadow">Remove</button></div></div>)}</div> : <div className="mt-4 rounded-2xl border border-dashed border-black/15 bg-black/[.02] p-6 text-center text-xs text-black/40">No images uploaded yet.</div>}</div>;
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <label className="block text-sm">{label}{children}<style>{`label > input, label > select { margin-top:.5rem; display:block; width:100%; height:3rem; border:1px solid rgba(16,21,16,.1); border-radius:1rem; background:#f4f5e9; padding:0 .9rem; outline:none; } label > input:focus, label > select:focus { border-color:rgba(32,45,32,.25); }`}</style></label>;
-}
-
-function slugify(value: string) {
-  return value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-}
+function Field({ label, children }: { label: string; children: React.ReactNode }) { return <label className="block text-sm">{label}{children}<style>{`label > input, label > select { margin-top:.5rem; display:block; width:100%; height:3rem; border:1px solid rgba(16,21,16,.1); border-radius:1rem; background:#f4f5e9; padding:0 .9rem; outline:none; } label > input:focus, label > select:focus { border-color:rgba(32,45,32,.25); }`}</style></label>; }
+function slugify(value: string) { return value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""); }
