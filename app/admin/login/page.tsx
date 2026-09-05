@@ -15,17 +15,11 @@ export default function AdminLoginPage() {
     if (loading) return;
     setLoading(true);
     setError("");
-
     try {
-      const response = await fetch("/api/admin/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
-
+      const response = await fetch("/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password }) });
       const data = await response.json().catch(() => null);
       if (!response.ok) throw new Error(data?.error || "Unable to sign in.");
-      router.replace("/admin/orders");
+      router.replace("/admin");
     } catch (loginError) {
       setError(loginError instanceof Error ? loginError.message : "Unable to sign in.");
       setLoading(false);
@@ -39,7 +33,7 @@ export default function AdminLoginPage() {
         <div className="mt-7 rounded-[32px] border border-white/10 bg-white/[.06] p-6 shadow-2xl backdrop-blur sm:p-8">
           <p className="text-[10px] font-bold tracking-[.18em] text-[#ddf27a]">PRIVATE AREA</p>
           <h1 className="mt-3 text-4xl font-semibold tracking-[-.05em]">Welcome back.</h1>
-          <p className="mt-3 text-sm leading-6 text-white/55">Sign in to manage Verdant orders.</p>
+          <p className="mt-3 text-sm leading-6 text-white/55">Sign in to manage the Verdant store.</p>
           <form onSubmit={handleSubmit} className="mt-8">
             <label className="text-sm text-white/80">Admin password<input autoFocus required type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="mt-2 h-12 w-full rounded-2xl border border-white/10 bg-black/15 px-4 text-white outline-none placeholder:text-white/25 focus:border-[#ddf27a]/60" placeholder="Enter password" /></label>
             {error && <p role="alert" className="mt-3 rounded-2xl bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</p>}
