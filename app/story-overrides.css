@@ -1,0 +1,72 @@
+/* Compact "The Verdant Way" story section */
+.story-section{
+  gap:clamp(28px,5vw,64px)!important;
+  padding:44px clamp(24px,6vw,84px)!important;
+}
+.story-art{
+  min-height:320px!important;
+}
+.story-card{
+  width:min(64%,300px)!important;
+  padding:18px!important;
+  border-radius:24px!important;
+}
+.story-card>span{
+  font-size:7px!important;
+}
+.story-circle{
+  width:56px!important;
+  height:56px!important;
+}
+.story-circle svg{
+  width:30px!important;
+}
+.story-card strong{
+  font-size:clamp(30px,2.8vw,42px)!important;
+}
+.story-stem{
+  height:68%!important;
+}
+.story-copy{
+  max-width:500px!important;
+}
+.story-copy h2{
+  margin-bottom:12px!important;
+  font-size:clamp(36px,4vw,56px)!important;
+}
+.story-copy>p:not(.eyebrow){
+  max-width:440px!important;
+  margin-bottom:16px!important;
+  font-size:12px!important;
+  line-height:1.5!important;
+}
+.story-copy .button{
+  min-height:38px!important;
+  padding:0 15px!important;
+  font-size:10px!important;
+}
+@media(max-width:980px){
+  .story-section{
+    gap:28px!important;
+    padding:44px 24px!important;
+  }
+  .story-art{min-height:300px!important;}
+  .story-card{width:min(66%,300px)!important;}
+}
+@media(max-width:640px){
+  .story-section{
+    padding:38px 20px!important;
+    gap:24px!important;
+  }
+  .story-art{min-height:270px!important;}
+  .story-card{
+    width:min(70%,260px)!important;
+    padding:16px!important;
+    border-radius:22px!important;
+  }
+  .story-card strong{font-size:clamp(28px,9vw,38px)!important;}
+  .story-circle{width:50px!important;height:50px!important;}
+  .story-circle svg{width:27px!important;}
+  .story-copy h2{font-size:clamp(34px,11vw,50px)!important;}
+  .story-copy>p:not(.eyebrow){font-size:12px!important;}
+}
