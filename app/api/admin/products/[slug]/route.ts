@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { adminCookieName, isValidAdminToken } from "@/lib/admin-auth";
-import { supabaseUpdate } from "@/lib/supabase-admin";
+import { supabaseSelect, supabaseUpdate } from "@/lib/supabase-admin";
 
 const tones = ["moss", "sage", "lime"] as const;
 const productTypes = ["Plants", "Gardening Supplies"] as const;
@@ -37,8 +37,22 @@ export async function PATCH(request: Request, context: { params: Promise<{ slug:
     if (Object.keys(update).length === 1) return NextResponse.json({ error: "No changes supplied." }, { status: 400 });
     const result = await supabaseUpdate("products", `slug=eq.${encodeURIComponent(slug)}`, update);
     if (!result.configured) return NextResponse.json({ error: "Supabase is not configured." }, { status: 500 });
-    if (!result.response?.ok) return NextResponse.json({ error: "Unable to update product." }, { status: 400 });
-    return NextResponse.json({ product: Array.isArray(result.data) ? result.data[0] ?? null : null });
+    if (!result.response?.ok) {
+      const detail = typeof result.data === "object" && result.data && "message" in result.data ? String((result.data as { message?: string }).message || "") : "";
+      return NextResponse.json({ error: detail || "Unable to update product." }, { status: 400 });
+    }
+
+    // Re-read the row from Supabase so the admin only reports success when the
+    // saved value is actually persisted and the latest product is returned.
+    const verified = await supabaseSelect(
+      "products",
+      `select=*&slug=eq.${encodeURIComponent(slug)}&limit=1`,
+    );
+    if (!verified.configured || !verified.response?.ok || !Array.isArray(verified.data) || !verified.data[0]) {
+      return NextResponse.json({ error: "Product updated, but the saved record could not be verified. Please refresh and try again." }, { status: 502 });
+    }
+
+    return NextResponse.json({ product: verified.data[0] });
   } catch {
     return NextResponse.json({ error: "Invalid product data." }, { status: 400 });
   }
