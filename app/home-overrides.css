@@ -1,0 +1,53 @@
+.shop-section .product-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 16px;
+}
+
+.shop-section .product-image {
+  aspect-ratio: 1 / 1 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  border-radius: 22px;
+}
+
+.shop-section .product-image .botanical-card {
+  inset: 0 !important;
+}
+
+.shop-section .product-info {
+  padding-top: 10px;
+  gap: 10px;
+}
+
+.shop-section .product-buy {
+  gap: 6px;
+}
+
+.shop-section .wish {
+  top: 12px;
+  right: 12px;
+  width: 38px;
+  height: 38px;
+}
+
+.shop-section .product-badge {
+  left: 12px;
+  top: 12px;
+  padding: 7px 9px;
+}
+
+@media (max-width: 980px) {
+  .shop-section .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .shop-section .product-image {
+    aspect-ratio: 1 / 1 !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .shop-section .product-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
