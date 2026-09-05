@@ -29,6 +29,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ slug:
     if (typeof body?.featured === "boolean") update.featured = body.featured;
     if (typeof body?.sort_order === "number" && Number.isFinite(body.sort_order)) update.sort_order = Math.max(0, Math.round(body.sort_order));
     if (typeof body?.tone === "string" && tones.includes(body.tone as (typeof tones)[number])) update.tone = body.tone;
+    if (typeof body?.badge_text === "string") update.badge_text = body.badge_text.trim();
     if (typeof body?.image_url === "string" || body?.image_url === null) update.image_url = typeof body.image_url === "string" ? body.image_url.trim() || null : null;
     if (Array.isArray(body?.image_urls)) update.image_urls = body.image_urls.filter((value: unknown) => typeof value === "string").slice(0, 8);
     update.updated_at = new Date().toISOString();
