@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 
 type LinkItem = { label?: string; title?: string; eyebrow?: string; note?: string; href?: string; number?: string };
@@ -9,8 +10,6 @@ const labels: Record<string, string> = {
   hero: "Hero", marquee: "Announcement strip", collections: "Collections", featured: "Featured products", story: "Our story", care: "Plant care", newsletter: "Newsletter", footer: "Footer",
 };
 
-const order = ["hero", "marquee", "collections", "featured", "story", "care", "newsletter", "footer"];
-
 function TextField({ label, value, onChange, placeholder = "" }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
   return <label className="block"><span className="mb-1.5 block text-[10px] font-black uppercase tracking-[.16em] text-black/45">{label}</span><input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="h-11 w-full rounded-2xl border border-black/10 bg-[#f4f5e9] px-4 text-sm outline-none focus:border-black/25" /></label>;
 }
@@ -19,7 +18,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
   return <button type="button" onClick={() => onChange(!checked)} className={`relative h-7 w-12 rounded-full transition ${checked ? "bg-[#202d20]" : "bg-black/15"}`} aria-label={checked ? "Disable section" : "Enable section"}><span className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${checked ? "left-6" : "left-1"}`} /></button>;
 }
 
-function InputGrid({ children }: { children: React.ReactNode }) { return <div className="grid gap-4 md:grid-cols-2">{children}</div>; }
+function InputGrid({ children }: { children: ReactNode }) { return <div className="grid gap-4 md:grid-cols-2">{children}</div>; }
 
 export default function HomeManager() {
   const [sections, setSections] = useState<Section[]>([]);
