@@ -73,7 +73,7 @@ export default function Home() {
     ? content("marquee").items.map((item: unknown) => String(item || "").trim()).filter(Boolean)
     : String(content("marquee").text || "PLANT MORE JOY").split("·").map((item: string) => item.trim()).filter(Boolean);
   const safeMarqueeItems = marqueeItems.length ? marqueeItems : ["PLANT MORE JOY"];
-  const marqueeSequence = [...safeMarqueeItems, ...safeMarqueeItems, ...safeMarqueeItems];
+  const marqueeSequence = [...safeMarqueeItems, ...safeMarqueeItems, ...safeMarqueeItems, ...safeMarqueeItems, ...safeMarqueeItems, ...safeMarqueeItems];
 
   const handleAdd = (product: CmsProduct) => {
     if (product.stock < 1) return;
