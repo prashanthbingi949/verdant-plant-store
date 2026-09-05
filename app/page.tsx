@@ -93,6 +93,7 @@ export default function Home() {
   }
 
   return <main className="verdant-site">
+    <style>{`\n      .marquee-flow{animation-duration:42s!important;}\n      .marquee-item{padding-top:8px!important;padding-bottom:8px!important;}\n      .product-grid{grid-template-columns:repeat(2,minmax(0,1fr));}\n      @media(max-width:980px){.product-grid{grid-template-columns:1fr;}}\n    `}</style>
     <VerdantSpotlightHero />
 
     {visible("marquee") && <section className="marquee"><div className="marquee-flow">{marqueeSequence.map((item: string, index: number) => <span key={`marquee-${index}`} className="marquee-item">{item}<b aria-hidden="true">•</b></span>)}</div></section>}
