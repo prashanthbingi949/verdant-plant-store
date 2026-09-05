@@ -19,6 +19,7 @@ export type Product = {
   active: boolean;
   featured: boolean;
   sort_order: number;
+  badge_text: string;
   image_url?: string | null;
   image_urls?: string[];
 };
