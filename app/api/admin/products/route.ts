@@ -10,7 +10,7 @@ async function authorized() {
 
 export async function GET() {
   if (!(await authorized())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const result = await supabaseSelect("products", "select=*&order=created_at.asc");
+  const result = await supabaseSelect("products", "select=*&order=sort_order.asc,created_at.asc");
   if (!result.configured) return NextResponse.json({ error: "Supabase is not configured." }, { status: 500 });
   if (!result.response?.ok) return NextResponse.json({ error: "Unable to load products." }, { status: 502 });
   return NextResponse.json({ products: Array.isArray(result.data) ? result.data : [] });
@@ -36,10 +36,13 @@ function normalizeProduct(body: Record<string, unknown>, slug: string) {
   const details = Array.isArray(body.details) ? body.details : [];
   const imageUrls = Array.isArray(body.image_urls) ? body.image_urls.filter((value: unknown) => typeof value === "string").slice(0, 8) : [];
   const imageUrl = typeof body.image_url === "string" ? body.image_url.trim() || null : imageUrls[0] || null;
+  const productType = String(body.product_type || "Plants").trim();
   return {
     slug,
-    name: String(body.name || "New Plant").trim(),
-    category: String(body.category || "Indoor plants").trim(),
+    name: String(body.name || "New Product").trim(),
+    product_type: productType === "Gardening Supplies" ? "Gardening Supplies" : "Plants",
+    category: String(body.category || "Indoor & Decorative Greens").trim(),
+    subcategory: String(body.subcategory || "").trim(),
     level: String(body.level || "Easy care").trim(),
     price: Math.max(0, Math.round(Number(body.price) || 0)),
     size: String(body.size || '6" pot').trim(),
@@ -48,6 +51,8 @@ function normalizeProduct(body: Record<string, unknown>, slug: string) {
     tone: ["moss", "sage", "lime"].includes(String(body.tone)) ? String(body.tone) : "moss",
     stock: Math.max(0, Math.round(Number(body.stock) || 0)),
     active: body.active !== false,
+    featured: body.featured === true,
+    sort_order: Math.max(0, Math.round(Number(body.sort_order) || 0)),
     image_url: imageUrl,
     image_urls: imageUrls,
   };
