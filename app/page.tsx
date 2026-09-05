@@ -71,7 +71,7 @@ export default function Home() {
   const section = (key: string) => sections.find((s) => s.section_key === key);
   const visible = (key: string) => section(key)?.active !== false;
   const content = (key: string) => section(key)?.content || {};
-  const featuredProducts = [...products.filter((p) => p.active && p.featured), ...products.filter((p) => p.active && !p.featured)].slice(0, 4);
+  const featuredProducts = [...products.filter((p) => p.active && p.featured), ...products.filter((p) => p.active && !p.featured)].slice(0, 8);
   const collections = Array.isArray(content("collections").items) && content("collections").items.length ? content("collections").items : fallbackCollections;
   const careItems = Array.isArray(content("care").items) && content("care").items.length ? content("care").items : [
     { number: "01", title: "Watering without overthinking", href: "/pages/plant-care" }, { number: "02", title: "Finding the right light", href: "/pages/plant-care" }, { number: "03", title: "Repotting, root to leaf", href: "/pages/plant-care" }, { number: "04", title: "Build your own green corner", href: "/pages/plant-care" },
@@ -93,7 +93,7 @@ export default function Home() {
   }
 
   return <main className="verdant-site">
-    <style>{`\n      .marquee-flow{animation-duration:42s!important;}\n      .marquee-item{padding-top:8px!important;padding-bottom:8px!important;}\n      .product-grid{grid-template-columns:repeat(2,minmax(0,1fr));}\n      @media(max-width:980px){.product-grid{grid-template-columns:1fr;}}\n    `}</style>
+    <style>{`\n      .marquee-flow{animation-duration:42s!important;}\n      .marquee-item{padding-top:8px!important;padding-bottom:8px!important;}\n      .product-grid{grid-template-columns:repeat(4,minmax(0,1fr));}\n      @media(max-width:980px){.product-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}\n      @media(max-width:640px){.product-grid{grid-template-columns:1fr;}}\n    `}</style>
     <VerdantSpotlightHero />
 
     {visible("marquee") && <section className="marquee"><div className="marquee-flow">{marqueeSequence.map((item: string, index: number) => <span key={`marquee-${index}`} className="marquee-item">{item}<b aria-hidden="true">•</b></span>)}</div></section>}
