@@ -39,15 +39,13 @@ export async function PATCH(request: Request, context: { params: Promise<{ slug:
     if (!result.configured) return NextResponse.json({ error: "Supabase is not configured." }, { status: 500 });
     if (!result.response?.ok) {
       const detail = typeof result.data === "object" && result.data && "message" in result.data ? String((result.data as { message?: string }).message || "") : "";
-      return NextResponse.json({ error: detail || "Unable to update product." }, { status: 400 });
+      const hint = detail.toLowerCase().includes("badge_text") && detail.toLowerCase().includes("column")
+        ? "The products.badge_text column is missing. Run supabase/product-badges.sql in your Supabase SQL Editor, then try again."
+        : detail;
+      return NextResponse.json({ error: hint || "Unable to update product." }, { status: 400 });
     }
 
-    // Re-read the row from Supabase so the admin only reports success when the
-    // saved value is actually persisted and the latest product is returned.
-    const verified = await supabaseSelect(
-      "products",
-      `select=*&slug=eq.${encodeURIComponent(slug)}&limit=1`,
-    );
+    const verified = await supabaseSelect("products", `select=*&slug=eq.${encodeURIComponent(slug)}&limit=1`);
     if (!verified.configured || !verified.response?.ok || !Array.isArray(verified.data) || !verified.data[0]) {
       return NextResponse.json({ error: "Product updated, but the saved record could not be verified. Please refresh and try again." }, { status: 502 });
     }
