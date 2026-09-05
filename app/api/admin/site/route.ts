@@ -16,10 +16,10 @@ const defaultSettings: Record<string, Record<string, unknown>> = {
 };
 
 const defaultNavigation = [
-  { label: "Shop", href: "/shop", location: "header", active: true, sort_order: 10 },
-  { label: "Collections", href: "#collections", location: "header", active: true, sort_order: 20 },
-  { label: "Plant Care", href: "#care", location: "header", active: true, sort_order: 30 },
-  { label: "Our Story", href: "#story", location: "header", active: true, sort_order: 40 },
+  { id: "default-shop", label: "Shop", href: "/shop", location: "header", active: true, sort_order: 10 },
+  { id: "default-collections", label: "Collections", href: "#collections", location: "header", active: true, sort_order: 20 },
+  { id: "default-plant-care", label: "Plant Care", href: "#care", location: "header", active: true, sort_order: 30 },
+  { id: "default-our-story", label: "Our Story", href: "#story", location: "header", active: true, sort_order: 40 },
 ];
 
 export async function GET() {
