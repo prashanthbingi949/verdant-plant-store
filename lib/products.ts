@@ -6,7 +6,9 @@ export type Product = {
   updated_at?: string;
   slug: string;
   name: string;
+  product_type: "Plants" | "Gardening Supplies";
   category: string;
+  subcategory: string;
   level: string;
   price: number;
   size: string;
@@ -15,12 +17,14 @@ export type Product = {
   tone: "moss" | "sage" | "lime";
   stock: number;
   active: boolean;
+  featured: boolean;
+  sort_order: number;
   image_url?: string | null;
   image_urls?: string[];
 };
 
 export async function getProducts(includeInactive = false) {
-  const query = includeInactive ? "select=*&order=created_at.asc" : "select=*&active=eq.true&order=created_at.asc";
+  const query = includeInactive ? "select=*&order=sort_order.asc,created_at.asc" : "select=*&active=eq.true&order=sort_order.asc,created_at.asc";
   const result = await supabaseSelect("products", query);
   if (!result.configured || !result.response?.ok || !Array.isArray(result.data)) return [] as Product[];
   return result.data as Product[];
