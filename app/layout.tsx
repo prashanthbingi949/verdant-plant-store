@@ -4,7 +4,6 @@ import "./globals.css";
 import "./home-overrides.css";
 import "./story-overrides.css";
 import { CartProvider } from "@/components/cart-provider";
-import HomeNavController from "@/components/home-nav-controller";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,10 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <CartProvider>
-          <HomeNavController />
-          {children}
-        </CartProvider>
+        <CartProvider>{children}</CartProvider>
       </body>
     </html>
   );
