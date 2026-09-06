@@ -6,6 +6,7 @@ import CurvedLoop from "@/components/CurvedLoop/CurvedLoop";
 import CircularText from "@/components/CircularText";
 
 const visualStyles = `
+  /* CircularText: reserve real space beside ABOUT and keep it visible. */
   .verdant-site .footer-about-with-circular {
     position: relative !important;
     overflow: visible !important;
@@ -53,7 +54,7 @@ const visualStyles = `
     visibility: visible !important;
   }
 
-  /* Plant Care: pull the loop tightly against the copy and next section. */
+  /* Plant Care: collapse the unused tail and pull the loop right up to the copy. */
   .verdant-site .care-section {
     min-height: 0 !important;
     height: auto !important;
@@ -66,12 +67,12 @@ const visualStyles = `
     z-index: 5 !important;
     width: 100vw !important;
     max-width: 100vw !important;
-    height: 76px !important;
-    min-height: 76px !important;
+    height: 64px !important;
+    min-height: 64px !important;
     margin-left: calc(50% - 50vw) !important;
     margin-right: 0 !important;
-    margin-top: -52px !important;
-    margin-bottom: -4px !important;
+    margin-top: -118px !important;
+    margin-bottom: -6px !important;
     padding: 0 !important;
     overflow: hidden !important;
     display: block !important;
@@ -81,8 +82,8 @@ const visualStyles = `
 
   .verdant-site .care-curved-loop-host .curved-loop-jacket {
     width: 100% !important;
-    height: 76px !important;
-    min-height: 76px !important;
+    height: 64px !important;
+    min-height: 64px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -93,13 +94,13 @@ const visualStyles = `
   .verdant-site .care-curved-loop-host .curved-loop-svg {
     width: 100vw !important;
     max-width: 100vw !important;
-    height: 76px !important;
-    min-height: 76px !important;
+    height: 64px !important;
+    min-height: 64px !important;
     aspect-ratio: auto !important;
     display: block !important;
     overflow: visible !important;
     fill: var(--forest) !important;
-    font-size: 3.2rem !important;
+    font-size: 3.25rem !important;
   }
 
   @media (max-width: 980px) {
@@ -125,15 +126,20 @@ const visualStyles = `
       font-size: 7.2px !important;
     }
 
-    .verdant-site .care-curved-loop-host,
+    .verdant-site .care-curved-loop-host {
+      height: 56px !important;
+      min-height: 56px !important;
+      margin-top: -92px !important;
+    }
+
     .verdant-site .care-curved-loop-host .curved-loop-jacket,
     .verdant-site .care-curved-loop-host .curved-loop-svg {
-      height: 60px !important;
-      min-height: 60px !important;
+      height: 56px !important;
+      min-height: 56px !important;
     }
 
     .verdant-site .care-curved-loop-host .curved-loop-svg {
-      font-size: 2.4rem !important;
+      font-size: 2.35rem !important;
     }
   }
 
@@ -161,81 +167,69 @@ const visualStyles = `
     }
 
     .verdant-site .care-curved-loop-host {
-      height: 52px !important;
-      min-height: 52px !important;
-      margin-top: -34px !important;
+      height: 48px !important;
+      min-height: 48px !important;
+      margin-top: -72px !important;
       margin-bottom: -2px !important;
     }
 
     .verdant-site .care-curved-loop-host .curved-loop-jacket,
     .verdant-site .care-curved-loop-host .curved-loop-svg {
-      height: 52px !important;
-      min-height: 52px !important;
+      height: 48px !important;
+      min-height: 48px !important;
     }
 
     .verdant-site .care-curved-loop-host .curved-loop-svg {
-      font-size: 1.9rem !important;
+      font-size: 1.85rem !important;
     }
   }
 `;
 
 export default function HomeVisualEffects() {
+  const [mounted, setMounted] = useState(false);
   const [careHost, setCareHost] = useState<HTMLElement | null>(null);
   const [footerHost, setFooterHost] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
+    setMounted(true);
+
     if (window.location.pathname !== "/") return;
 
-    let observer: MutationObserver | null = null;
+    const care = document.getElementById("care");
+    const footerAbout = document.querySelector<HTMLElement>(".footer-about-with-circular");
+
     let careTarget: HTMLDivElement | null = null;
     let footerTarget: HTMLDivElement | null = null;
-    let cancelled = false;
 
-    const attach = () => {
-      if (cancelled) return true;
-
-      const care = document.getElementById("care");
-      const footerAbout = document.querySelector<HTMLElement>(".footer-about-with-circular");
-
-      if (care) {
-        careTarget = care.querySelector<HTMLDivElement>(".care-curved-loop-host");
-        if (!careTarget) {
-          careTarget = document.createElement("div");
-          careTarget.className = "care-curved-loop-host";
-          care.appendChild(careTarget);
-        }
-        setCareHost(careTarget);
+    if (care) {
+      careTarget = care.querySelector<HTMLDivElement>(".care-curved-loop-host");
+      if (!careTarget) {
+        careTarget = document.createElement("div");
+        careTarget.className = "care-curved-loop-host";
+        care.appendChild(careTarget);
       }
+      setCareHost(careTarget);
+    }
 
-      if (footerAbout) {
-        footerTarget = footerAbout.querySelector<HTMLDivElement>(".footer-circular-host");
-        if (!footerTarget) {
-          footerTarget = document.createElement("div");
-          footerTarget.className = "footer-circular-host";
-          footerAbout.appendChild(footerTarget);
-        }
-        setFooterHost(footerTarget);
+    if (footerAbout) {
+      footerTarget = footerAbout.querySelector<HTMLDivElement>(".footer-circular-host");
+      if (!footerTarget) {
+        footerTarget = document.createElement("div");
+        footerTarget.className = "footer-circular-host";
+        footerAbout.appendChild(footerTarget);
       }
-
-      return Boolean(care && footerAbout);
-    };
-
-    if (!attach()) {
-      observer = new MutationObserver(() => {
-        if (attach()) observer?.disconnect();
-      });
-      observer.observe(document.body, { childList: true, subtree: true });
+      setFooterHost(footerTarget);
     }
 
     return () => {
-      cancelled = true;
-      observer?.disconnect();
       if (careTarget?.parentNode) careTarget.parentNode.removeChild(careTarget);
       if (footerTarget?.parentNode) footerTarget.parentNode.removeChild(footerTarget);
       setCareHost(null);
       setFooterHost(null);
     };
   }, []);
+
+  if (!mounted) return null;
 
   return (
     <>
@@ -245,7 +239,7 @@ export default function HomeVisualEffects() {
             <CurvedLoop
               marqueeText="PLANT MORE JOY ✦ GROW SOMETHING GOOD ✦ BRING HOME A LITTLE WILD ✦ SHOP THE NEW ARRIVALS ✦"
               speed={1}
-              curveAmount={48}
+              curveAmount={20}
               direction="left"
               interactive={true}
               className="verdant-care-curved-loop"
