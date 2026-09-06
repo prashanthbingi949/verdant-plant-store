@@ -21,9 +21,9 @@ const CurvedLoop = ({
   const uid = useId();
   const pathId = `curve-${uid}`;
 
-  // A shallow, alternating wave keeps the type relaxed and editorial rather than U-shaped.
-  const amount = Math.max(5, Math.min(Math.abs(curveAmount), 16));
-  const pathD = `M-120,62 C120,${62 - amount} 340,${62 + amount} 560,62 S1000,${62 - amount} 1220,62 S1440,${62 + amount} 1560,62`;
+  // A shallow, natural wave: visible curvature without a deep U shape.
+  const amount = Math.max(18, Math.min(Math.abs(curveAmount), 42));
+  const pathD = `M-120,60 C70,18 215,102 410,60 S770,18 960,60 S1320,102 1560,60`;
 
   const dragRef = useRef(false);
   const lastXRef = useRef(0);
@@ -106,12 +106,10 @@ const CurvedLoop = ({
     }
   };
 
-  const cursorStyle = interactive ? 'grab' : 'default';
-
   return (
     <div
       className="curved-loop-jacket"
-      style={{ visibility: ready ? 'visible' : 'hidden', cursor: cursorStyle }}
+      style={{ visibility: ready ? 'visible' : 'hidden', cursor: interactive ? 'grab' : 'default' }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endDrag}
