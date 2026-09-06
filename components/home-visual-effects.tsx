@@ -5,22 +5,13 @@ import { createPortal } from "react-dom";
 import CircularText from "@/components/CircularText";
 
 const visualStyles = `
-  /* CircularText is anchored directly to the ABOUT column so it cannot be
-     misplaced by the footer grid or viewport coordinates. */
-  .verdant-site .verdant-footer-about-anchor {
-    position: relative !important;
-    overflow: visible !important;
-  }
-
   .verdant-site .verdant-footer-circular-host {
     position: absolute !important;
-    z-index: 20 !important;
-    top: -16px !important;
-    left: 112px !important;
-    width: 96px !important;
-    height: 96px !important;
-    min-width: 96px !important;
-    min-height: 96px !important;
+    z-index: 50 !important;
+    width: 108px !important;
+    height: 108px !important;
+    min-width: 108px !important;
+    min-height: 108px !important;
     display: block !important;
     overflow: visible !important;
     pointer-events: auto !important;
@@ -29,10 +20,10 @@ const visualStyles = `
   .verdant-site .verdant-footer-circular-host .circular-text {
     position: relative !important;
     display: block !important;
-    width: 96px !important;
-    height: 96px !important;
-    min-width: 96px !important;
-    min-height: 96px !important;
+    width: 108px !important;
+    height: 108px !important;
+    min-width: 108px !important;
+    min-height: 108px !important;
     margin: 0 !important;
     overflow: visible !important;
     color: var(--lime) !important;
@@ -43,7 +34,7 @@ const visualStyles = `
   .verdant-site .verdant-footer-circular-host .circular-text span {
     color: var(--lime) !important;
     font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif !important;
-    font-size: 7px !important;
+    font-size: 10.5px !important;
     line-height: 1 !important;
     font-weight: 850 !important;
     letter-spacing: .055em !important;
@@ -52,62 +43,44 @@ const visualStyles = `
   }
 
   @media (max-width: 900px) {
-    .verdant-site .verdant-footer-circular-host {
-      top: -10px !important;
-      left: 104px !important;
-      width: 82px !important;
-      height: 82px !important;
-      min-width: 82px !important;
-      min-height: 82px !important;
-    }
-
+    .verdant-site .verdant-footer-circular-host,
     .verdant-site .verdant-footer-circular-host .circular-text {
-      width: 82px !important;
-      height: 82px !important;
-      min-width: 82px !important;
-      min-height: 82px !important;
+      width: 92px !important;
+      height: 92px !important;
+      min-width: 92px !important;
+      min-height: 92px !important;
     }
 
     .verdant-site .verdant-footer-circular-host .circular-text span {
-      font-size: 5.8px !important;
+      font-size: 8.5px !important;
     }
   }
 
   @media (max-width: 640px) {
-    .verdant-site .verdant-footer-circular-host {
-      top: -6px !important;
-      left: 94px !important;
-      width: 72px !important;
-      height: 72px !important;
-      min-width: 72px !important;
-      min-height: 72px !important;
-    }
-
+    .verdant-site .verdant-footer-circular-host,
     .verdant-site .verdant-footer-circular-host .circular-text {
-      width: 72px !important;
-      height: 72px !important;
-      min-width: 72px !important;
-      min-height: 72px !important;
+      width: 78px !important;
+      height: 78px !important;
+      min-width: 78px !important;
+      min-height: 78px !important;
     }
 
     .verdant-site .verdant-footer-circular-host .circular-text span {
-      font-size: 5px !important;
+      font-size: 6.8px !important;
     }
   }
 `;
-
-function findAboutHeading(root: HTMLElement): HTMLElement | null {
-  const elements = Array.from(root.querySelectorAll<HTMLElement>("h1,h2,h3,h4,h5,h6,p,span,div"));
-  return elements.find((element) => {
-    if (element.children.length > 0) return false;
-    return element.textContent?.trim().toUpperCase() === "ABOUT";
-  }) ?? null;
-}
 
 function findFooter(): HTMLElement | null {
   return document.querySelector<HTMLElement>("footer")
     ?? document.querySelector<HTMLElement>(".site-footer")
     ?? document.querySelector<HTMLElement>("[class*='footer']");
+}
+
+function findLinkByText(root: HTMLElement, text: string): HTMLAnchorElement | null {
+  return Array.from(root.querySelectorAll<HTMLAnchorElement>("a")).find(
+    (link) => link.textContent?.trim().toLowerCase() === text.toLowerCase(),
+  ) ?? null;
 }
 
 export default function HomeVisualEffects() {
@@ -122,11 +95,15 @@ export default function HomeVisualEffects() {
       const footer = findFooter();
       if (!footer) return false;
 
-      const about = findAboutHeading(footer);
-      if (!about || !about.parentElement) return false;
+      const careJournal = findLinkByText(footer, "Care journal");
+      const account = findLinkByText(footer, "Account");
+      if (!careJournal || !account) return false;
 
-      const anchor = about.parentElement;
+      const anchor = careJournal.parentElement ?? account.parentElement;
+      if (!anchor) return false;
+
       anchor.classList.add("verdant-footer-about-anchor");
+      anchor.style.position = "relative";
       anchor.style.overflow = "visible";
 
       let host = anchor.querySelector<HTMLDivElement>(".verdant-footer-circular-host");
@@ -136,8 +113,32 @@ export default function HomeVisualEffects() {
         anchor.appendChild(host);
       }
 
+      const position = () => {
+        if (!host) return;
+        const mobile = window.innerWidth <= 640;
+        const tablet = window.innerWidth <= 900;
+        const size = mobile ? 78 : tablet ? 92 : 108;
+        const gap = mobile ? 16 : 24;
+        const careRect = careJournal.getBoundingClientRect();
+        const accountRect = account.getBoundingClientRect();
+        const anchorRect = anchor.getBoundingClientRect();
+        const pairCenter = (careRect.top + accountRect.bottom) / 2;
+
+        host.style.width = `${size}px`;
+        host.style.height = `${size}px`;
+        host.style.left = `${anchorRect.width + gap}px`;
+        host.style.top = `${pairCenter - anchorRect.top - size / 2}px`;
+      };
+
+      position();
+      window.addEventListener("resize", position, { passive: true });
       setFooterHost(host);
-      return true;
+
+      return () => {
+        window.removeEventListener("resize", position);
+        if (host?.parentNode) host.parentNode.removeChild(host);
+        setFooterHost(null);
+      };
     };
 
     if (attach()) return;
