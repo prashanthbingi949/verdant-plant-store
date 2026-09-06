@@ -21,10 +21,9 @@ const CurvedLoop = ({
   const uid = useId();
   const pathId = `curve-${uid}`;
 
-  // A restrained flowing path gives the marquee a more premium editorial feel
-  // than the original deep U-shaped curve.
-  const amount = Math.max(8, Math.min(Math.abs(curveAmount), 70));
-  const pathD = `M-100,58 C260,${58 - amount} 500,${58 + amount} 720,58 S1180,${58 - amount} 1540,58`;
+  // Keep the path shallow: a restrained editorial wave instead of a deep U.
+  const amount = Math.max(4, Math.min(Math.abs(curveAmount), 34));
+  const pathD = `M-100,60 C120,${60 - amount} 270,${60 + amount} 470,60 S820,${60 - amount} 1040,60 S1350,${60 + amount} 1540,60`;
 
   const dragRef = useRef(false);
   const lastXRef = useRef(0);
