@@ -16,12 +16,15 @@ const CurvedLoop = ({
 
   const measureRef = useRef(null);
   const textPathRef = useRef(null);
-  const pathRef = useRef(null);
   const [spacing, setSpacing] = useState(0);
   const [offset, setOffset] = useState(0);
   const uid = useId();
   const pathId = `curve-${uid}`;
-  const pathD = `M-100,40 Q500,${40 + curveAmount} 1540,40`;
+
+  // A restrained flowing path gives the marquee a more premium editorial feel
+  // than the original deep U-shaped curve.
+  const amount = Math.max(8, Math.min(Math.abs(curveAmount), 70));
+  const pathD = `M-100,58 C260,${58 - amount} 500,${58 + amount} 720,58 S1180,${58 - amount} 1540,58`;
 
   const dragRef = useRef(false);
   const lastXRef = useRef(0);
@@ -99,7 +102,9 @@ const CurvedLoop = ({
   const endDrag = () => {
     if (!interactive) return;
     dragRef.current = false;
-    dirRef.current = velRef.current > 0 ? 'right' : 'left';
+    if (Math.abs(velRef.current) > 0.1) {
+      dirRef.current = velRef.current > 0 ? 'right' : 'left';
+    }
   };
 
   const cursorStyle = interactive ? (dragRef.current ? 'grabbing' : 'grab') : 'auto';
@@ -113,12 +118,12 @@ const CurvedLoop = ({
       onPointerUp={endDrag}
       onPointerLeave={endDrag}
     >
-      <svg className="curved-loop-svg" viewBox="0 0 1440 120">
+      <svg className="curved-loop-svg" viewBox="0 0 1440 120" preserveAspectRatio="none">
         <text ref={measureRef} xmlSpace="preserve" style={{ visibility: 'hidden', opacity: 0, pointerEvents: 'none' }}>
           {text}
         </text>
         <defs>
-          <path ref={pathRef} id={pathId} d={pathD} fill="none" stroke="transparent" />
+          <path id={pathId} d={pathD} fill="none" stroke="transparent" />
         </defs>
         {ready && (
           <text fontWeight="bold" xmlSpace="preserve" className={className}>
