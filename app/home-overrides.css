@@ -109,6 +109,22 @@
   font-size: 11px !important;
 }
 
+/* Plant-care headline: prevent serif descenders from colliding with the next line. */
+.care-heading h2 {
+  line-height: 1.08 !important;
+  margin-bottom: 18px !important;
+}
+
+.care-heading h2 em {
+  display: inline-block;
+  line-height: 1.08 !important;
+  margin-top: 0.04em !important;
+}
+
+.care-heading > p:last-child {
+  margin-top: 0 !important;
+}
+
 /* Root scrolling remains native for Next.js App Router route transitions. */
 html {
   scroll-behavior: auto !important;
@@ -166,6 +182,15 @@ html {
 
   .story-card {
     width: min(82%, 300px) !important;
+  }
+
+  .care-heading h2 {
+    line-height: 1.12 !important;
+    margin-bottom: 20px !important;
+  }
+
+  .care-heading h2 em {
+    line-height: 1.12 !important;
   }
 
   .verdant-spotlight .hero-fade > p:first-child {
