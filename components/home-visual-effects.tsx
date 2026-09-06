@@ -6,27 +6,25 @@ import CurvedLoop from "@/components/CurvedLoop/CurvedLoop";
 import CircularText from "@/components/CircularText";
 
 const visualStyles = `
+  /* CircularText: reserve real space beside ABOUT and keep it visible. */
   .verdant-site .footer-about-with-circular {
     position: relative !important;
     overflow: visible !important;
+    min-height: 132px !important;
   }
 
-  /* The old inline placeholder is hidden; the real component is mounted in the dedicated host below. */
   .verdant-site .footer-about-with-circular > .footer-circular-wrap {
     display: none !important;
   }
 
   .verdant-site .footer-circular-host {
     position: absolute !important;
-    top: -8px !important;
-    right: 0 !important;
-    width: 116px !important;
-    height: 116px !important;
-    min-width: 116px !important;
-    min-height: 116px !important;
-    display: grid !important;
-    place-items: center !important;
-    z-index: 20 !important;
+    top: -10px !important;
+    left: 150px !important;
+    width: 112px !important;
+    height: 112px !important;
+    display: block !important;
+    z-index: 30 !important;
     overflow: visible !important;
     pointer-events: auto !important;
   }
@@ -34,10 +32,10 @@ const visualStyles = `
   .verdant-site .footer-circular-host .circular-text {
     position: relative !important;
     display: block !important;
-    width: 116px !important;
-    height: 116px !important;
-    min-width: 116px !important;
-    min-height: 116px !important;
+    width: 112px !important;
+    height: 112px !important;
+    min-width: 112px !important;
+    min-height: 112px !important;
     margin: 0 !important;
     overflow: visible !important;
     color: var(--lime) !important;
@@ -48,124 +46,131 @@ const visualStyles = `
   .verdant-site .footer-circular-host .circular-text span {
     color: var(--lime) !important;
     font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif !important;
-    font-size: 9px !important;
+    font-size: 8.5px !important;
     line-height: 1 !important;
     font-weight: 850 !important;
     letter-spacing: .055em !important;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
 
-  /* Full-bleed CurvedLoop directly beneath Plant Care. */
+  /* Plant Care: remove the large empty tail before the marquee. */
+  .verdant-site .care-section {
+    min-height: 0 !important;
+    height: auto !important;
+    padding-bottom: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Full-bleed CurvedLoop with a restrained editorial wave. */
   .verdant-site .care-curved-loop-host {
     position: relative !important;
     z-index: 5 !important;
     width: 100vw !important;
     max-width: 100vw !important;
-    height: 92px !important;
-    min-height: 92px !important;
+    height: 72px !important;
+    min-height: 72px !important;
     margin-left: calc(50% - 50vw) !important;
     margin-right: 0 !important;
-    margin-top: 10px !important;
+    margin-top: -6px !important;
     margin-bottom: 0 !important;
     padding: 0 !important;
-    overflow: visible !important;
+    overflow: hidden !important;
     display: block !important;
-    grid-column: 1 / -1 !important;
     flex-shrink: 0 !important;
+    grid-column: 1 / -1 !important;
   }
 
   .verdant-site .care-curved-loop-host .curved-loop-jacket {
     width: 100% !important;
-    height: 92px !important;
-    min-height: 92px !important;
+    height: 72px !important;
+    min-height: 72px !important;
     display: flex !important;
-    align-items: flex-end !important;
+    align-items: center !important;
     justify-content: center !important;
-    overflow: visible !important;
+    overflow: hidden !important;
     padding: 0 !important;
   }
 
   .verdant-site .care-curved-loop-host .curved-loop-svg {
     width: 100vw !important;
     max-width: 100vw !important;
-    height: 92px !important;
-    min-height: 92px !important;
+    height: 72px !important;
+    min-height: 72px !important;
     aspect-ratio: auto !important;
     display: block !important;
     overflow: visible !important;
     fill: var(--forest) !important;
-    font-size: 3.7rem !important;
-  }
-
-  .verdant-site .care-section {
-    padding-bottom: 0 !important;
-    overflow: visible !important;
+    font-size: 2.5rem !important;
   }
 
   @media (max-width: 980px) {
+    .verdant-site .footer-about-with-circular {
+      min-height: 118px !important;
+    }
+
     .verdant-site .footer-circular-host {
-      width: 96px !important;
-      height: 96px !important;
-      min-width: 96px !important;
-      min-height: 96px !important;
-      top: -4px !important;
+      left: 126px !important;
+      top: -6px !important;
+      width: 94px !important;
+      height: 94px !important;
     }
 
     .verdant-site .footer-circular-host .circular-text {
-      width: 96px !important;
-      height: 96px !important;
-      min-width: 96px !important;
-      min-height: 96px !important;
+      width: 94px !important;
+      height: 94px !important;
+      min-width: 94px !important;
+      min-height: 94px !important;
     }
 
     .verdant-site .footer-circular-host .circular-text span {
-      font-size: 7.5px !important;
+      font-size: 7.2px !important;
     }
 
     .verdant-site .care-curved-loop-host,
     .verdant-site .care-curved-loop-host .curved-loop-jacket,
     .verdant-site .care-curved-loop-host .curved-loop-svg {
-      height: 78px !important;
-      min-height: 78px !important;
+      height: 60px !important;
+      min-height: 60px !important;
     }
 
     .verdant-site .care-curved-loop-host .curved-loop-svg {
-      font-size: 3rem !important;
+      font-size: 2.05rem !important;
     }
   }
 
   @media (max-width: 640px) {
     .verdant-site .footer-about-with-circular {
-      min-height: 126px !important;
+      min-height: 108px !important;
     }
 
     .verdant-site .footer-circular-host {
-      width: 82px !important;
-      height: 82px !important;
-      min-width: 82px !important;
-      min-height: 82px !important;
-      top: -2px !important;
+      left: 112px !important;
+      top: -4px !important;
+      width: 78px !important;
+      height: 78px !important;
     }
 
     .verdant-site .footer-circular-host .circular-text {
-      width: 82px !important;
-      height: 82px !important;
-      min-width: 82px !important;
-      min-height: 82px !important;
+      width: 78px !important;
+      height: 78px !important;
+      min-width: 78px !important;
+      min-height: 78px !important;
     }
 
     .verdant-site .footer-circular-host .circular-text span {
-      font-size: 6.1px !important;
+      font-size: 5.5px !important;
     }
 
     .verdant-site .care-curved-loop-host,
     .verdant-site .care-curved-loop-host .curved-loop-jacket,
     .verdant-site .care-curved-loop-host .curved-loop-svg {
-      height: 64px !important;
-      min-height: 64px !important;
+      height: 52px !important;
+      min-height: 52px !important;
     }
 
     .verdant-site .care-curved-loop-host .curved-loop-svg {
-      font-size: 2.55rem !important;
+      font-size: 1.75rem !important;
     }
   }
 `;
@@ -236,7 +241,7 @@ export default function HomeVisualEffects() {
             <CurvedLoop
               marqueeText="PLANT MORE JOY ✦ GROW SOMETHING GOOD ✦ BRING HOME A LITTLE WILD ✦ SHOP THE NEW ARRIVALS ✦"
               speed={1}
-              curveAmount={140}
+              curveAmount={28}
               direction="left"
               interactive={true}
               className="verdant-care-curved-loop"
