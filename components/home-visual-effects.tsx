@@ -5,23 +5,36 @@ import { createPortal } from "react-dom";
 import CircularText from "@/components/CircularText";
 
 const visualStyles = `
+  /* CircularText is anchored directly to the ABOUT column so it cannot be
+     misplaced by the footer grid or viewport coordinates. */
+  .verdant-site .verdant-footer-about-anchor {
+    position: relative !important;
+    overflow: visible !important;
+  }
+
   .verdant-site .verdant-footer-circular-host {
     position: absolute !important;
-    z-index: 50 !important;
-    width: 88px !important;
-    height: 88px !important;
+    z-index: 20 !important;
+    top: -16px !important;
+    left: 112px !important;
+    width: 96px !important;
+    height: 96px !important;
+    min-width: 96px !important;
+    min-height: 96px !important;
     display: block !important;
     overflow: visible !important;
     pointer-events: auto !important;
   }
 
   .verdant-site .verdant-footer-circular-host .circular-text {
-    width: 88px !important;
-    height: 88px !important;
-    min-width: 88px !important;
-    min-height: 88px !important;
-    margin: 0 !important;
+    position: relative !important;
     display: block !important;
+    width: 96px !important;
+    height: 96px !important;
+    min-width: 96px !important;
+    min-height: 96px !important;
+    margin: 0 !important;
+    overflow: visible !important;
     color: var(--lime) !important;
     opacity: 1 !important;
     visibility: visible !important;
@@ -30,25 +43,55 @@ const visualStyles = `
   .verdant-site .verdant-footer-circular-host .circular-text span {
     color: var(--lime) !important;
     font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif !important;
-    font-size: 6.5px !important;
+    font-size: 7px !important;
     line-height: 1 !important;
     font-weight: 850 !important;
-    letter-spacing: .05em !important;
+    letter-spacing: .055em !important;
     opacity: 1 !important;
     visibility: visible !important;
   }
 
-  @media (max-width: 640px) {
-    .verdant-site .verdant-footer-circular-host,
+  @media (max-width: 900px) {
+    .verdant-site .verdant-footer-circular-host {
+      top: -10px !important;
+      left: 104px !important;
+      width: 82px !important;
+      height: 82px !important;
+      min-width: 82px !important;
+      min-height: 82px !important;
+    }
+
     .verdant-site .verdant-footer-circular-host .circular-text {
-      width: 70px !important;
-      height: 70px !important;
-      min-width: 70px !important;
-      min-height: 70px !important;
+      width: 82px !important;
+      height: 82px !important;
+      min-width: 82px !important;
+      min-height: 82px !important;
     }
 
     .verdant-site .verdant-footer-circular-host .circular-text span {
-      font-size: 5.2px !important;
+      font-size: 5.8px !important;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .verdant-site .verdant-footer-circular-host {
+      top: -6px !important;
+      left: 94px !important;
+      width: 72px !important;
+      height: 72px !important;
+      min-width: 72px !important;
+      min-height: 72px !important;
+    }
+
+    .verdant-site .verdant-footer-circular-host .circular-text {
+      width: 72px !important;
+      height: 72px !important;
+      min-width: 72px !important;
+      min-height: 72px !important;
+    }
+
+    .verdant-site .verdant-footer-circular-host .circular-text span {
+      font-size: 5px !important;
     }
   }
 `;
@@ -62,7 +105,9 @@ function findAboutHeading(root: HTMLElement): HTMLElement | null {
 }
 
 function findFooter(): HTMLElement | null {
-  return document.querySelector<HTMLElement>("footer, .site-footer, [class*='footer']");
+  return document.querySelector<HTMLElement>("footer")
+    ?? document.querySelector<HTMLElement>(".site-footer")
+    ?? document.querySelector<HTMLElement>("[class*='footer']");
 }
 
 export default function HomeVisualEffects() {
@@ -78,49 +123,27 @@ export default function HomeVisualEffects() {
       if (!footer) return false;
 
       const about = findAboutHeading(footer);
-      if (!about) return false;
+      if (!about || !about.parentElement) return false;
 
-      const computed = window.getComputedStyle(footer);
-      if (computed.position === "static") footer.style.position = "relative";
-      footer.style.overflow = "visible";
+      const anchor = about.parentElement;
+      anchor.classList.add("verdant-footer-about-anchor");
+      anchor.style.overflow = "visible";
 
-      let host = footer.querySelector<HTMLDivElement>(".verdant-footer-circular-host");
+      let host = anchor.querySelector<HTMLDivElement>(".verdant-footer-circular-host");
       if (!host) {
         host = document.createElement("div");
         host.className = "verdant-footer-circular-host";
-        footer.appendChild(host);
+        anchor.appendChild(host);
       }
 
-      const positionHost = () => {
-        const footerRect = footer.getBoundingClientRect();
-        const aboutRect = about.getBoundingClientRect();
-        const mobile = window.innerWidth <= 640;
-        const size = mobile ? 70 : 88;
-        const gap = mobile ? 12 : 16;
-
-        host!.style.left = `${aboutRect.right - footerRect.left + gap}px`;
-        host!.style.top = `${aboutRect.top - footerRect.top + (aboutRect.height - size) / 2}px`;
-        host!.style.width = `${size}px`;
-        host!.style.height = `${size}px`;
-      };
-
-      positionHost();
-      window.addEventListener("resize", positionHost, { passive: true });
       setFooterHost(host);
-
-      return () => {
-        window.removeEventListener("resize", positionHost);
-        if (host?.parentNode) host.parentNode.removeChild(host);
-        setFooterHost(null);
-      };
+      return true;
     };
 
-    const cleanup = attach();
-    if (cleanup) return cleanup;
+    if (attach()) return;
 
     const observer = new MutationObserver(() => {
-      const ready = attach();
-      if (ready) observer.disconnect();
+      if (attach()) observer.disconnect();
     });
     observer.observe(document.body, { childList: true, subtree: true });
 
