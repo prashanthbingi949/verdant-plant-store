@@ -6,7 +6,6 @@ import CurvedLoop from "@/components/CurvedLoop/CurvedLoop";
 import CircularText from "@/components/CircularText";
 
 const visualStyles = `
-  /* CircularText: reserve real space beside ABOUT and keep it visible. */
   .verdant-site .footer-about-with-circular {
     position: relative !important;
     overflow: visible !important;
@@ -54,7 +53,7 @@ const visualStyles = `
     visibility: visible !important;
   }
 
-  /* Plant Care: remove the large empty tail before the marquee. */
+  /* Plant Care: pull the loop tightly against the copy and next section. */
   .verdant-site .care-section {
     min-height: 0 !important;
     height: auto !important;
@@ -62,18 +61,17 @@ const visualStyles = `
     overflow: visible !important;
   }
 
-  /* Full-bleed CurvedLoop with a restrained editorial wave. */
   .verdant-site .care-curved-loop-host {
     position: relative !important;
     z-index: 5 !important;
     width: 100vw !important;
     max-width: 100vw !important;
-    height: 72px !important;
-    min-height: 72px !important;
+    height: 76px !important;
+    min-height: 76px !important;
     margin-left: calc(50% - 50vw) !important;
     margin-right: 0 !important;
-    margin-top: -6px !important;
-    margin-bottom: 0 !important;
+    margin-top: -52px !important;
+    margin-bottom: -4px !important;
     padding: 0 !important;
     overflow: hidden !important;
     display: block !important;
@@ -83,8 +81,8 @@ const visualStyles = `
 
   .verdant-site .care-curved-loop-host .curved-loop-jacket {
     width: 100% !important;
-    height: 72px !important;
-    min-height: 72px !important;
+    height: 76px !important;
+    min-height: 76px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -95,13 +93,13 @@ const visualStyles = `
   .verdant-site .care-curved-loop-host .curved-loop-svg {
     width: 100vw !important;
     max-width: 100vw !important;
-    height: 72px !important;
-    min-height: 72px !important;
+    height: 76px !important;
+    min-height: 76px !important;
     aspect-ratio: auto !important;
     display: block !important;
     overflow: visible !important;
     fill: var(--forest) !important;
-    font-size: 2.5rem !important;
+    font-size: 3.2rem !important;
   }
 
   @media (max-width: 980px) {
@@ -135,7 +133,7 @@ const visualStyles = `
     }
 
     .verdant-site .care-curved-loop-host .curved-loop-svg {
-      font-size: 2.05rem !important;
+      font-size: 2.4rem !important;
     }
   }
 
@@ -162,7 +160,13 @@ const visualStyles = `
       font-size: 5.5px !important;
     }
 
-    .verdant-site .care-curved-loop-host,
+    .verdant-site .care-curved-loop-host {
+      height: 52px !important;
+      min-height: 52px !important;
+      margin-top: -34px !important;
+      margin-bottom: -2px !important;
+    }
+
     .verdant-site .care-curved-loop-host .curved-loop-jacket,
     .verdant-site .care-curved-loop-host .curved-loop-svg {
       height: 52px !important;
@@ -170,7 +174,7 @@ const visualStyles = `
     }
 
     .verdant-site .care-curved-loop-host .curved-loop-svg {
-      font-size: 1.75rem !important;
+      font-size: 1.9rem !important;
     }
   }
 `;
@@ -241,7 +245,7 @@ export default function HomeVisualEffects() {
             <CurvedLoop
               marqueeText="PLANT MORE JOY ✦ GROW SOMETHING GOOD ✦ BRING HOME A LITTLE WILD ✦ SHOP THE NEW ARRIVALS ✦"
               speed={1}
-              curveAmount={28}
+              curveAmount={48}
               direction="left"
               interactive={true}
               className="verdant-care-curved-loop"
