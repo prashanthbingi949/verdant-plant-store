@@ -3,88 +3,92 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import CurvedLoop from "@/components/CurvedLoop/CurvedLoop";
+import CircularText from "@/components/CircularText";
 
-const footerAndCurvedStyles = `
-  /* Keep the homepage ABOUT column and circular text together at every breakpoint. */
+const visualStyles = `
   .verdant-site .footer-about-with-circular {
     position: relative !important;
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) 104px !important;
-    align-items: start !important;
-    gap: 24px !important;
-    min-width: 0 !important;
     overflow: visible !important;
   }
 
-  .verdant-site .footer-about-with-circular > .footer-col {
-    min-width: 0 !important;
-    width: auto !important;
+  .verdant-site .footer-about-with-circular > .footer-circular-wrap {
+    display: none !important;
   }
 
-  .verdant-site .footer-about-with-circular .footer-circular-wrap {
-    width: 104px !important;
-    height: 104px !important;
-    min-width: 104px !important;
+  .verdant-site .footer-circular-host {
+    position: absolute !important;
+    top: -8px !important;
+    right: 0 !important;
+    width: 116px !important;
+    height: 116px !important;
+    min-width: 116px !important;
+    min-height: 116px !important;
     display: grid !important;
     place-items: center !important;
-    align-self: start !important;
-    justify-self: end !important;
-    margin: 0 !important;
+    z-index: 10 !important;
     overflow: visible !important;
-    opacity: 1 !important;
-    visibility: visible !important;
+    pointer-events: auto !important;
   }
 
-  .verdant-site .footer-about-with-circular .footer-circular-wrap .circular-text {
-    display: block !important;
+  .verdant-site .footer-circular-host .circular-text {
     position: relative !important;
-    width: 104px !important;
-    height: 104px !important;
-    min-width: 104px !important;
-    min-height: 104px !important;
+    display: block !important;
+    width: 116px !important;
+    height: 116px !important;
+    min-width: 116px !important;
+    min-height: 116px !important;
     margin: 0 !important;
+    overflow: visible !important;
     color: var(--lime) !important;
     opacity: 1 !important;
     visibility: visible !important;
-    overflow: visible !important;
   }
 
-  .verdant-site .footer-about-with-circular .footer-circular-wrap .circular-text span {
+  .verdant-site .footer-circular-host .circular-text span {
     color: var(--lime) !important;
     font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif !important;
     font-size: 9px !important;
+    line-height: 1 !important;
     font-weight: 850 !important;
-    letter-spacing: .05em !important;
+    letter-spacing: .055em !important;
   }
 
   .verdant-site .care-curved-loop-host {
+    grid-column: 1 / -1 !important;
     position: relative !important;
     z-index: 2 !important;
-    width: calc(100% + (2 * clamp(24px, 7vw, 100px))) !important;
-    margin-left: calc(-1 * clamp(24px, 7vw, 100px)) !important;
-    margin-top: 14px !important;
+    width: 100vw !important;
+    height: 88px !important;
+    min-height: 88px !important;
+    margin-left: 50% !important;
+    transform: translateX(-50%) !important;
+    margin-top: 8px !important;
     margin-bottom: 0 !important;
-    height: 78px !important;
+    padding: 0 !important;
     overflow: hidden !important;
     display: block !important;
   }
 
   .verdant-site .care-curved-loop-host .curved-loop-jacket {
-    min-height: 0 !important;
-    height: 78px !important;
+    width: 100% !important;
+    height: 88px !important;
+    min-height: 88px !important;
     display: flex !important;
     align-items: flex-end !important;
     justify-content: center !important;
-    width: 100% !important;
+    overflow: visible !important;
+    padding: 0 !important;
   }
 
   .verdant-site .care-curved-loop-host .curved-loop-svg {
     width: 100% !important;
-    height: 78px !important;
+    height: 88px !important;
+    min-height: 88px !important;
     aspect-ratio: auto !important;
-    font-size: 4.5rem !important;
-    fill: var(--forest) !important;
+    display: block !important;
     overflow: visible !important;
+    fill: var(--forest) !important;
+    font-size: 4.25rem !important;
   }
 
   .verdant-site .care-section {
@@ -93,97 +97,113 @@ const footerAndCurvedStyles = `
   }
 
   @media (max-width: 980px) {
-    .verdant-site .footer {
-      grid-template-columns: 1fr 1fr !important;
+    .verdant-site .footer-circular-host {
+      width: 96px !important;
+      height: 96px !important;
+      min-width: 96px !important;
+      min-height: 96px !important;
+      top: -4px !important;
     }
 
-    .verdant-site .footer-brand {
-      grid-column: 1 / -1 !important;
+    .verdant-site .footer-circular-host .circular-text {
+      width: 96px !important;
+      height: 96px !important;
+      min-width: 96px !important;
+      min-height: 96px !important;
     }
 
+    .verdant-site .footer-circular-host .circular-text span {
+      font-size: 7.5px !important;
+    }
+
+    .verdant-site .care-curved-loop-host,
+    .verdant-site .care-curved-loop-host .curved-loop-jacket,
+    .verdant-site .care-curved-loop-host .curved-loop-svg {
+      height: 74px !important;
+      min-height: 74px !important;
+    }
+
+    .verdant-site .care-curved-loop-host .curved-loop-svg {
+      font-size: 3.6rem !important;
+    }
+  }
+
+  @media (max-width: 640px) {
     .verdant-site .footer-about-with-circular {
-      grid-column: 1 / -1 !important;
-      grid-template-columns: minmax(0, 1fr) 88px !important;
-      gap: 22px !important;
+      min-height: 126px !important;
     }
 
-    .verdant-site .footer-about-with-circular .footer-circular-wrap,
-    .verdant-site .footer-about-with-circular .footer-circular-wrap .circular-text {
+    .verdant-site .footer-circular-host {
+      width: 88px !important;
+      height: 88px !important;
+      min-width: 88px !important;
+      min-height: 88px !important;
+      top: -4px !important;
+    }
+
+    .verdant-site .footer-circular-host .circular-text {
       width: 88px !important;
       height: 88px !important;
       min-width: 88px !important;
       min-height: 88px !important;
     }
 
-    .verdant-site .footer-about-with-circular .footer-circular-wrap .circular-text span {
-      font-size: 7.5px !important;
-    }
-  }
-
-  @media (max-width: 640px) {
-    .verdant-site .footer {
-      grid-template-columns: 1fr !important;
-    }
-
-    .verdant-site .footer-brand,
-    .verdant-site .footer-col,
-    .verdant-site .footer-about-with-circular {
-      grid-column: auto !important;
-    }
-
-    .verdant-site .footer-about-with-circular {
-      grid-template-columns: minmax(0, 1fr) 82px !important;
-      gap: 16px !important;
-      width: 100% !important;
-    }
-
-    .verdant-site .footer-about-with-circular .footer-circular-wrap,
-    .verdant-site .footer-about-with-circular .footer-circular-wrap .circular-text {
-      width: 82px !important;
-      height: 82px !important;
-      min-width: 82px !important;
-      min-height: 82px !important;
-    }
-
-    .verdant-site .footer-about-with-circular .footer-circular-wrap .circular-text span {
-      font-size: 6.5px !important;
+    .verdant-site .footer-circular-host .circular-text span {
+      font-size: 6.2px !important;
     }
 
     .verdant-site .care-curved-loop-host,
-    .verdant-site .care-curved-loop-host .curved-loop-jacket {
+    .verdant-site .care-curved-loop-host .curved-loop-jacket,
+    .verdant-site .care-curved-loop-host .curved-loop-svg {
       height: 62px !important;
+      min-height: 62px !important;
     }
 
     .verdant-site .care-curved-loop-host .curved-loop-svg {
-      height: 62px !important;
-      font-size: 3.25rem !important;
+      font-size: 3rem !important;
     }
   }
 `;
 
 export default function HomeVisualEffects() {
   const [careHost, setCareHost] = useState<HTMLElement | null>(null);
+  const [footerHost, setFooterHost] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
     if (window.location.pathname !== "/") return;
 
     let observer: MutationObserver | null = null;
-    let host: HTMLDivElement | null = null;
+    let careTarget: HTMLDivElement | null = null;
+    let footerTarget: HTMLDivElement | null = null;
     let cancelled = false;
 
     const attach = () => {
       if (cancelled) return true;
-      const care = document.getElementById("care");
-      if (!care) return false;
 
-      host = care.querySelector<HTMLDivElement>(".care-curved-loop-host");
-      if (!host) {
-        host = document.createElement("div");
-        host.className = "care-curved-loop-host";
-        care.appendChild(host);
+      const care = document.getElementById("care");
+      const footerAbout = document.querySelector<HTMLElement>(".footer-about-with-circular");
+
+      if (care) {
+        careTarget = care.querySelector<HTMLDivElement>(".care-curved-loop-host");
+        if (!careTarget) {
+          careTarget = document.createElement("div");
+          careTarget.className = "care-curved-loop-host";
+          care.appendChild(careTarget);
+        }
+        setCareHost(careTarget);
       }
-      setCareHost(host);
-      return true;
+
+      if (footerAbout) {
+        footerTarget = footerAbout.querySelector<HTMLDivElement>(".footer-circular-host");
+        if (!footerTarget) {
+          footerTarget = document.createElement("div");
+          footerTarget.className = "footer-circular-host";
+          footerAbout.appendChild(footerTarget);
+        }
+        setFooterHost(footerTarget);
+      }
+
+      return Boolean(care && footerAbout);
     };
 
     if (!attach()) {
@@ -196,14 +216,16 @@ export default function HomeVisualEffects() {
     return () => {
       cancelled = true;
       observer?.disconnect();
-      if (host?.parentNode) host.parentNode.removeChild(host);
+      if (careTarget?.parentNode) careTarget.parentNode.removeChild(careTarget);
+      if (footerTarget?.parentNode) footerTarget.parentNode.removeChild(footerTarget);
       setCareHost(null);
+      setFooterHost(null);
     };
   }, []);
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: footerAndCurvedStyles }} />
+      <style dangerouslySetInnerHTML={{ __html: visualStyles }} />
       {careHost
         ? createPortal(
             <CurvedLoop
@@ -215,6 +237,17 @@ export default function HomeVisualEffects() {
               className="verdant-care-curved-loop"
             />,
             careHost,
+          )
+        : null}
+      {footerHost
+        ? createPortal(
+            <CircularText
+              text="GREENS*PLANTS*GARDENING*"
+              onHover="speedUp"
+              spinDuration={20}
+              className="verdant-footer-circular"
+            />,
+            footerHost,
           )
         : null}
     </>
