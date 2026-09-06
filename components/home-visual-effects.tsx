@@ -5,8 +5,8 @@ import { createPortal } from "react-dom";
 import CurvedLoop from "@/components/CurvedLoop/CurvedLoop";
 
 const footerAndCurvedStyles = `
-  /* Keep the ABOUT column and circular text together at every breakpoint. */
-  .footer-about-with-circular {
+  /* Keep the homepage ABOUT column and circular text together at every breakpoint. */
+  .verdant-site .footer-about-with-circular {
     position: relative !important;
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) 104px !important;
@@ -16,12 +16,12 @@ const footerAndCurvedStyles = `
     overflow: visible !important;
   }
 
-  .footer-about-with-circular > .footer-col {
+  .verdant-site .footer-about-with-circular > .footer-col {
     min-width: 0 !important;
     width: auto !important;
   }
 
-  .footer-about-with-circular .footer-circular-wrap {
+  .verdant-site .footer-about-with-circular .footer-circular-wrap {
     width: 104px !important;
     height: 104px !important;
     min-width: 104px !important;
@@ -35,7 +35,7 @@ const footerAndCurvedStyles = `
     visibility: visible !important;
   }
 
-  .footer-about-with-circular .footer-circular-wrap .circular-text {
+  .verdant-site .footer-about-with-circular .footer-circular-wrap .circular-text {
     display: block !important;
     position: relative !important;
     width: 104px !important;
@@ -49,7 +49,7 @@ const footerAndCurvedStyles = `
     overflow: visible !important;
   }
 
-  .footer-about-with-circular .footer-circular-wrap .circular-text span {
+  .verdant-site .footer-about-with-circular .footer-circular-wrap .circular-text span {
     color: var(--lime) !important;
     font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif !important;
     font-size: 9px !important;
@@ -57,7 +57,7 @@ const footerAndCurvedStyles = `
     letter-spacing: .05em !important;
   }
 
-  .care-curved-loop-host {
+  .verdant-site .care-curved-loop-host {
     position: relative !important;
     z-index: 2 !important;
     width: calc(100% + (2 * clamp(24px, 7vw, 100px))) !important;
@@ -69,7 +69,7 @@ const footerAndCurvedStyles = `
     display: block !important;
   }
 
-  .care-curved-loop-host .curved-loop-jacket {
+  .verdant-site .care-curved-loop-host .curved-loop-jacket {
     min-height: 0 !important;
     height: 78px !important;
     display: flex !important;
@@ -78,7 +78,7 @@ const footerAndCurvedStyles = `
     width: 100% !important;
   }
 
-  .care-curved-loop-host .curved-loop-svg {
+  .verdant-site .care-curved-loop-host .curved-loop-svg {
     width: 100% !important;
     height: 78px !important;
     aspect-ratio: auto !important;
@@ -87,75 +87,74 @@ const footerAndCurvedStyles = `
     overflow: visible !important;
   }
 
-  /* Let the curved loop sit directly against the next section. */
-  .care-section {
+  .verdant-site .care-section {
     padding-bottom: 0 !important;
     overflow: visible !important;
   }
 
   @media (max-width: 980px) {
-    .footer {
+    .verdant-site .footer {
       grid-template-columns: 1fr 1fr !important;
     }
 
-    .footer-brand {
+    .verdant-site .footer-brand {
       grid-column: 1 / -1 !important;
     }
 
-    .footer-about-with-circular {
+    .verdant-site .footer-about-with-circular {
       grid-column: 1 / -1 !important;
       grid-template-columns: minmax(0, 1fr) 88px !important;
       gap: 22px !important;
     }
 
-    .footer-about-with-circular .footer-circular-wrap,
-    .footer-about-with-circular .footer-circular-wrap .circular-text {
+    .verdant-site .footer-about-with-circular .footer-circular-wrap,
+    .verdant-site .footer-about-with-circular .footer-circular-wrap .circular-text {
       width: 88px !important;
       height: 88px !important;
       min-width: 88px !important;
       min-height: 88px !important;
     }
 
-    .footer-about-with-circular .footer-circular-wrap .circular-text span {
+    .verdant-site .footer-about-with-circular .footer-circular-wrap .circular-text span {
       font-size: 7.5px !important;
     }
   }
 
   @media (max-width: 640px) {
-    .footer {
+    .verdant-site .footer {
       grid-template-columns: 1fr !important;
     }
 
-    .footer-brand,
-    .footer-col,
-    .footer-about-with-circular {
+    .verdant-site .footer-brand,
+    .verdant-site .footer-col,
+    .verdant-site .footer-about-with-circular {
       grid-column: auto !important;
     }
 
-    .footer-about-with-circular {
+    .verdant-site .footer-about-with-circular {
       grid-template-columns: minmax(0, 1fr) 82px !important;
       gap: 16px !important;
       width: 100% !important;
     }
 
-    .footer-about-with-circular .footer-circular-wrap,
-    .footer-about-with-circular .footer-circular-wrap .circular-text {
+    .verdant-site .footer-about-with-circular .footer-circular-wrap,
+    .verdant-site .footer-about-with-circular .footer-circular-wrap .circular-text {
       width: 82px !important;
       height: 82px !important;
       min-width: 82px !important;
       min-height: 82px !important;
     }
 
-    .footer-about-with-circular .footer-circular-wrap .circular-text span {
+    .verdant-site .footer-about-with-circular .footer-circular-wrap .circular-text span {
       font-size: 6.5px !important;
     }
 
-    .care-curved-loop-host,
-    .care-curved-loop-host .curved-loop-jacket {
+    .verdant-site .care-curved-loop-host,
+    .verdant-site .care-curved-loop-host .curved-loop-jacket {
       height: 62px !important;
     }
 
-    .care-curved-loop-host .curved-loop-svg {
+    .verdant-site .care-curved-loop-host .curved-loop-svg {
       height: 62px !important;
       font-size: 3.25rem !important;
     }
