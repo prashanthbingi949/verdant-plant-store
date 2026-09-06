@@ -54,7 +54,7 @@ const visualStyles = `
     visibility: visible !important;
   }
 
-  /* Plant Care: collapse the unused tail and pull the loop right up to the copy. */
+  /* Plant Care: keep the loop immediately after the content without a large empty tail. */
   .verdant-site .care-section {
     min-height: 0 !important;
     height: auto !important;
@@ -62,17 +62,18 @@ const visualStyles = `
     overflow: visible !important;
   }
 
+  /* Full-bleed CurvedLoop. Extra SVG headroom prevents the curved type from clipping. */
   .verdant-site .care-curved-loop-host {
     position: relative !important;
     z-index: 5 !important;
     width: 100vw !important;
     max-width: 100vw !important;
-    height: 64px !important;
-    min-height: 64px !important;
+    height: 82px !important;
+    min-height: 82px !important;
     margin-left: calc(50% - 50vw) !important;
     margin-right: 0 !important;
-    margin-top: -118px !important;
-    margin-bottom: -6px !important;
+    margin-top: -16px !important;
+    margin-bottom: 0 !important;
     padding: 0 !important;
     overflow: hidden !important;
     display: block !important;
@@ -82,25 +83,25 @@ const visualStyles = `
 
   .verdant-site .care-curved-loop-host .curved-loop-jacket {
     width: 100% !important;
-    height: 64px !important;
-    min-height: 64px !important;
+    height: 82px !important;
+    min-height: 82px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     padding: 0 !important;
   }
 
   .verdant-site .care-curved-loop-host .curved-loop-svg {
     width: 100vw !important;
     max-width: 100vw !important;
-    height: 64px !important;
-    min-height: 64px !important;
+    height: 82px !important;
+    min-height: 82px !important;
     aspect-ratio: auto !important;
     display: block !important;
     overflow: visible !important;
     fill: var(--forest) !important;
-    font-size: 3.25rem !important;
+    font-size: 3.15rem !important;
   }
 
   @media (max-width: 980px) {
@@ -127,15 +128,15 @@ const visualStyles = `
     }
 
     .verdant-site .care-curved-loop-host {
-      height: 56px !important;
-      min-height: 56px !important;
-      margin-top: -92px !important;
+      height: 68px !important;
+      min-height: 68px !important;
+      margin-top: -14px !important;
     }
 
     .verdant-site .care-curved-loop-host .curved-loop-jacket,
     .verdant-site .care-curved-loop-host .curved-loop-svg {
-      height: 56px !important;
-      min-height: 56px !important;
+      height: 68px !important;
+      min-height: 68px !important;
     }
 
     .verdant-site .care-curved-loop-host .curved-loop-svg {
@@ -167,20 +168,20 @@ const visualStyles = `
     }
 
     .verdant-site .care-curved-loop-host {
-      height: 48px !important;
-      min-height: 48px !important;
-      margin-top: -72px !important;
-      margin-bottom: -2px !important;
+      height: 58px !important;
+      min-height: 58px !important;
+      margin-top: -12px !important;
+      margin-bottom: 0 !important;
     }
 
     .verdant-site .care-curved-loop-host .curved-loop-jacket,
     .verdant-site .care-curved-loop-host .curved-loop-svg {
-      height: 48px !important;
-      min-height: 48px !important;
+      height: 58px !important;
+      min-height: 58px !important;
     }
 
     .verdant-site .care-curved-loop-host .curved-loop-svg {
-      font-size: 1.85rem !important;
+      font-size: 1.82rem !important;
     }
   }
 `;
