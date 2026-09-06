@@ -21,67 +21,68 @@ const CurvedLoop = ({
   const uid = useId();
   const pathId = `curve-${uid}`;
 
-  // Keep the path shallow: a restrained editorial wave instead of a deep U.
-  const amount = Math.max(4, Math.min(Math.abs(curveAmount), 34));
-  const pathD = `M-100,60 C120,${60 - amount} 270,${60 + amount} 470,60 S820,${60 - amount} 1040,60 S1350,${60 + amount} 1540,60`;
+  // A shallow, alternating wave keeps the type relaxed and editorial rather than U-shaped.
+  const amount = Math.max(5, Math.min(Math.abs(curveAmount), 16));
+  const pathD = `M-120,62 C120,${62 - amount} 340,${62 + amount} 560,62 S1000,${62 - amount} 1220,62 S1440,${62 + amount} 1560,62`;
 
   const dragRef = useRef(false);
   const lastXRef = useRef(0);
   const dirRef = useRef(direction);
   const velRef = useRef(0);
 
-  const textLength = spacing;
-  const totalText = textLength
-    ? Array(Math.ceil(1800 / textLength) + 2)
+  const totalText = spacing
+    ? Array(Math.ceil(2400 / spacing) + 3)
         .fill(text)
         .join('')
     : text;
   const ready = spacing > 0;
 
   useEffect(() => {
-    if (measureRef.current) setSpacing(measureRef.current.getComputedTextLength());
+    if (measureRef.current) {
+      setSpacing(measureRef.current.getComputedTextLength());
+    }
   }, [text, className]);
 
   useEffect(() => {
-    if (!spacing) return;
-    if (textPathRef.current) {
-      const initial = -spacing;
-      textPathRef.current.setAttribute('startOffset', initial + 'px');
-      setOffset(initial);
-    }
+    if (!spacing || !textPathRef.current) return;
+    const initial = -spacing;
+    textPathRef.current.setAttribute('startOffset', `${initial}px`);
+    setOffset(initial);
   }, [spacing]);
 
   useEffect(() => {
     if (!spacing || !ready) return;
     let frame = 0;
+
     const step = () => {
       if (!dragRef.current && textPathRef.current) {
         const delta = dirRef.current === 'right' ? speed : -speed;
         const currentOffset = parseFloat(textPathRef.current.getAttribute('startOffset') || '0');
         let newOffset = currentOffset + delta;
 
-        const wrapPoint = spacing;
-        if (newOffset <= -wrapPoint) newOffset += wrapPoint;
-        if (newOffset > 0) newOffset -= wrapPoint;
+        if (newOffset <= -spacing) newOffset += spacing;
+        if (newOffset > 0) newOffset -= spacing;
 
-        textPathRef.current.setAttribute('startOffset', newOffset + 'px');
+        textPathRef.current.setAttribute('startOffset', `${newOffset}px`);
         setOffset(newOffset);
       }
+
       frame = requestAnimationFrame(step);
     };
+
     frame = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frame);
   }, [spacing, speed, ready]);
 
-  const onPointerDown = e => {
+  const onPointerDown = (e) => {
     if (!interactive) return;
     dragRef.current = true;
     lastXRef.current = e.clientX;
     velRef.current = 0;
-    e.target.setPointerCapture(e.pointerId);
+    e.currentTarget.setPointerCapture?.(e.pointerId);
   };
 
-  const onPointerMove = e => {
+  const onPointerMove = (e) => {
     if (!interactive || !dragRef.current || !textPathRef.current) return;
     const dx = e.clientX - lastXRef.current;
     lastXRef.current = e.clientX;
@@ -90,11 +91,10 @@ const CurvedLoop = ({
     const currentOffset = parseFloat(textPathRef.current.getAttribute('startOffset') || '0');
     let newOffset = currentOffset + dx;
 
-    const wrapPoint = spacing;
-    if (newOffset <= -wrapPoint) newOffset += wrapPoint;
-    if (newOffset > 0) newOffset -= wrapPoint;
+    if (newOffset <= -spacing) newOffset += spacing;
+    if (newOffset > 0) newOffset -= spacing;
 
-    textPathRef.current.setAttribute('startOffset', newOffset + 'px');
+    textPathRef.current.setAttribute('startOffset', `${newOffset}px`);
     setOffset(newOffset);
   };
 
@@ -106,7 +106,7 @@ const CurvedLoop = ({
     }
   };
 
-  const cursorStyle = interactive ? (dragRef.current ? 'grabbing' : 'grab') : 'auto';
+  const cursorStyle = interactive ? 'grab' : 'default';
 
   return (
     <div
@@ -115,10 +115,16 @@ const CurvedLoop = ({
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endDrag}
+      onPointerCancel={endDrag}
       onPointerLeave={endDrag}
     >
-      <svg className="curved-loop-svg" viewBox="0 0 1440 120" preserveAspectRatio="none">
-        <text ref={measureRef} xmlSpace="preserve" style={{ visibility: 'hidden', opacity: 0, pointerEvents: 'none' }}>
+      <svg className="curved-loop-svg" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+        <text
+          ref={measureRef}
+          xmlSpace="preserve"
+          className={className}
+          style={{ visibility: 'hidden', opacity: 0, pointerEvents: 'none' }}
+        >
           {text}
         </text>
         <defs>
@@ -126,7 +132,7 @@ const CurvedLoop = ({
         </defs>
         {ready && (
           <text fontWeight="bold" xmlSpace="preserve" className={className}>
-            <textPath ref={textPathRef} href={`#${pathId}`} startOffset={offset + 'px'} xmlSpace="preserve">
+            <textPath ref={textPathRef} href={`#${pathId}`} startOffset={`${offset}px`} xmlSpace="preserve">
               {totalText}
             </textPath>
           </text>
