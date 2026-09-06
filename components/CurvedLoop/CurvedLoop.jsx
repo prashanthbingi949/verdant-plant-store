@@ -45,7 +45,8 @@ const CurvedLoop = ({
 
   useEffect(() => {
     if (!spacing || !textPathRef.current) return;
-    const initial = -spacing;
+    // Start at the path origin so the first rendered phrase is not clipped.
+    const initial = 0;
     textPathRef.current.setAttribute('startOffset', `${initial}px`);
     setOffset(initial);
   }, [spacing]);
