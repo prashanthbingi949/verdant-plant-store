@@ -17,14 +17,14 @@ const CurvedLoop = ({
   const measureRef = useRef(null);
   const textPathRef = useRef(null);
   const [spacing, setSpacing] = useState(0);
-  const [offset, setOffset] = useState(24);
+  const [offset, setOffset] = useState(0);
   const uid = useId();
   const pathId = `curve-${uid}`;
 
-  // Keep the curve visible inside the SVG bounds while retaining a clear,
-  // natural wave instead of a deep U-shape.
-  const amount = Math.max(14, Math.min(Math.abs(curveAmount), 28));
-  const pathD = `M-120,72 C70,${72 - amount} 220,${72 + amount} 410,72 S750,${72 - amount} 940,72 S1280,${72 + amount} 1560,72`;
+  // Keep the wave visible inside the SVG with generous vertical breathing room.
+  // This avoids clipping while retaining a soft, premium editorial curve.
+  const amount = Math.max(10, Math.min(Math.abs(curveAmount), 20));
+  const pathD = `M0,88 C180,${88 - amount} 300,${88 + amount} 480,88 S780,${88 - amount} 960,88 S1260,${88 + amount} 1440,88`;
 
   const dragRef = useRef(false);
   const lastXRef = useRef(0);
@@ -32,7 +32,7 @@ const CurvedLoop = ({
   const velRef = useRef(0);
 
   const totalText = spacing
-    ? Array(Math.ceil(2400 / spacing) + 3)
+    ? Array(Math.ceil(3600 / spacing) + 4)
         .fill(text)
         .join('')
     : text;
@@ -46,7 +46,7 @@ const CurvedLoop = ({
 
   useEffect(() => {
     if (!spacing || !textPathRef.current) return;
-    const initial = 24;
+    const initial = 0;
     textPathRef.current.setAttribute('startOffset', `${initial}px`);
     setOffset(initial);
   }, [spacing]);
@@ -58,11 +58,11 @@ const CurvedLoop = ({
     const step = () => {
       if (!dragRef.current && textPathRef.current) {
         const delta = dirRef.current === 'right' ? speed : -speed;
-        const currentOffset = parseFloat(textPathRef.current.getAttribute('startOffset') || '24');
+        const currentOffset = parseFloat(textPathRef.current.getAttribute('startOffset') || '0');
         let newOffset = currentOffset + delta;
 
-        if (newOffset <= -spacing) newOffset += spacing;
-        if (newOffset > spacing) newOffset -= spacing;
+        while (newOffset <= -spacing) newOffset += spacing;
+        while (newOffset > 0) newOffset -= spacing;
 
         textPathRef.current.setAttribute('startOffset', `${newOffset}px`);
         setOffset(newOffset);
@@ -89,11 +89,11 @@ const CurvedLoop = ({
     lastXRef.current = e.clientX;
     velRef.current = dx;
 
-    const currentOffset = parseFloat(textPathRef.current.getAttribute('startOffset') || '24');
+    const currentOffset = parseFloat(textPathRef.current.getAttribute('startOffset') || '0');
     let newOffset = currentOffset + dx;
 
-    if (newOffset <= -spacing) newOffset += spacing;
-    if (newOffset > spacing) newOffset -= spacing;
+    while (newOffset <= -spacing) newOffset += spacing;
+    while (newOffset > 0) newOffset -= spacing;
 
     textPathRef.current.setAttribute('startOffset', `${newOffset}px`);
     setOffset(newOffset);
@@ -117,7 +117,7 @@ const CurvedLoop = ({
       onPointerCancel={endDrag}
       onPointerLeave={endDrag}
     >
-      <svg className="curved-loop-svg" viewBox="0 0 1440 144" preserveAspectRatio="none" aria-hidden="true">
+      <svg className="curved-loop-svg" viewBox="0 0 1440 150" preserveAspectRatio="none" aria-hidden="true">
         <text
           ref={measureRef}
           xmlSpace="preserve"
