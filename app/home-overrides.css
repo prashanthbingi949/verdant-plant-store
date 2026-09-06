@@ -63,7 +63,6 @@
   padding: 7px 9px;
 }
 
-/* Premium compact story band with soft rounded outer corners. */
 .story-section {
   gap: clamp(32px, 5vw, 72px) !important;
   padding: 58px clamp(24px, 6vw, 78px) !important;
@@ -109,7 +108,6 @@
   font-size: 11px !important;
 }
 
-/* Plant-care headline: prevent serif descenders from colliding with the next line. */
 .care-heading h2 {
   line-height: 1.08 !important;
   margin-bottom: 18px !important;
@@ -125,17 +123,14 @@
   margin-top: 0 !important;
 }
 
-/* Root scrolling remains native for Next.js App Router route transitions. */
 html {
   scroll-behavior: auto !important;
 }
 
-/* Keep the hero from creating extra paint/layout work while scrolling. */
 .verdant-spotlight {
   contain: layout paint;
 }
 
-/* Hero supporting copy: readable Balthazar treatment. */
 .verdant-spotlight .hero-fade > p:first-child {
   font-family: 'Balthazar', Georgia, serif !important;
   font-style: normal !important;
@@ -144,6 +139,35 @@ html {
   letter-spacing: 0.01em !important;
   color: rgba(255,255,255,.92) !important;
   text-shadow: 0 1px 14px rgba(0,0,0,.4);
+}
+
+/* React Bits CircularText in the footer ABOUT area. */
+.footer-about-with-circular {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+}
+
+.footer-about-with-circular .footer-circular-wrap {
+  flex: 0 0 auto;
+  width: 112px;
+  height: 112px;
+  margin-top: -7px;
+  display: grid;
+  place-items: center;
+}
+
+.footer-about-with-circular .footer-circular-wrap .circular-text {
+  width: 112px;
+  height: 112px;
+  color: var(--lime) !important;
+}
+
+.footer-about-with-circular .footer-circular-wrap .circular-text span {
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
 }
 
 @media (max-width: 980px) {
@@ -162,6 +186,10 @@ html {
 
   .story-art {
     min-height: 340px !important;
+  }
+
+  .footer-about-with-circular {
+    gap: 18px;
   }
 }
 
@@ -197,6 +225,21 @@ html {
     font-size: 18px !important;
     line-height: 1.15 !important;
     max-width: 300px !important;
+  }
+
+  .footer-about-with-circular {
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .footer-about-with-circular .footer-circular-wrap,
+  .footer-about-with-circular .footer-circular-wrap .circular-text {
+    width: 92px;
+    height: 92px;
+  }
+
+  .footer-about-with-circular .footer-circular-wrap .circular-text span {
+    font-size: 9px;
   }
 }
 
