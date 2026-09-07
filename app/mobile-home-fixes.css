@@ -1,0 +1,141 @@
+/* Mobile fixes for the homepage's Verdant Edit / category section. */
+
+@media (max-width: 760px) {
+  .verdant-site .collections-section {
+    width: 100% !important;
+    padding: 42px 16px 44px !important;
+  }
+
+  .verdant-site .collections-section .section-heading {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    margin-bottom: 20px !important;
+    align-items: start !important;
+  }
+
+  .verdant-site .collections-section .section-heading h2 {
+    margin: 0 !important;
+    max-width: 100% !important;
+    font-size: clamp(46px, 13vw, 66px) !important;
+    line-height: .9 !important;
+    letter-spacing: -.06em !important;
+  }
+
+  .verdant-site .collections-section .section-heading > p {
+    max-width: 32ch !important;
+    margin: 0 !important;
+    font-size: 11px !important;
+    line-height: 1.45 !important;
+  }
+
+  .verdant-site .collections-section .premium-category-grid,
+  .verdant-site .collections-section .collection-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    width: 100% !important;
+    margin-top: 18px !important;
+  }
+
+  .verdant-site .collections-section .premium-category-card,
+  .verdant-site .collections-section .collection-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+  }
+
+  .verdant-site .collections-section .premium-category-image {
+    aspect-ratio: 1.08 / 1 !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  .verdant-site .collections-section .premium-category-copy {
+    min-width: 0 !important;
+    padding: 11px 10px 12px !important;
+  }
+
+  .verdant-site .collections-section .premium-category-copy > span:first-child {
+    font-size: 6px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .verdant-site .collections-section .premium-category-copy h3 {
+    max-width: none !important;
+    margin: 0 !important;
+    font-size: clamp(15px, 4.4vw, 21px) !important;
+    line-height: .98 !important;
+  }
+
+  .verdant-site .collections-section .premium-category-copy p {
+    margin: 7px 0 9px !important;
+    max-width: 25ch !important;
+    font-size: 8px !important;
+    line-height: 1.35 !important;
+  }
+
+  .verdant-site .collections-section .premium-category-link {
+    gap: 5px !important;
+    padding-top: 3px !important;
+    font-size: 8px !important;
+  }
+
+  .verdant-site .collections-section .premium-category-link svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .verdant-site .collections-section {
+    padding: 34px 14px 38px !important;
+  }
+
+  .verdant-site .collections-section .section-heading h2 {
+    font-size: clamp(42px, 14vw, 58px) !important;
+    line-height: .9 !important;
+  }
+
+  .verdant-site .collections-section .premium-category-grid,
+  .verdant-site .collections-section .collection-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .verdant-site .collections-section .premium-category-card,
+  .verdant-site .collections-section .collection-card {
+    display: grid !important;
+    grid-template-columns: 104px minmax(0, 1fr) !important;
+    min-height: 112px !important;
+    align-items: stretch !important;
+  }
+
+  .verdant-site .collections-section .premium-category-image {
+    aspect-ratio: auto !important;
+    height: 100% !important;
+    min-height: 112px !important;
+  }
+
+  .verdant-site .collections-section .premium-category-copy {
+    justify-content: center !important;
+    padding: 11px 12px !important;
+  }
+
+  .verdant-site .collections-section .premium-category-copy h3 {
+    font-size: 18px !important;
+    line-height: 1 !important;
+  }
+
+  .verdant-site .collections-section .premium-category-copy p {
+    margin: 5px 0 7px !important;
+    font-size: 8.5px !important;
+    line-height: 1.32 !important;
+  }
+
+  .verdant-site .collections-section .premium-category-link {
+    font-size: 8px !important;
+  }
+}
