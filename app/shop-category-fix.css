@@ -1,11 +1,36 @@
-/* Targeted fix: keep the Shop category description clear of the floating search field. */
+/* Targeted fix: keep the Shop category description completely above the floating search field. */
 .verdant-shop-page .shop-category-hero-content {
-  padding-bottom: 70px !important;
+  padding-bottom: 0 !important;
 }
 
-/* Give the hero enough vertical room on narrow screens as the copy wraps more. */
+.verdant-shop-page .shop-category-hero-content > p:last-child {
+  max-width: none !important;
+  white-space: nowrap !important;
+  margin-top: 7px !important;
+  line-height: 1.25 !important;
+}
+
+/* Lower the floating search field so it cannot cover the hero copy. */
+.verdant-shop-page .shop-search {
+  bottom: -39px !important;
+}
+
+/* Preserve comfortable spacing below the overlapping search field. */
+.verdant-shop-page .shop-category-body {
+  padding-top: 60px !important;
+}
+
 @media (max-width: 760px) {
-  .verdant-shop-page .shop-category-hero-content {
-    padding-bottom: 62px !important;
+  .verdant-shop-page .shop-category-hero-content > p:last-child {
+    white-space: normal !important;
+    max-width: 100% !important;
+  }
+
+  .verdant-shop-page .shop-search {
+    bottom: -34px !important;
+  }
+
+  .verdant-shop-page .shop-category-body {
+    padding-top: 56px !important;
   }
 }
