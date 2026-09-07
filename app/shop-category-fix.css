@@ -1,45 +1,48 @@
-/* Targeted fix: keep the Shop category description completely clear of the floating search field. */
+/* Targeted fix: keep the Shop category description completely above the floating search field. */
 .verdant-shop-page .shop-category-hero-content {
   padding-bottom: 0 !important;
 }
 
-/* Desktop: render the description as one guaranteed line. */
+/* Desktop: keep the real description on one line and reserve vertical space for it. */
 .verdant-shop-page .shop-category-hero-content > p.text-xs:last-child {
   display: block !important;
-  width: auto !important;
+  width: max-content !important;
   max-width: none !important;
   height: 15px !important;
   margin-top: 7px !important;
-  margin-bottom: 0 !important;
+  margin-bottom: 14px !important;
   line-height: 15px !important;
-  font-size: 0 !important;
+  font-size: 11px !important;
   white-space: nowrap !important;
   overflow: visible !important;
 }
 
-.verdant-shop-page .shop-category-hero-content > p.text-xs:last-child::after {
-  content: "Real imagery, clear categories and room to discover every plant and gardening essential in one place.";
-  display: inline-block !important;
-  white-space: nowrap !important;
-  font-size: 10px !important;
-  line-height: 15px !important;
-  letter-spacing: -0.01em !important;
-  color: rgba(244, 245, 233, 0.78) !important;
+/* Keep the search field below the entire hero copy instead of crossing it. */
+.verdant-shop-page .shop-search {
+  bottom: -27px !important;
+}
+
+/* Keep the category content below clear of the floating search field. */
+.verdant-shop-page .shop-category-body {
+  padding-top: 48px !important;
 }
 
 @media (max-width: 760px) {
-  /* Mobile: restore the actual paragraph so it can wrap naturally. */
   .verdant-shop-page .shop-category-hero-content > p.text-xs:last-child {
     width: 100% !important;
     max-width: 100% !important;
     height: auto !important;
+    margin-bottom: 18px !important;
     font-size: 12px !important;
     line-height: 20px !important;
     white-space: normal !important;
-    overflow: visible !important;
   }
 
-  .verdant-shop-page .shop-category-hero-content > p.text-xs:last-child::after {
-    content: none !important;
+  .verdant-shop-page .shop-search {
+    bottom: -25px !important;
+  }
+
+  .verdant-shop-page .shop-category-body {
+    padding-top: 46px !important;
   }
 }
