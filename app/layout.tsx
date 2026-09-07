@@ -7,6 +7,7 @@ import "./story-overrides.css";
 import { CartProvider } from "@/components/cart-provider";
 import HomeNavController from "@/components/home-nav-controller";
 import HomeVisualEffects from "@/components/home-visual-effects";
+import SiteUtilities from "@/components/site-utilities";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <CartProvider>
           <HomeNavController />
           <HomeVisualEffects />
+          <SiteUtilities />
           {children}
         </CartProvider>
       </body>
