@@ -1,4 +1,11 @@
 /* Targeted fix: keep the Shop category description clear of the floating search field. */
 .verdant-shop-page .shop-category-hero-content {
-  padding-bottom: 32px !important;
+  padding-bottom: 70px !important;
+}
+
+/* Give the hero enough vertical room on narrow screens as the copy wraps more. */
+@media (max-width: 760px) {
+  .verdant-shop-page .shop-category-hero-content {
+    padding-bottom: 62px !important;
+  }
 }
