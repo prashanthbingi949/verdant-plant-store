@@ -1,0 +1,4 @@
+/* Targeted fix: keep the Shop category description clear of the floating search field. */
+.verdant-shop-page .shop-category-hero-content {
+  padding-bottom: 32px !important;
+}
