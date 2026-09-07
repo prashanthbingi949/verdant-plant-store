@@ -101,24 +101,88 @@ export default function SiteUtilities() {
         .verdant-utility-btn { position:relative; width:40px; height:40px; display:grid; place-items:center; border:0; border-radius:999px; background:transparent; color:inherit; cursor:pointer; transition:background .2s ease, transform .2s ease; }
         .verdant-utility-btn:hover { background:rgba(32,45,32,.08); transform:translateY(-1px); }
         .verdant-utility-count { position:absolute; top:1px; right:0; min-width:16px; height:16px; display:grid; place-items:center; border-radius:999px; background:#ddf27a; color:#101510; font-size:9px; font-weight:900; }
+
+        /* Store-wide dark mode: keep every light section readable instead of leaving black text on dark surfaces. */
+        .verdant-dark { color-scheme: dark; }
         .verdant-dark body { background:#101510; color:#f4f5e9; }
         .verdant-dark .verdant-site { background:#101510; color:#f4f5e9; }
-        .verdant-dark .section-heading>p, .verdant-dark .product-info p, .verdant-dark .footer-brand p { color:rgba(244,245,233,.62); }
         .verdant-dark .site-header { background:rgba(16,21,16,.9); color:#f4f5e9; border-color:rgba(244,245,233,.08); }
-        .verdant-dark .premium-category-card, .verdant-dark .product-card { color:#f4f5e9; }
-        .verdant-dark .premium-category-copy { background:#182119; }
+        .verdant-dark .site-header .desktop-nav a,
+        .verdant-dark .site-header .account-link,
+        .verdant-dark .site-header .brand,
+        .verdant-dark .site-header .text-link { color:#f4f5e9; }
+        .verdant-dark .section-heading>p,
+        .verdant-dark .product-info p,
+        .verdant-dark .footer-brand p { color:rgba(244,245,233,.68); }
+        .verdant-dark .collections-section,
+        .verdant-dark .shop-section,
+        .verdant-dark .care-section { background:#101510; color:#f4f5e9; }
+        .verdant-dark .premium-category-card,
+        .verdant-dark .product-card { color:#f4f5e9; }
+        .verdant-dark .premium-category-copy { background:#182119; color:#f4f5e9; }
         .verdant-dark .premium-category-copy p { color:rgba(244,245,233,.62); }
-        .verdant-dark .collection-card { filter:brightness(.78); }
+        .verdant-dark .premium-category-copy > span:first-child { color:#bcd47a; }
+        .verdant-dark .collection-card { filter:brightness(.72); }
         .verdant-dark .product-image { background:#1c281d !important; }
-        .verdant-dark .care-list { border-color:rgba(244,245,233,.13); }
-        .verdant-dark .care-list a { border-color:rgba(244,245,233,.13); }
+        .verdant-dark .product-badge,
+        .verdant-dark .wish { color:#f4f5e9; background:rgba(32,45,32,.82); border-color:rgba(244,245,233,.1); }
+        .verdant-dark .wish.is-liked { color:#101510; background:#ddf27a; }
+        .verdant-dark .product-info h3,
+        .verdant-dark .product-buy strong { color:#f4f5e9; }
+        .verdant-dark .product-buy button { background:#ddf27a; color:#101510; }
+        .verdant-dark .care-list { border-color:rgba(244,245,233,.14); }
+        .verdant-dark .care-list a { border-color:rgba(244,245,233,.14); color:#f4f5e9; }
+        .verdant-dark .care-list span { color:rgba(244,245,233,.42); }
+        .verdant-dark .care-heading .eyebrow { color:#bcd47a; }
         .verdant-dark .newsletter { background:#b9cf54; color:#101510; }
+        .verdant-dark .newsletter label { color:rgba(16,21,16,.68); }
+        .verdant-dark .newsletter .email-row input { color:#101510; border-color:rgba(16,21,16,.18); }
+        .verdant-dark .footer { background:#0c110d; color:#f4f5e9; }
+        .verdant-dark .footer-col a { color:rgba(244,245,233,.76); }
+
+        /* Shop page: the page uses several literal light-mode utility colors, so override those directly in dark mode. */
         .verdant-dark .verdant-shop-page { background:#101510 !important; color:#f4f5e9 !important; }
-        .verdant-dark .verdant-shop-page .shop-category-body { background:#151d16; }
-        .verdant-dark .verdant-shop-page .shop-category-card { background:#1c281d; color:#f4f5e9; }
-        .verdant-dark .verdant-shop-page .shop-category-copy { background:#1c281d; }
-        .verdant-dark .verdant-shop-page .shop-search { background-color:#f4f5e9 !important; color:#101510 !important; }
-        .verdant-dark .verdant-utilities { background:rgba(20,29,21,.94); color:#f4f5e9; border-color:rgba(244,245,233,.14); }
+        .verdant-dark .verdant-shop-page [class*="text-black"],
+        .verdant-dark .verdant-shop-page [class*="text-[#202d20]"],
+        .verdant-dark .verdant-shop-page [class*="text-[#52634b]"] { color:#f4f5e9 !important; }
+        .verdant-dark .verdant-shop-page .shop-category-panel { background:#141c15; border-color:rgba(244,245,233,.16); }
+        .verdant-dark .verdant-shop-page .shop-category-body { background:#141c15; color:#f4f5e9; }
+        .verdant-dark .verdant-shop-page .shop-category-card { background:#1b251c; color:#f4f5e9; border-color:rgba(244,245,233,.11); }
+        .verdant-dark .verdant-shop-page .shop-category-card.active { border-color:#ddf27a; }
+        .verdant-dark .verdant-shop-page .shop-category-copy { background:#1b251c; color:#f4f5e9; }
+        .verdant-dark .verdant-shop-page .shop-category-copy strong { color:#f4f5e9; }
+        .verdant-dark .verdant-shop-page .shop-category-copy span,
+        .verdant-dark .verdant-shop-page .shop-control-note { color:rgba(244,245,233,.62) !important; }
+        .verdant-dark .verdant-shop-page .shop-category-body > div:first-child p { color:#bcd47a !important; }
+        .verdant-dark .verdant-shop-page .shop-search { background-color:#f4f5e9 !important; color:#101510 !important; border-color:rgba(244,245,233,.22); }
+        .verdant-dark .verdant-shop-page .shop-search::placeholder { color:rgba(16,21,16,.42) !important; }
+        .verdant-dark .verdant-shop-page .shop-pill { background:#1b251c; color:#f4f5e9; border-color:rgba(244,245,233,.11); }
+        .verdant-dark .verdant-shop-page .shop-pill.active { background:#ddf27a; color:#101510; border-color:#ddf27a; }
+        .verdant-dark .verdant-shop-page .shop-select { background:#1b251c; color:#f4f5e9; border-color:rgba(244,245,233,.11); }
+        .verdant-dark .verdant-shop-page .shop-subcat { background:#1b251c; color:#f4f5e9; border-color:rgba(244,245,233,.11); }
+        .verdant-dark .verdant-shop-page .shop-subcat.active { background:#ddf27a; color:#101510; border-color:#ddf27a; }
+        .verdant-dark .verdant-shop-page .shop-category-tab { color:#f4f5e9; }
+        .verdant-dark .verdant-shop-page .shop-category-tab.active { color:#101510; }
+        .verdant-dark .verdant-shop-page section > div > p[class*="text-black"],
+        .verdant-dark .verdant-shop-page section > div p[class*="text-black/"] { color:rgba(244,245,233,.68) !important; }
+        .verdant-dark .verdant-shop-page .group > div > p[class*="text-black"] { color:rgba(244,245,233,.62) !important; }
+        .verdant-dark .verdant-shop-page .group h3,
+        .verdant-dark .verdant-shop-page .group strong { color:#f4f5e9 !important; }
+        .verdant-dark .verdant-shop-page .group a[class*="bg-[#202d20]"] { color:#f4f5e9 !important; background:#202d20 !important; }
+        .verdant-dark .verdant-shop-page .group button { color:inherit; }
+
+        /* Favorites page */
+        .verdant-dark .verdant-favorites-page { background:#101510 !important; color:#f4f5e9 !important; }
+        .verdant-dark .verdant-favorites-links a { background:#182119; border-color:rgba(244,245,233,.14); color:#f4f5e9; }
+        .verdant-dark .verdant-favorites-copy,
+        .verdant-dark .verdant-favorite-meta small { color:rgba(244,245,233,.62); }
+        .verdant-dark .verdant-favorite-image { background:#1c281d; }
+        .verdant-dark .verdant-favorite-remove { background:rgba(20,29,21,.9); color:#f4f5e9; }
+        .verdant-dark .verdant-favorite-buy button { background:#ddf27a; color:#101510; }
+        .verdant-dark .verdant-favorites-empty { border-color:rgba(244,245,233,.16); color:rgba(244,245,233,.62); }
+
+        /* Utility palette */
+        .verdant-dark .verdant-utilities { background:rgba(20,29,21,.96); color:#f4f5e9; border-color:rgba(244,245,233,.14); }
         .verdant-dark .verdant-utility-btn:hover { background:rgba(255,255,255,.08); }
         @media (max-width:640px){ .verdant-utilities { right:10px; bottom:10px; } .verdant-utility-btn{width:38px;height:38px;} }
       `}</style>
