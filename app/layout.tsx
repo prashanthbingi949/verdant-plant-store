@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./home-overrides.css";
@@ -21,6 +21,11 @@ export const metadata: Metadata = {
   title: "Verdant — Plants, Pots & Garden Life",
   description:
     "Thoughtful plants and beautiful objects for spaces that feel more alive.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
