@@ -102,7 +102,6 @@ export default function SiteUtilities() {
         .verdant-utility-btn:hover { background:rgba(32,45,32,.08); transform:translateY(-1px); }
         .verdant-utility-count { position:absolute; top:1px; right:0; min-width:16px; height:16px; display:grid; place-items:center; border-radius:999px; background:#ddf27a; color:#101510; font-size:9px; font-weight:900; }
 
-        /* Store-wide dark mode: keep every light section readable instead of leaving black text on dark surfaces. */
         .verdant-dark { color-scheme: dark; }
         .verdant-dark body { background:#101510; color:#f4f5e9; }
         .verdant-dark .verdant-site { background:#101510; color:#f4f5e9; }
@@ -140,7 +139,7 @@ export default function SiteUtilities() {
         .verdant-dark .footer { background:#0c110d; color:#f4f5e9; }
         .verdant-dark .footer-col a { color:rgba(244,245,233,.76); }
 
-        /* Shop page: the page uses several literal light-mode utility colors, so override those directly in dark mode. */
+        /* Shop page */
         .verdant-dark .verdant-shop-page { background:#101510 !important; color:#f4f5e9 !important; }
         .verdant-dark .verdant-shop-page [class*="text-black"],
         .verdant-dark .verdant-shop-page [class*="text-[#202d20]"],
@@ -170,6 +169,15 @@ export default function SiteUtilities() {
         .verdant-dark .verdant-shop-page .group strong { color:#f4f5e9 !important; }
         .verdant-dark .verdant-shop-page .group a[class*="bg-[#202d20]"] { color:#f4f5e9 !important; background:#202d20 !important; }
         .verdant-dark .verdant-shop-page .group button { color:inherit; }
+
+        /* Product detail page: override its light utility colors in dark mode. */
+        .verdant-dark main[class*="bg-[#f4f5e9]"] { background:#101510 !important; color:#f4f5e9 !important; }
+        .verdant-dark main[class*="bg-[#f4f5e9]"] header { background:rgba(16,21,16,.92) !important; color:#f4f5e9 !important; border-color:rgba(244,245,233,.1) !important; }
+        .verdant-dark main[class*="bg-[#f4f5e9]"] [class*="text-black/"] { color:rgba(244,245,233,.68) !important; }
+        .verdant-dark main[class*="bg-[#f4f5e9]"] [class*="border-black/"] { border-color:rgba(244,245,233,.12) !important; }
+        .verdant-dark main[class*="bg-[#f4f5e9]"] [class*="bg-white/"] { background:rgba(32,45,32,.72) !important; }
+        .verdant-dark main[class*="bg-[#f4f5e9]"] [class*="border-[#202d20]"] { border-color:#ddf27a !important; }
+        .verdant-dark main[class*="bg-[#f4f5e9]"] [class*="text-[#202d20]"] { color:#f4f5e9 !important; }
 
         /* Favorites page */
         .verdant-dark .verdant-favorites-page { background:#101510 !important; color:#f4f5e9 !important; }
