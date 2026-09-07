@@ -183,76 +183,105 @@ html { scroll-behavior: auto !important; }
   padding-top: 48px !important;
 }
 
-/* Shop category browser — compact search area + all categories visible as a grid. */
+/* Shop category browser: compact hero, readable search, and ten categories in one desktop row. */
 .verdant-shop-page .shop-category-hero {
-  min-height: 226px !important;
-  height: 226px !important;
-  padding: 24px 30px 78px !important;
+  min-height: 252px !important;
+  height: 252px !important;
+  padding: 22px 30px 84px !important;
 }
-.verdant-shop-page .shop-category-search,
+.verdant-shop-page .shop-category-hero-content {
+  max-width: 640px !important;
+  position: relative !important;
+  z-index: 3 !important;
+}
+.verdant-shop-page .shop-category-hero-content > p:last-child {
+  max-width: 500px !important;
+  margin-top: 5px !important;
+  color: rgba(244,245,233,.82) !important;
+}
 .verdant-shop-page .shop-search {
   left: 30px !important;
   right: 30px !important;
-  bottom: 18px !important;
-  height: 52px !important;
+  bottom: 16px !important;
+  height: 50px !important;
+  z-index: 5 !important;
+  background: rgba(251,252,245,.98) !important;
 }
 .verdant-shop-page .shop-category-body {
-  padding: 24px 28px 22px !important;
+  padding: 22px 24px 18px !important;
 }
 .verdant-shop-page .shop-category-rail {
   display: grid !important;
-  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-  gap: 12px !important;
+  grid-template-columns: repeat(10, minmax(0, 1fr)) !important;
+  gap: 8px !important;
   overflow: visible !important;
   padding: 2px 0 0 !important;
   scroll-snap-type: none !important;
   scrollbar-width: none !important;
 }
 .verdant-shop-page .shop-category-rail::-webkit-scrollbar { display: none; }
+.verdant-shop-page .shop-category-rail > .shop-category-card:first-child { display: none !important; }
 .verdant-shop-page .shop-category-card {
   width: 100% !important;
   min-width: 0 !important;
   flex: none !important;
-  border-radius: 20px !important;
-  box-shadow: 0 7px 22px rgba(32,45,32,.035) !important;
+  border-radius: 17px !important;
+  box-shadow: 0 5px 16px rgba(32,45,32,.03) !important;
 }
 .verdant-shop-page .shop-category-photo {
-  height: 116px !important;
-  aspect-ratio: 1.18 / 1 !important;
+  height: 70px !important;
 }
 .verdant-shop-page .shop-category-copy {
-  padding: 11px 12px 12px !important;
-  min-height: 62px !important;
+  padding: 8px 8px 9px !important;
+  min-height: 60px !important;
 }
 .verdant-shop-page .shop-category-copy strong {
-  font-size: 12px !important;
+  font-size: 10px !important;
   line-height: 1.1 !important;
 }
 .verdant-shop-page .shop-category-copy span {
-  margin-top: 4px !important;
-  font-size: 8.5px !important;
-  line-height: 1.25 !important;
+  margin-top: 3px !important;
+  font-size: 7.5px !important;
+  line-height: 1.18 !important;
 }
+.verdant-shop-page .shop-category-card:hover { transform: translateY(-2px) !important; }
 .verdant-shop-page .shop-control-row {
-  margin-top: 18px !important;
-  padding-top: 14px !important;
+  margin-top: 14px !important;
+  padding-top: 12px !important;
 }
 
-@media (max-width: 980px) {
-  .shop-section .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .story-section { padding: 54px 24px !important; border-radius: 30px !important; }
-  .story-art { min-height: 340px !important; }
-  .premium-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 26px; }
-  .premium-category-copy { padding: 16px 16px 18px; }
-  .premium-category-copy h3 { font-size: 22px; }
-  .premium-category-copy p { font-size: 10.5px; }
-  .verdant-site .marquee-item b { margin-inline: 28px !important; }
-  .verdant-site .care-section { padding-bottom: 40px !important; }
-  .verdant-site .newsletter { padding-top: 40px !important; }
-  .verdant-shop-page .shop-category-hero { min-height: 230px !important; height: 230px !important; padding-left: 24px !important; padding-right: 24px !important; }
-  .verdant-shop-page .shop-search { left: 24px !important; right: 24px !important; }
-  .verdant-shop-page .shop-category-body { padding-inline: 22px !important; }
-  .verdant-shop-page .shop-category-rail { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+@media (max-width: 1100px) {
+  .verdant-shop-page .shop-category-rail {
+    grid-auto-flow: column !important;
+    grid-template-rows: repeat(2, minmax(0, auto)) !important;
+    grid-template-columns: repeat(5, minmax(145px, 1fr)) !important;
+    grid-auto-columns: minmax(145px, 1fr) !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    max-height: 170px !important;
+    padding-bottom: 4px !important;
+    scroll-snap-type: x proximity !important;
+  }
+  .verdant-shop-page .shop-category-card { scroll-snap-align: start !important; }
+}
+
+@media (max-width: 760px) {
+  .verdant-shop-page .shop-category-hero {
+    min-height: 238px !important;
+    height: 238px !important;
+    padding: 20px 18px 76px !important;
+  }
+  .verdant-shop-page .shop-category-hero-content { max-width: 100% !important; }
+  .verdant-shop-page .shop-category-hero h2 { font-size: 34px !important; }
+  .verdant-shop-page .shop-search {
+    left: 18px !important;
+    right: 18px !important;
+    bottom: 15px !important;
+    height: 49px !important;
+  }
+  .verdant-shop-page .shop-category-body { padding: 20px 16px 16px !important; }
+  .verdant-shop-page .shop-category-photo { height: 72px !important; }
+  .verdant-shop-page .shop-category-copy { min-height: 60px !important; }
 }
 
 @media (max-width: 640px) {
@@ -271,15 +300,6 @@ html { scroll-behavior: auto !important; }
   .verdant-site .marquee-item b { margin-inline: 22px !important; }
   .verdant-site .care-section { padding-bottom: 34px !important; }
   .verdant-site .newsletter { padding-top: 34px !important; }
-  .verdant-shop-page .shop-category-hero { min-height: 220px !important; height: 220px !important; padding: 21px 18px 74px !important; }
-  .verdant-shop-page .shop-category-hero-content { max-width: 100% !important; }
-  .verdant-shop-page .shop-category-hero h2 { font-size: 34px !important; }
-  .verdant-shop-page .shop-search { left: 18px !important; right: 18px !important; bottom: 16px !important; height: 50px !important; }
-  .verdant-shop-page .shop-category-body { padding: 22px 16px 18px !important; }
-  .verdant-shop-page .shop-category-rail { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
-  .verdant-shop-page .shop-category-photo { height: 104px !important; }
-  .verdant-shop-page .shop-category-copy { padding: 10px 10px 11px !important; min-height: 58px !important; }
-  .verdant-shop-page .shop-category-copy strong { font-size: 11px !important; }
 }
 
 @media (prefers-reduced-motion: reduce) { .shop-section .product-image img, .shop-section .product-image .plant-art, .premium-category-image img { transition: none; } }
