@@ -3,11 +3,15 @@
   padding-bottom: 0 !important;
 }
 
-.verdant-shop-page .shop-category-hero-content > p:last-child {
+/* Desktop: keep the full description on one line so it can never enter the search field's space. */
+.verdant-shop-page .shop-category-hero-content > p.text-xs:last-child {
+  display: block !important;
+  width: max-content !important;
   max-width: none !important;
   white-space: nowrap !important;
   margin-top: 7px !important;
   line-height: 1.25 !important;
+  font-size: 11px !important;
 }
 
 /* Lower the floating search field so it cannot cover the hero copy. */
@@ -15,15 +19,18 @@
   bottom: -39px !important;
 }
 
-/* Preserve comfortable spacing below the overlapping search field. */
+/* Preserve comfortable spacing below the floating search field. */
 .verdant-shop-page .shop-category-body {
   padding-top: 60px !important;
 }
 
 @media (max-width: 760px) {
-  .verdant-shop-page .shop-category-hero-content > p:last-child {
-    white-space: normal !important;
+  /* On mobile the sentence may wrap naturally because the viewport is narrow. */
+  .verdant-shop-page .shop-category-hero-content > p.text-xs:last-child {
+    width: 100% !important;
     max-width: 100% !important;
+    white-space: normal !important;
+    font-size: 12px !important;
   }
 
   .verdant-shop-page .shop-search {
