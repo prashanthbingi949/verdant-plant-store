@@ -1,48 +1,60 @@
-/* Targeted fix: keep the Shop category description completely above the floating search field. */
-.verdant-shop-page .shop-category-hero-content {
-  padding-bottom: 0 !important;
+/* Targeted Shop hero layout fix: keep the description on one line and keep the search field fully inside the hero. */
+.verdant-shop-page .shop-category-hero {
+  min-height: 250px !important;
+  overflow: hidden !important;
 }
 
-/* Desktop: keep the real description on one line and reserve vertical space for it. */
+.verdant-shop-page .shop-category-hero-content {
+  padding-bottom: 56px !important;
+}
+
+/* Desktop: one complete line, above the search field. */
 .verdant-shop-page .shop-category-hero-content > p.text-xs:last-child {
   display: block !important;
   width: max-content !important;
   max-width: none !important;
-  height: 15px !important;
-  margin-top: 7px !important;
-  margin-bottom: 14px !important;
-  line-height: 15px !important;
+  height: 16px !important;
+  margin-top: 8px !important;
+  margin-bottom: 0 !important;
+  line-height: 16px !important;
   font-size: 11px !important;
   white-space: nowrap !important;
   overflow: visible !important;
 }
 
-/* Keep the search field below the entire hero copy instead of crossing it. */
+/* Keep the search bar completely inside the hero so the parent cannot clip it. */
 .verdant-shop-page .shop-search {
-  bottom: -27px !important;
+  bottom: 16px !important;
 }
 
-/* Keep the category content below clear of the floating search field. */
 .verdant-shop-page .shop-category-body {
-  padding-top: 48px !important;
+  padding-top: 24px !important;
 }
 
 @media (max-width: 760px) {
+  .verdant-shop-page .shop-category-hero {
+    min-height: 236px !important;
+  }
+
+  .verdant-shop-page .shop-category-hero-content {
+    padding-bottom: 60px !important;
+  }
+
   .verdant-shop-page .shop-category-hero-content > p.text-xs:last-child {
     width: 100% !important;
     max-width: 100% !important;
     height: auto !important;
-    margin-bottom: 18px !important;
+    margin-bottom: 0 !important;
     font-size: 12px !important;
     line-height: 20px !important;
     white-space: normal !important;
   }
 
   .verdant-shop-page .shop-search {
-    bottom: -25px !important;
+    bottom: 14px !important;
   }
 
   .verdant-shop-page .shop-category-body {
-    padding-top: 46px !important;
+    padding-top: 22px !important;
   }
 }
