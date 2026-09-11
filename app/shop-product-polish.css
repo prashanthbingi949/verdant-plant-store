@@ -164,20 +164,25 @@
   transform: translateY(-1px);
 }
 
-/* Immediate feedback after Quick Add: the focused control changes into a check. */
-.verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button:focus {
-  outline: none;
+/* The React quick-added state gets its own visual class, so the checkmark does not depend on focus. */
+.verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button.is-quick-added {
   background: #ddf27a !important;
+  border-color: #ddf27a !important;
   color: #202d20 !important;
-  box-shadow: 0 0 0 4px rgba(221,242,122,.18), 0 12px 28px rgba(32,45,32,.14);
+  box-shadow: 0 0 0 4px rgba(221,242,122,.14), 0 12px 28px rgba(32,45,32,.14);
   transform: scale(1.05);
 }
 
-.verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button:focus::before {
+.verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button.is-quick-added::before {
   content: "✓";
   font-size: 18px;
   font-weight: 850;
   transform: translateY(0);
+}
+
+.verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button.is-quick-added:hover:not(:disabled) {
+  background: #ddf27a !important;
+  transform: scale(1.05);
 }
 
 .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button:disabled::before {
