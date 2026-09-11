@@ -110,9 +110,9 @@ export default function MiniCartDrawer() {
             <div className="flex items-center justify-between text-black/55"><span>Delivery</span><span>{delivery === 0 ? "Free" : `₹${delivery.toLocaleString("en-IN")}`}</span></div>
             <div className="mt-3 flex items-center justify-between border-t border-black/8 pt-3"><span className="font-bold text-[#101510]">Total</span><strong className="text-lg text-[#101510]">₹{total.toLocaleString("en-IN")}</strong></div>
           </div>
-          <div className="mt-4 grid grid-cols-[1fr_auto] gap-2">
-            <button type="button" disabled={!items.length} onClick={() => { setOpen(false); router.push("/checkout"); }} className="rounded-full bg-[#202d20] px-5 py-3.5 text-sm font-bold text-[#f4f5e9] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-black/10 disabled:text-black/35">Checkout</button>
-            <Link href="/cart" onClick={() => setOpen(false)} className="inline-flex items-center justify-center rounded-full border border-black/10 bg-white/40 px-5 py-3.5 text-sm font-bold text-[#202d20] transition hover:-translate-y-0.5 hover:bg-[#ddf27a]">View cart</Link>
+          <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto]">
+            <button type="button" disabled={!items.length} onClick={() => { setOpen(false); router.push("/checkout"); }} className="rounded-full bg-[#202d20] px-5 py-3.5 text-sm font-bold !text-[#f4f5e9] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-black/10 disabled:!text-black/35">Checkout</button>
+            <Link href="/cart" onClick={() => setOpen(false)} className="inline-flex min-h-[54px] items-center justify-center rounded-full border border-[#202d20]/20 bg-white/70 px-5 py-3.5 text-sm font-bold !text-[#202d20] opacity-100 transition hover:-translate-y-0.5 hover:border-[#202d20] hover:bg-[#ddf27a]">View cart</Link>
           </div>
         </div>
       </aside>
