@@ -1,0 +1,102 @@
+/* Verdant Product Detail 2.1 visual polish */
+
+.vd-pdp .vd-gallery {
+  background: linear-gradient(145deg, #e7eddc 0%, #dce6cf 100%);
+}
+
+.vd-pdp .vd-pdp-main-image {
+  object-position: center;
+}
+
+.vd-pdp .vd-buy-box {
+  background: rgba(245, 247, 239, 0.72);
+  border-color: rgba(32, 45, 32, 0.13);
+  box-shadow: 0 18px 50px rgba(32, 45, 32, 0.08);
+}
+
+.vd-pdp .vd-buy-box .vd-add {
+  letter-spacing: -0.01em;
+}
+
+.vd-pdp .vd-price-row {
+  border-color: rgba(16, 21, 16, 0.11);
+}
+
+.vd-pdp .vd-facts .vd-fact:first-child {
+  border-top-color: rgba(82, 99, 75, 0.24);
+}
+
+/* Dark theme: keep the hero gallery soft and the product asset clearly visible. */
+.verdant-dark .vd-pdp {
+  --cream: #f3f2e8;
+  --ink: #f3f2e8;
+}
+
+.verdant-dark .vd-pdp .vd-gallery {
+  background: radial-gradient(circle at 52% 42%, rgba(91, 119, 74, 0.22), transparent 48%), #18221a;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.24);
+}
+
+.verdant-dark .vd-pdp .vd-pdp-visual-glow {
+  background: radial-gradient(circle, rgba(184, 221, 122, 0.26), transparent 63%);
+}
+
+.verdant-dark .vd-pdp .vd-pdp-main-image {
+  mix-blend-mode: normal;
+  filter: drop-shadow(0 30px 34px rgba(0, 0, 0, 0.36)) brightness(1.06) saturate(1.08);
+}
+
+.verdant-dark .vd-pdp .vd-pdp-floor-shadow {
+  background: rgba(0, 0, 0, 0.32);
+}
+
+.verdant-dark .vd-pdp .vd-buy-box {
+  background: linear-gradient(180deg, rgba(31, 46, 34, 0.96), rgba(25, 38, 28, 0.96));
+  border-color: rgba(221, 242, 122, 0.16);
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.22);
+}
+
+.verdant-dark .vd-pdp .vd-qty {
+  background: rgba(15, 24, 17, 0.72);
+  border-color: rgba(244, 245, 233, 0.16);
+}
+
+.verdant-dark .vd-pdp .vd-qty button {
+  color: #f4f5e9;
+}
+
+.verdant-dark .vd-pdp .vd-qty button:hover:not(:disabled) {
+  background: rgba(221, 242, 122, 0.12);
+}
+
+.verdant-dark .vd-pdp .vd-add {
+  background: #263829;
+  color: #f4f5e9;
+}
+
+.verdant-dark .vd-pdp .vd-add:hover:not(:disabled) {
+  background: #304632;
+}
+
+.verdant-dark .vd-pdp .vd-add.is-added {
+  background: #ddf27a;
+  color: #101510;
+}
+
+.verdant-dark .vd-pdp .vd-buy-foot {
+  color: rgba(244, 245, 233, 0.44);
+}
+
+.verdant-dark .vd-pdp .vd-stock {
+  color: rgba(221, 242, 122, 0.78);
+}
+
+.verdant-dark .vd-pdp .vd-fact {
+  border-top-color: rgba(244, 245, 233, 0.12);
+}
+
+@media (max-width: 760px) {
+  .vd-pdp .vd-buy-box {
+    border-radius: 20px;
+  }
+}
