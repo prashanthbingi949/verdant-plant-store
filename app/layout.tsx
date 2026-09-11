@@ -15,6 +15,7 @@ import SiteUtilities from "@/components/site-utilities";
 import ShopSearchEnhancer from "@/components/shop-search-enhancer";
 import ShopCartToast from "@/components/shop-cart-toast";
 import MiniCartDrawer from "@/components/mini-cart-drawer";
+import ShopQuickAddFeedback from "@/components/shop-quick-add-feedback";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -52,6 +53,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <ShopSearchEnhancer />
           <ShopCartToast />
           <MiniCartDrawer />
+          <ShopQuickAddFeedback />
           {children}
         </CartProvider>
       </body>
