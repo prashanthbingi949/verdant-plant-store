@@ -20,6 +20,7 @@
   box-shadow: 0 24px 58px rgba(32,45,32,.15);
 }
 
+/* Product type badge becomes a quiet premium label. */
 .verdant-shop-page .group.min-w-0 > .relative > a > div > span {
   border: 1px solid rgba(244,245,233,.32);
   box-shadow: 0 8px 20px rgba(16,21,16,.08);
@@ -31,6 +32,7 @@
   background: rgba(221,242,122,.92);
 }
 
+/* Wishlist control floats slightly on card hover. */
 .verdant-shop-page .group.min-w-0 > .relative > button {
   box-shadow: 0 10px 24px rgba(16,21,16,.08);
   transition: transform .28s cubic-bezier(.2,.7,.2,1), background .25s ease, color .25s ease, box-shadow .25s ease;
@@ -49,6 +51,7 @@
   transform: translateY(-1px);
 }
 
+/* Make product metadata feel editorial rather than template-like. */
 .verdant-shop-page .group.min-w-0 > .pt-4 p:first-child {
   letter-spacing: .08em;
   text-transform: uppercase;
@@ -65,12 +68,13 @@
   color: #52634b;
 }
 
+/* Price gets a more deliberate hierarchy. */
 .verdant-shop-page .group.min-w-0 > .pt-4 strong {
   padding-top: 2px;
   letter-spacing: -.02em;
 }
 
-/* Action row: primary action and icon add feel like one composed control group. */
+/* Action row: primary action and quick add feel like one composed control group. */
 .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 {
   gap: 8px;
 }
@@ -82,6 +86,7 @@
   transition: transform .25s cubic-bezier(.2,.7,.2,1), background .25s ease, border-color .25s ease, box-shadow .25s ease, color .25s ease;
 }
 
+/* Keep primary CTA text readable against the dark button, including hover. */
 .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > a {
   color: #f4f5e9 !important;
 }
@@ -101,36 +106,38 @@
   color: #202d20;
 }
 
-/* Replace the Quick add label with a compact premium plus control. */
+/* Quick-add is a compact circular control, not a text button. */
 .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button {
-  width: 48px;
-  min-width: 48px;
-  padding: 0;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  max-width: 44px !important;
+  flex: 0 0 44px !important;
+  padding: 0 !important;
+  border-radius: 9999px !important;
+  aspect-ratio: 1 / 1;
+  line-height: 1 !important;
   font-size: 0 !important;
-  line-height: 1;
-  border-radius: 999px;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button::before {
   content: "+";
-  display: inline-grid;
+  display: grid;
   place-items: center;
   width: 100%;
   height: 100%;
-  font-size: 25px;
-  font-weight: 450;
+  font-size: 23px;
+  font-weight: 400;
   line-height: 1;
   transform: translateY(-1px);
-  transition: transform .25s ease;
 }
 
-.verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button:hover:not(:disabled)::before {
-  transform: translateY(-1px) rotate(90deg);
-}
-
-.verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button:focus-visible {
-  outline: 2px solid #ddf27a;
-  outline-offset: 3px;
+.verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button:disabled::before {
+  content: "—";
+  opacity: .45;
 }
 
 /* A subtle sheen moves across the image only when the card is explored. */
@@ -168,10 +175,6 @@
     transform: none;
   }
 
-  .verdant-shop-page .group.min-w-0:hover > .pt-4 > .mt-4 > button:hover:not(:disabled)::before {
-    transform: none;
-  }
-
   .verdant-shop-page .group.min-w-0 > .relative > a > div::after {
     display: none;
   }
@@ -185,8 +188,7 @@
   .verdant-shop-page .group.min-w-0 > .pt-4,
   .verdant-shop-page .group.min-w-0 > .pt-4 h3,
   .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > a,
-  .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button,
-  .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button::before {
+  .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button {
     transition: none !important;
   }
 }
