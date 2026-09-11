@@ -21,13 +21,19 @@
   transition: transform .55s cubic-bezier(.2,.7,.2,1), box-shadow .55s cubic-bezier(.2,.7,.2,1), border-color .35s ease;
 }
 
+/* Six-column desktop cards need a little less image height so more products fit comfortably. */
+@media (min-width: 1200px) {
+  .verdant-shop-page .group.min-w-0 > .relative > a > div {
+    aspect-ratio: 1.14 / 1 !important;
+  }
+}
+
 .verdant-shop-page .group.min-w-0:hover > .relative > a > div {
   transform: translateY(-4px) scale(1.006);
   border-color: rgba(32,45,32,.14);
   box-shadow: 0 24px 58px rgba(32,45,32,.15);
 }
 
-/* Product type badge becomes a quiet premium label. */
 .verdant-shop-page .group.min-w-0 > .relative > a > div > span {
   border: 1px solid rgba(244,245,233,.32);
   box-shadow: 0 8px 20px rgba(16,21,16,.08);
@@ -39,7 +45,6 @@
   background: rgba(221,242,122,.92);
 }
 
-/* Wishlist control floats slightly on card hover. */
 .verdant-shop-page .group.min-w-0 > .relative > button {
   box-shadow: 0 10px 24px rgba(16,21,16,.08);
   transition: transform .28s cubic-bezier(.2,.7,.2,1), background .25s ease, color .25s ease, box-shadow .25s ease;
@@ -54,7 +59,7 @@
 .verdant-shop-page .group.min-w-0 > .pt-4 {
   display: flex;
   flex: 1 1 auto;
-  min-height: 0;
+  min-height: 205px;
   flex-direction: column;
   transition: transform .3s ease;
 }
@@ -63,7 +68,6 @@
   transform: translateY(-1px);
 }
 
-/* Editorial metadata. */
 .verdant-shop-page .group.min-w-0 > .pt-4 p:first-child {
   letter-spacing: .08em;
   text-transform: uppercase;
@@ -72,7 +76,6 @@
   color: rgba(16,21,16,.46);
 }
 
-/* Product names can use a clean two-line lockup instead of awkward single-line truncation. */
 .verdant-shop-page .group.min-w-0 > .pt-4 h3 {
   white-space: normal !important;
   overflow: hidden !important;
@@ -80,6 +83,7 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   min-height: 2.25em;
   line-height: 1.12;
   transition: color .22s ease, transform .22s ease;
@@ -89,18 +93,15 @@
   color: #52634b;
 }
 
-/* Price gets a more deliberate hierarchy. */
 .verdant-shop-page .group.min-w-0 > .pt-4 strong {
   padding-top: 2px;
   letter-spacing: -.02em;
 }
 
-/* Keep descriptions readable while allowing the card row to stretch naturally. */
 .verdant-shop-page .group.min-w-0 > .pt-4 > p.mt-2 {
   margin-bottom: 0 !important;
 }
 
-/* Action row stays pinned to the bottom of every card in its grid row. */
 .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 {
   margin-top: auto !important;
   padding-top: 16px;
@@ -114,7 +115,6 @@
   transition: transform .25s cubic-bezier(.2,.7,.2,1), background .25s ease, border-color .25s ease, box-shadow .25s ease, color .25s ease;
 }
 
-/* Keep primary CTA text readable against the dark button, including hover. */
 .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > a {
   color: #f4f5e9 !important;
 }
@@ -164,12 +164,27 @@
   transform: translateY(-1px);
 }
 
+/* Immediate feedback after Quick Add: the focused control changes into a check. */
+.verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button:focus {
+  outline: none;
+  background: #ddf27a !important;
+  color: #202d20 !important;
+  box-shadow: 0 0 0 4px rgba(221,242,122,.18), 0 12px 28px rgba(32,45,32,.14);
+  transform: scale(1.05);
+}
+
+.verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button:focus::before {
+  content: "✓";
+  font-size: 18px;
+  font-weight: 850;
+  transform: translateY(0);
+}
+
 .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button:disabled::before {
   content: "—";
   opacity: .45;
 }
 
-/* A subtle sheen moves across the image only when the card is explored. */
 .verdant-shop-page .group.min-w-0 > .relative > a > div::after {
   content: "";
   position: absolute;
@@ -183,6 +198,12 @@
 
 .verdant-shop-page .group.min-w-0:hover > .relative > a > div::after {
   transform: skewX(-15deg) translateX(620%);
+}
+
+@media (max-width: 1199px) {
+  .verdant-shop-page .group.min-w-0 > .relative > a > div {
+    aspect-ratio: 1 / 1 !important;
+  }
 }
 
 @media (max-width: 760px) {
@@ -206,6 +227,10 @@
 
   .verdant-shop-page .group.min-w-0 > .relative > a > div::after {
     display: none;
+  }
+
+  .verdant-shop-page .group.min-w-0 > .pt-4 {
+    min-height: 0;
   }
 }
 
