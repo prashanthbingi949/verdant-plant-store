@@ -6,6 +6,7 @@ import "./mobile-home-fixes.css";
 import "./story-overrides.css";
 import "./shop-category-fix.css";
 import "./shop-product-polish.css";
+import "./shop-grid-density.css";
 import { CartProvider } from "@/components/cart-provider";
 import HomeNavController from "@/components/home-nav-controller";
 import HomeVisualEffects from "@/components/home-visual-effects";
