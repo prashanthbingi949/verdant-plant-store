@@ -48,7 +48,7 @@ export default function SiteUtilities() {
     const handleFavoriteClick = (event: Event) => {
       const mouseEvent = event as MouseEvent;
       const target = mouseEvent.target as Element | null;
-      const button = target?.closest<HTMLButtonElement>('button[aria-label^="Wishlist "]');
+      const button = target?.closest<HTMLButtonElement>('button[aria-label*="wishlist"]');
       if (!button) return;
 
       window.requestAnimationFrame(() => {
@@ -59,8 +59,11 @@ export default function SiteUtilities() {
         if (!slug) return;
 
         const next = readFavorites();
-        const liked = button.classList.contains("is-liked");
-        const updated = liked ? Array.from(new Set([...next, slug])) : next.filter((item) => item !== slug);
+        const label = button.getAttribute("aria-label")?.toLowerCase() || "";
+        const liked = label.startsWith("remove ");
+        const updated = liked
+          ? Array.from(new Set([...next, slug]))
+          : next.filter((item) => item !== slug);
         writeFavorites(updated);
         setFavoriteCount(updated.length);
       });
