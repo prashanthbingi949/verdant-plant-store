@@ -17,7 +17,7 @@ function syncBadges(products: ProductBadge[]) {
   links.forEach((link) => {
     const href = link.getAttribute("href") || "";
     const slug = href.slice("/shop/".length).split(/[?#]/)[0];
-    if (!slug || slug === "") return;
+    if (!slug) return;
 
     const card = link.closest("article");
     const badge = card?.querySelector<HTMLElement>(".relative > span");
@@ -60,5 +60,14 @@ export default function ShopBadgeBridge() {
     };
   }, []);
 
-  return null;
+  return (
+    <style>{`
+      .verdant-shop-page .group.min-w-0 > .relative > a > div > span {
+        display: none !important;
+      }
+      .verdant-shop-page .group.min-w-0 > .relative > a > div > span[data-admin-badge="true"][aria-hidden="false"] {
+        display: inline-flex !important;
+      }
+    `}</style>
+  );
 }
