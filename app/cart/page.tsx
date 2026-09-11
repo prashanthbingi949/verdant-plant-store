@@ -31,7 +31,7 @@ export default function CartPage() {
     return (
       <main className="min-h-screen bg-[#f4f5e9] text-[#101510]">
         <header className="border-b border-black/10 px-5 py-4 sm:px-8">
-          <div className="mx-auto flex max-w-7xl items-center justify-between"><Link href="/" className="text-sm font-extrabold tracking-[.14em]">VERDANT</Link><Link href="/shop" className="rounded-full bg-[#ddf27a] px-4 py-2 text-sm font-bold">Continue shopping</Link></div>
+          <div className="mx-auto flex max-w-7xl items-center justify-between"><Link href="/" className="text-sm font-extrabold tracking-[.14em]">VERDANT</Link><Link href="/shop" className="rounded-full bg-[#ddf27a] px-4 py-2 text-sm font-bold text-[#101510]">Continue shopping</Link></div>
         </header>
         <section className="mx-auto max-w-xl px-5 py-28 text-center sm:px-8">
           <p className="text-[10px] font-bold tracking-[.2em] text-black/45">YOUR BAG</p>
@@ -44,9 +44,9 @@ export default function CartPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f4f5e9] text-[#101510]">
+    <main className="verdant-cart-page min-h-screen bg-[#f4f5e9] text-[#101510]">
       <header className="sticky top-0 z-40 border-b border-black/10 bg-[#f4f5e9]/90 px-5 py-4 backdrop-blur-xl sm:px-8">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4"><Link href="/" className="text-sm font-extrabold tracking-[.14em]">VERDANT</Link><div className="text-sm text-black/55">{itemCount} {itemCount === 1 ? "item" : "items"}</div><Link href="/shop" className="rounded-full bg-[#ddf27a] px-4 py-2 text-sm font-bold">Continue shopping</Link></div>
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4"><Link href="/" className="text-sm font-extrabold tracking-[.14em]">VERDANT</Link><div className="text-sm text-black/55">{itemCount} {itemCount === 1 ? "item" : "items"}</div><Link href="/shop" className="rounded-full bg-[#ddf27a] px-4 py-2 text-sm font-bold text-[#101510]">Continue shopping</Link></div>
       </header>
 
       <section className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
@@ -58,13 +58,9 @@ export default function CartPage() {
               <article key={item.id} className="rounded-[28px] border border-black/10 bg-white/40 p-4 sm:p-5">
                 <div className="flex gap-4 sm:gap-6">
                   <div className="flex h-36 w-32 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#dde6cf] sm:h-44 sm:w-40">
-                    {item.image_url ? (
-                      <img src={item.image_url} alt={item.name} className="h-full w-full object-contain p-2" />
-                    ) : (
-                      <PlantThumb tone={item.tone} />
-                    )}
+                    {item.image_url ? <img src={item.image_url} alt={item.name} className="h-full w-full object-contain p-2" /> : <PlantThumb tone={item.tone} />}
                   </div>
-                  <div className="min-w-0 flex-1 py-1"><div className="flex items-start justify-between gap-3"><div><p className="text-[10px] tracking-wide text-black/45">{item.category} · {item.size}</p><h2 className="mt-1 text-xl font-semibold tracking-[-.03em] sm:text-2xl">{item.name}</h2></div><button type="button" onClick={() => removeItem(item.id)} className="text-xs text-black/45 hover:text-black" aria-label={`Remove ${item.name}`}>Remove</button></div><p className="mt-2 text-sm text-black/50">₹{item.price.toLocaleString("en-IN")} each</p><div className="mt-6 flex items-center justify-between gap-4"><div className="flex h-10 items-center rounded-full border border-black/10 bg-[#f4f5e9] p-1"><button type="button" onClick={() => updateQuantity(item.id, item.quantity - 1)} className="h-8 w-8 rounded-full" aria-label={`Decrease ${item.name} quantity`}>−</button><span className="w-7 text-center text-sm font-bold">{item.quantity}</span><button type="button" onClick={() => updateQuantity(item.id, item.quantity + 1)} className="h-8 w-8 rounded-full" aria-label={`Increase ${item.name} quantity`}>+</button></div><strong>₹{(item.price * item.quantity).toLocaleString("en-IN")}</strong></div></div>
+                  <div className="min-w-0 flex-1 py-1"><div className="flex items-start justify-between gap-3"><div><p className="text-[10px] tracking-wide text-black/45">{item.category} · {item.size}</p><h2 className="mt-1 text-xl font-semibold tracking-[-.03em] sm:text-2xl">{item.name}</h2></div><button type="button" onClick={() => removeItem(item.id)} className="text-xs text-black/45 hover:text-black" aria-label={`Remove ${item.name}`}>Remove</button></div><p className="mt-2 text-sm text-black/50">₹{item.price.toLocaleString("en-IN")} each</p><div className="mt-6 flex items-center justify-between gap-4"><div className="verdant-cart-quantity flex h-10 items-center rounded-full border border-black/10 bg-[#f4f5e9] p-1"><button type="button" onClick={() => updateQuantity(item.id, item.quantity - 1)} className="grid h-8 w-8 place-items-center rounded-full !text-[#202d20] transition hover:bg-white" aria-label={`Decrease ${item.name} quantity`}>−</button><span className="w-7 text-center text-sm font-bold !text-[#202d20]">{item.quantity}</span><button type="button" onClick={() => updateQuantity(item.id, item.quantity + 1)} className="grid h-8 w-8 place-items-center rounded-full !text-[#202d20] transition hover:bg-white" aria-label={`Increase ${item.name} quantity`}>+</button></div><strong>₹{(item.price * item.quantity).toLocaleString("en-IN")}</strong></div></div>
                 </div>
               </article>
             ))}
