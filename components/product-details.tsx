@@ -8,9 +8,9 @@ type Product = {
   id: string;
   slug: string;
   name: string;
+  product_type?: "Plants" | "Gardening Supplies";
   category: string;
   subcategory?: string;
-  product_type?: "Plants" | "Gardening Supplies";
   price: number;
   level: string;
   size: string;
@@ -24,30 +24,45 @@ type Product = {
   image_urls?: string[];
 };
 
-function HeartIcon({ filled = false }: { filled?: boolean }) {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M20.8 8.8c0 5.1-8.8 10.2-8.8 10.2S3.2 13.9 3.2 8.8A4.8 4.8 0 0 1 12 6.1a4.8 4.8 0 0 1 8.8 2.7Z" />
-    </svg>
-  );
-}
+const realProductImages: Record<string, string> = {
+  "monstera-deliciosa": "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=1400&q=90",
+  "snake-plant": "https://images.unsplash.com/photo-1611211232932-da3113c5b960?auto=format&fit=crop&w=1400&q=90",
+  "jade-plant": "https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=1400&q=90",
+  "bird-of-paradise": "https://images.unsplash.com/photo-1512428813834-c702c7702b78?auto=format&fit=crop&w=1400&q=90",
+  "string-of-pearls": "https://images.unsplash.com/photo-1520412099551-62b6bafeb5bb?auto=format&fit=crop&w=1400&q=90",
+  "lavender": "https://images.unsplash.com/photo-1451336819701-5a83f6534292?auto=format&fit=crop&w=1400&q=90",
+  "fiddle-leaf-fig": "https://images.unsplash.com/photo-1517191434949-5e90cd67d2b6?auto=format&fit=crop&w=1400&q=90",
+  "aloe-vera": "https://images.unsplash.com/photo-1513360994626-fc3639d1cc82?auto=format&fit=crop&w=1400&q=90",
+};
+
+const toneStyles = {
+  moss: { glow: "rgba(113,145,80,.26)", accent: "#ddf27a" },
+  sage: { glow: "rgba(143,171,125,.25)", accent: "#d8eea3" },
+  lime: { glow: "rgba(207,232,106,.27)", accent: "#ddf27a" },
+};
 
 function PlantRender({ product }: { product: Product }) {
-  const images = Array.from(new Set([product.image_url, ...(product.image_urls || [])].filter(Boolean))) as string[];
+  const images = Array.from(new Set([product.image_url, ...(product.image_urls || []), realProductImages[product.slug]].filter(Boolean))) as string[];
   const [active, setActive] = useState(images[0] || "");
 
   if (images.length) {
     return (
-      <div className="flex h-full min-h-[520px] flex-col">
-        <div className="relative min-h-0 flex-1 overflow-hidden bg-[#dde6cf]">
-          <div className="absolute inset-x-[18%] bottom-10 h-16 rounded-full bg-black/10 blur-3xl" />
-          <img src={active || images[0]} alt={product.name} className="relative h-full w-full object-contain p-8 sm:p-12" />
+      <div className="vd-product-visual-shell">
+        <div className="vd-product-visual-glow" />
+        <div className="vd-product-visual-stage">
+          <img src={active || images[0]} alt={product.name} className="vd-product-main-image" />
+          <div className="vd-product-floor-shadow" />
         </div>
         {images.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto border-t border-black/10 bg-[#f4f5e9]/75 p-3">
+          <div className="vd-product-thumbs">
             {images.map((url) => (
-              <button type="button" key={url} onClick={() => setActive(url)} className={`h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 ${active === url ? "border-[#202d20]" : "border-transparent"}`}>
-                <img src={url} alt="" className="h-full w-full object-contain bg-[#dde6cf] p-1" />
+              <button
+                type="button"
+                key={url}
+                onClick={() => setActive(url)}
+                className={`vd-thumb ${active === url ? "is-active" : ""}`}
+              >
+                <img src={url} alt="" />
               </button>
             ))}
           </div>
@@ -62,11 +77,10 @@ function PlantRender({ product }: { product: Product }) {
     lime: ["#8ea64d", "#bbcd67", "#c8c1b0"],
   } as const;
   const [a, b, pot] = palette[product.tone];
-
   return (
-    <div className="relative h-full min-h-[520px] w-full bg-[#dde6cf]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(238,246,193,.62),transparent_45%)]" />
-      <svg viewBox="0 0 560 560" className="relative h-full w-full" aria-hidden="true">
+    <div className="vd-product-visual-shell">
+      <div className="vd-product-visual-glow" />
+      <svg viewBox="0 0 560 560" className="vd-fallback-art" aria-hidden="true">
         <ellipse cx="280" cy="500" rx="132" ry="28" fill="#101510" fillOpacity=".13" />
         <path d="M280 445V205" stroke="#30472d" strokeWidth="13" strokeLinecap="round" />
         <path d="M276 306c-85-78-140-74-187-28 29 80 105 112 187 28Z" fill={a} />
@@ -77,37 +91,8 @@ function PlantRender({ product }: { product: Product }) {
         <path d="M180 443h200l-19 66H199l-19-66Z" fill={pot} />
         <ellipse cx="280" cy="444" rx="100" ry="18" fill="#9d988a" />
         <ellipse cx="280" cy="440" rx="78" ry="12" fill="#4e4534" />
-        <path d="M214 444h132" stroke="#ded8c9" strokeOpacity=".7" strokeWidth="5" strokeLinecap="round" />
       </svg>
     </div>
-  );
-}
-
-function ProductMiniCard({ product }: { product: Product }) {
-  const image = product.image_url || product.image_urls?.[0] || null;
-  return (
-    <article className="group min-w-0">
-      <Link href={`/shop/${product.slug}`} className="block">
-        <div className="relative aspect-[1.03/1] overflow-hidden rounded-[28px] border border-black/[.07] bg-[#e5eadb] shadow-[0_14px_38px_rgba(32,45,32,.06)] transition duration-500 group-hover:-translate-y-1 group-hover:shadow-[0_24px_55px_rgba(32,45,32,.13)]">
-          {image ? (
-            <img src={image} alt={product.name} className="h-full w-full object-contain p-7 transition duration-700 group-hover:scale-[1.045]" />
-          ) : (
-            <div className="grid h-full place-items-center px-6 text-center text-sm font-semibold text-[#52634b]">{product.name}</div>
-          )}
-          <span className="absolute left-4 top-4 rounded-full bg-[#f4f5e9]/90 px-3 py-1.5 text-[9px] font-black tracking-[.14em] text-[#202d20] backdrop-blur">{product.level}</span>
-          <span className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-[#f4f5e9]/90 text-[#202d20] backdrop-blur"><HeartIcon /></span>
-        </div>
-      </Link>
-      <div className="pt-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-[9px] font-bold uppercase tracking-[.12em] text-black/40">{product.category}</p>
-            <Link href={`/shop/${product.slug}`}><h3 className="mt-1 line-clamp-2 text-base font-semibold tracking-[-.025em] group-hover:text-[#52634b]">{product.name}</h3></Link>
-          </div>
-          <strong className="shrink-0 text-sm">₹{product.price.toLocaleString("en-IN")}</strong>
-        </div>
-      </div>
-    </article>
   );
 }
 
@@ -119,195 +104,187 @@ export default function ProductDetails({ product }: { product: Product }) {
   const [liked, setLiked] = useState(false);
   const [related, setRelated] = useState<Product[]>([]);
   const addedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
+  const total = useMemo(() => product.price * quantity, [product.price, quantity]);
   const maxQuantity = Math.min(20, Math.max(0, product.stock));
   const soldOut = !product.active || product.stock <= 0;
+  const tone = toneStyles[product.tone] || toneStyles.moss;
 
   useEffect(() => {
-    let cancelled = false;
     fetch("/api/products", { cache: "no-store" })
-      .then((response) => (response.ok ? response.json() : null))
+      .then((response) => response.ok ? response.json() : null)
       .then((data) => {
-        if (cancelled || !Array.isArray(data?.products)) return;
-        const all = data.products as Product[];
-        const candidates = all
-          .filter((item) => item.active && item.slug !== product.slug)
-          .sort((a, b) => {
-            const aScore = a.subcategory && product.subcategory && a.subcategory === product.subcategory ? 2 : a.category === product.category ? 1 : 0;
-            const bScore = b.subcategory && product.subcategory && b.subcategory === product.subcategory ? 2 : b.category === product.category ? 1 : 0;
-            return bScore - aScore || Number(b.featured) - Number(a.featured) || (a.sort_order || 0) - (b.sort_order || 0);
-          });
-        setRelated(candidates.slice(0, 4));
+        if (!Array.isArray(data?.products)) return;
+        const candidates = (data.products as Product[]).filter((item) => item.active && item.slug !== product.slug);
+        const sameSubcategory = candidates.filter((item) => product.subcategory && item.subcategory === product.subcategory);
+        const sameCategory = candidates.filter((item) => item.category === product.category && !sameSubcategory.some((same) => same.slug === item.slug));
+        setRelated([...sameSubcategory, ...sameCategory].slice(0, 4));
       })
       .catch(() => {});
-    return () => { cancelled = true; };
   }, [product.category, product.slug, product.subcategory]);
-
-  const careRows = useMemo(() => {
-    const details = product.details || [];
-    return details.length ? details : [
-      ["Light", "Bright, indirect light"],
-      ["Water", "Let the top layer dry before watering"],
-      ["Humidity", "Medium"],
-      ["Placement", "A calm, bright corner"],
-    ];
-  }, [product.details]);
 
   const handleAdd = () => {
     if (soldOut) return;
-    addItem({ id: product.slug, name: product.name, price: product.price, tone: product.tone, size: product.size, category: product.category, image_url: product.image_url || product.image_urls?.[0] || null }, quantity);
+    addItem({ id: product.slug, name: product.name, price: product.price, tone: product.tone, size: product.size, category: product.category, image_url: product.image_url || product.image_urls?.[0] || realProductImages[product.slug] || null }, quantity);
     setAdded(true);
     if (addedTimerRef.current) clearTimeout(addedTimerRef.current);
-    addedTimerRef.current = setTimeout(() => setAdded(false), 2500);
+    addedTimerRef.current = setTimeout(() => setAdded(false), 2200);
   };
 
+  const facts = [
+    ["LIGHT", product.level.toLowerCase().includes("easy") ? "Bright, indirect light" : "Bright, filtered light"],
+    ["CARE", product.level.replace(/^./, (s) => s.toUpperCase())],
+    ["SIZE", product.size],
+  ];
+
   return (
-    <main className="min-h-screen bg-[#f4f5e9] text-[#101510]">
+    <main className="vd-product-page" style={{ "--vd-accent": tone.accent, "--vd-glow": tone.glow } as React.CSSProperties}>
       <style>{`
-        .verdant-product-page .product-display{background:linear-gradient(145deg,#e4ebd9 0%,#dbe6cf 100%);}
-        .verdant-product-page .eyebrow{font-size:10px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;}
-        .verdant-product-page .soft-card{border:1px solid rgba(16,21,16,.09);background:rgba(255,255,255,.34);box-shadow:0 16px 50px rgba(32,45,32,.045);}
-        .verdant-product-page .stat-card{transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease;}
-        .verdant-product-page .stat-card:hover{transform:translateY(-3px);box-shadow:0 18px 45px rgba(32,45,32,.09);border-color:rgba(32,45,32,.15)}
-        .verdant-product-page .purchase{box-shadow:0 14px 34px rgba(32,45,32,.12);}
-        .verdant-product-page .sticky-buy{box-shadow:0 -10px 30px rgba(16,21,16,.08);backdrop-filter:blur(16px);}
-        @media(max-width:760px){.verdant-product-page .hero-title{font-size:clamp(48px,15vw,74px)}.verdant-product-page .product-display{min-height:420px}.verdant-product-page .sticky-buy{display:block}.verdant-product-page .desktop-purchase{padding-bottom:100px}}
-        @media(min-width:761px){.verdant-product-page .sticky-buy{display:none}}
+        .vd-product-page{min-height:100vh;background:#f4f5e9;color:#101510;overflow:hidden}
+        .vd-product-page .vd-header{position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(16,21,16,.09);background:rgba(244,245,233,.88);backdrop-filter:blur(18px)}
+        .vd-product-page .vd-header-inner{max-width:1280px;margin:auto;min-height:72px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+        .vd-product-page .vd-brand{font-size:14px;font-weight:850;letter-spacing:.16em}
+        .vd-product-page .vd-nav{display:flex;gap:28px;font-size:12px;font-weight:650;color:rgba(16,21,16,.58)}
+        .vd-product-page .vd-nav a:hover{color:#101510}
+        .vd-product-page .vd-bag{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;background:#ddf27a;font-size:12px;font-weight:850}
+        .vd-product-page .vd-breadcrumb{max-width:1280px;margin:0 auto;padding:22px 24px 0;color:rgba(16,21,16,.48);font-size:10px;letter-spacing:.08em}
+        .vd-product-page .vd-hero{max-width:1280px;margin:auto;padding:22px 24px 84px;display:grid;grid-template-columns:minmax(0,1.03fr) minmax(380px,.97fr);gap:72px;align-items:center}
+        .vd-product-page .vd-gallery{min-height:680px;border-radius:36px;background:#e2ead4;position:relative;overflow:hidden;box-shadow:0 24px 70px rgba(32,45,32,.08)}
+        .vd-product-page .vd-gallery::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.12),transparent 35%,rgba(16,21,16,.05));pointer-events:none}
+        .vd-product-page .vd-gallery .vd-product-visual-shell{height:100%;min-height:680px}
+        .vd-product-page .vd-product-visual-shell{position:relative;min-height:560px;height:100%;display:flex;flex-direction:column;justify-content:flex-end}
+        .vd-product-page .vd-product-visual-glow{position:absolute;inset:5% 7% 15%;border-radius:50%;background:radial-gradient(circle,var(--vd-glow),transparent 62%);filter:blur(3px)}
+        .vd-product-page .vd-product-visual-stage{position:relative;min-height:0;flex:1;display:grid;place-items:center;padding:44px 40px 30px}
+        .vd-product-page .vd-product-main-image{position:relative;width:100%;height:100%;max-height:620px;object-fit:contain;mix-blend-mode:multiply;filter:drop-shadow(0 26px 30px rgba(16,21,16,.12));transition:transform .8s cubic-bezier(.2,.7,.2,1)}
+        .vd-product-page .vd-gallery:hover .vd-product-main-image{transform:scale(1.025) translateY(-5px)}
+        .vd-product-page .vd-product-floor-shadow{position:absolute;left:25%;right:25%;bottom:35px;height:42px;border-radius:50%;background:rgba(16,21,16,.12);filter:blur(20px)}
+        .vd-product-page .vd-product-thumbs{position:relative;z-index:2;display:flex;gap:9px;overflow:auto;padding:12px 16px 16px;border-top:1px solid rgba(16,21,16,.08);background:rgba(244,245,233,.5);backdrop-filter:blur(12px)}
+        .vd-product-page .vd-thumb{width:64px;height:64px;flex:0 0 64px;padding:6px;border:1px solid transparent;border-radius:14px;background:rgba(251,252,245,.6)}
+        .vd-product-page .vd-thumb.is-active{border-color:#202d20;box-shadow:0 0 0 2px rgba(221,242,122,.5)}
+        .vd-product-page .vd-thumb img{width:100%;height:100%;object-fit:contain}
+        .vd-product-page .vd-fallback-art{position:relative;width:100%;height:100%;padding:46px;filter:drop-shadow(0 24px 24px rgba(16,21,16,.12))}
+        .vd-product-page .vd-kicker{font-size:10px;font-weight:850;letter-spacing:.22em;color:#52634b;text-transform:uppercase}
+        .vd-product-page .vd-title{margin-top:14px;font-size:clamp(54px,6.3vw,92px);line-height:.86;letter-spacing:-.065em;font-weight:760;max-width:720px}
+        .vd-product-page .vd-title em{font-family:Georgia,'Times New Roman',serif;font-weight:400}
+        .vd-product-page .vd-tagline{margin-top:18px;font-size:11px;font-weight:850;letter-spacing:.17em;text-transform:uppercase;color:#52634b}
+        .vd-product-page .vd-desc{max-width:600px;margin-top:16px;color:rgba(16,21,16,.63);font-size:15px;line-height:1.8}
+        .vd-product-page .vd-price-row{display:flex;align-items:flex-end;gap:13px;margin-top:28px;padding-top:24px;border-top:1px solid rgba(16,21,16,.1)}
+        .vd-product-page .vd-price{font-size:34px;font-weight:800;letter-spacing:-.04em}
+        .vd-product-page .vd-tax{font-size:10px;color:rgba(16,21,16,.4);padding-bottom:5px}
+        .vd-product-page .vd-buy-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;margin-top:16px}
+        .vd-product-page .vd-qty{height:52px;display:flex;align-items:center;border:1px solid rgba(16,21,16,.14);border-radius:999px;background:rgba(255,255,255,.42);padding:5px}
+        .vd-product-page .vd-qty button{width:40px;height:40px;border-radius:50%;font-size:19px;color:#202d20;background:transparent}
+        .vd-product-page .vd-qty button:hover:not(:disabled){background:#e9eddf}.vd-product-page .vd-qty button:disabled{opacity:.25;cursor:not-allowed}
+        .vd-product-page .vd-qty span{width:32px;text-align:center;font-size:13px;font-weight:850}
+        .vd-product-page .vd-add{height:52px;border-radius:999px;background:#202d20;color:#f4f5e9;font-size:13px;font-weight:850;transition:transform .24s ease,background .24s ease,box-shadow .24s ease}
+        .vd-product-page .vd-add:hover:not(:disabled){transform:translateY(-2px);background:#101510;box-shadow:0 12px 28px rgba(16,21,16,.15)}
+        .vd-product-page .vd-add.is-added{background:#ddf27a;color:#101510}
+        .vd-product-page .vd-stock-row{display:flex;justify-content:space-between;gap:12px;margin-top:10px;font-size:10px;color:rgba(16,21,16,.43)}
+        .vd-product-page .vd-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:34px}
+        .vd-product-page .vd-fact{padding:16px 0;border-top:1px solid rgba(16,21,16,.1)}
+        .vd-product-page .vd-fact-label{font-size:9px;font-weight:850;letter-spacing:.17em;color:rgba(16,21,16,.42)}
+        .vd-product-page .vd-fact-value{margin-top:8px;font-size:12px;font-weight:760}
+        .vd-product-page .vd-tabs{margin-top:34px;border-top:1px solid rgba(16,21,16,.1)}
+        .vd-product-page .vd-tab-nav{display:flex;gap:26px;border-bottom:1px solid rgba(16,21,16,.1)}
+        .vd-product-page .vd-tab{padding:16px 0;font-size:12px;font-weight:800;color:rgba(16,21,16,.45);border-bottom:2px solid transparent}.vd-product-page .vd-tab.is-active{color:#101510;border-color:#202d20}
+        .vd-product-page .vd-tab-copy{padding:20px 0;color:rgba(16,21,16,.62);font-size:13px;line-height:1.8}
+        .vd-product-page .vd-detail-row{display:grid;grid-template-columns:120px 1fr;padding:13px 0;border-bottom:1px solid rgba(16,21,16,.07);font-size:12px}.vd-product-page .vd-detail-row span:first-child{color:rgba(16,21,16,.42)}
+        .vd-product-page .vd-story{background:#202d20;color:#f4f5e9;padding:92px 24px}
+        .vd-product-page .vd-story-inner{max-width:1280px;margin:auto}
+        .vd-product-page .vd-story-kicker{font-size:10px;font-weight:850;letter-spacing:.2em;color:#ddf27a;text-transform:uppercase}
+        .vd-product-page .vd-story-grid{margin-top:28px;display:grid;grid-template-columns:.74fr 1.26fr;gap:60px;align-items:end}
+        .vd-product-page .vd-story-title{margin:0;font-size:clamp(42px,5vw,74px);line-height:.93;letter-spacing:-.055em;font-weight:740}.vd-product-page .vd-story-title em{font-family:Georgia,'Times New Roman',serif;font-weight:400}
+        .vd-product-page .vd-story-copy{max-width:650px;color:rgba(244,245,233,.68);font-size:15px;line-height:1.8}
+        .vd-product-page .vd-story-cards{margin-top:54px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+        .vd-product-page .vd-story-card{min-height:178px;padding:22px;border:1px solid rgba(244,245,233,.11);border-radius:26px;background:rgba(255,255,255,.045);transition:transform .25s ease,border-color .25s ease,background .25s ease}.vd-product-page .vd-story-card:hover{transform:translateY(-4px);border-color:rgba(221,242,122,.32);background:rgba(255,255,255,.07)}
+        .vd-product-page .vd-story-card small{font-size:9px;letter-spacing:.18em;color:rgba(244,245,233,.42)}.vd-product-page .vd-story-card h3{margin-top:14px;font-size:18px}.vd-product-page .vd-story-card p{margin-top:10px;color:rgba(244,245,233,.62);font-size:12px;line-height:1.6}
+        .vd-product-page .vd-corner{padding:90px 24px;background:#eef1e2}.vd-product-page .vd-corner-inner{max-width:1280px;margin:auto}.vd-product-page .vd-section-head{display:flex;align-items:end;justify-content:space-between;gap:20px}.vd-product-page .vd-section-kicker{font-size:10px;font-weight:850;letter-spacing:.2em;color:#52634b}.vd-product-page .vd-section-title{margin-top:8px;font-size:clamp(36px,4.2vw,60px);line-height:.95;letter-spacing:-.05em}.vd-product-page .vd-section-note{max-width:360px;color:rgba(16,21,16,.5);font-size:12px;line-height:1.6}
+        .vd-product-page .vd-related-grid{margin-top:32px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.vd-product-page .vd-related-card{min-width:0}.vd-product-page .vd-related-image{position:relative;aspect-ratio:1/.95;overflow:hidden;border-radius:24px;background:#dce5cf}.vd-product-page .vd-related-image img{width:100%;height:100%;object-fit:contain;padding:18px;mix-blend-mode:multiply;transition:transform .55s ease}.vd-product-page .vd-related-card:hover .vd-related-image img{transform:scale(1.045)}.vd-product-page .vd-related-meta{padding-top:13px}.vd-product-page .vd-related-category{font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:rgba(16,21,16,.4)}.vd-product-page .vd-related-name{margin-top:6px;font-size:15px;font-weight:780}.vd-product-page .vd-related-price{margin-top:5px;font-size:13px;font-weight:800}
+        .vd-product-page .vd-mobile-bar{display:none}
+        @media(max-width:1050px){.vd-product-page .vd-hero{gap:46px;grid-template-columns:1fr .9fr}.vd-product-page .vd-title{font-size:clamp(48px,6.4vw,72px)}.vd-product-page .vd-related-grid{grid-template-columns:repeat(3,1fr)}}
+        @media(max-width:760px){.vd-product-page .vd-nav{display:none}.vd-product-page .vd-header-inner{min-height:62px;padding:0 16px}.vd-product-page .vd-breadcrumb{padding:15px 16px 0}.vd-product-page .vd-hero{display:block;padding:16px 16px 110px}.vd-product-page .vd-gallery{min-height:480px;border-radius:28px}.vd-product-page .vd-gallery .vd-product-visual-shell{min-height:480px}.vd-product-page .vd-product-visual-stage{padding:26px}.vd-product-page .vd-title{font-size:54px}.vd-product-page .vd-desc{font-size:14px}.vd-product-page .vd-facts{margin-top:26px}.vd-product-page .vd-buy-row{grid-template-columns:1fr}.vd-product-page .vd-qty{width:100%;justify-content:center}.vd-product-page .vd-story{padding:70px 16px}.vd-product-page .vd-story-grid{grid-template-columns:1fr;gap:26px}.vd-product-page .vd-story-cards{grid-template-columns:1fr}.vd-product-page .vd-corner{padding:70px 16px}.vd-product-page .vd-section-head{display:block}.vd-product-page .vd-section-note{margin-top:10px}.vd-product-page .vd-related-grid{grid-template-columns:repeat(2,1fr);gap:18px 10px}.vd-product-page .vd-mobile-bar{position:fixed;left:12px;right:12px;bottom:12px;z-index:80;display:flex;align-items:center;gap:10px;padding:8px;border:1px solid rgba(16,21,16,.12);border-radius:20px;background:rgba(244,245,233,.94);backdrop-filter:blur(18px);box-shadow:0 20px 50px rgba(16,21,16,.18)}.vd-product-page .vd-mobile-price{padding:0 8px;font-size:13px;font-weight:850}.vd-product-page .vd-mobile-add{height:44px;flex:1;border-radius:14px;background:#202d20;color:#f4f5e9;font-size:12px;font-weight:850}.vd-product-page .vd-mobile-add.is-added{background:#ddf27a;color:#101510}}
+        @media(prefers-reduced-motion:reduce){.vd-product-page *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+        .verdant-dark .vd-product-page{background:#101510;color:#f4f5e9}.verdant-dark .vd-product-page .vd-header{background:rgba(16,21,16,.9);border-color:rgba(244,245,233,.08)}.verdant-dark .vd-product-page .vd-brand,.verdant-dark .vd-product-page .vd-nav,.verdant-dark .vd-product-page .vd-breadcrumb{color:#f4f5e9}.verdant-dark .vd-product-page .vd-breadcrumb,.verdant-dark .vd-product-page .vd-desc,.verdant-dark .vd-product-page .vd-tax,.verdant-dark .vd-product-page .vd-stock-row,.verdant-dark .vd-product-page .vd-fact-label,.verdant-dark .vd-product-page .vd-tab-copy,.verdant-dark .vd-product-page .vd-detail-row span:first-child{color:rgba(244,245,233,.58)}.verdant-dark .vd-product-page .vd-kicker,.verdant-dark .vd-product-page .vd-tagline,.verdant-dark .vd-product-page .vd-section-kicker{color:#bcd47a}.verdant-dark .vd-product-page .vd-gallery,.verdant-dark .vd-product-page .vd-product-visual-shell{background:#1a241b}.verdant-dark .vd-product-page .vd-product-thumbs{background:rgba(16,21,16,.6);border-color:rgba(244,245,233,.09)}.verdant-dark .vd-product-page .vd-qty{background:rgba(32,45,32,.7);border-color:rgba(244,245,233,.16)}.verdant-dark .vd-product-page .vd-qty button{color:#f4f5e9}.verdant-dark .vd-product-page .vd-tabs,.verdant-dark .vd-product-page .vd-tab-nav,.verdant-dark .vd-product-page .vd-fact,.verdant-dark .vd-product-page .vd-price-row{border-color:rgba(244,245,233,.12)}.verdant-dark .vd-product-page .vd-tab{color:rgba(244,245,233,.5)}.verdant-dark .vd-product-page .vd-tab.is-active{color:#f4f5e9;border-color:#ddf27a}.verdant-dark .vd-product-page .vd-corner{background:#152019}.verdant-dark .vd-product-page .vd-section-note,.verdant-dark .vd-product-page .vd-related-category{color:rgba(244,245,233,.5)}.verdant-dark .vd-product-page .vd-related-image{background:#1d2a1f}.verdant-dark .vd-product-page .vd-related-image img{mix-blend-mode:screen}.verdant-dark .vd-product-page .vd-mobile-bar{background:rgba(20,29,21,.95);border-color:rgba(244,245,233,.1)}.verdant-dark .vd-product-page .vd-mobile-price{color:#f4f5e9}
       `}</style>
 
-      <header className="sticky top-0 z-40 border-b border-black/10 bg-[#f4f5e9]/90 px-5 py-4 backdrop-blur-xl sm:px-8">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <Link href="/" className="text-sm font-extrabold tracking-[.14em]">VERDANT</Link>
-          <nav className="hidden items-center gap-6 text-sm md:flex">
-            <Link href="/" className="opacity-70 hover:opacity-100">Home</Link>
-            <Link href="/shop" className="font-semibold">Shop</Link>
-            <Link href="/#care" className="opacity-70 hover:opacity-100">Plant care</Link>
-          </nav>
-          <Link href="/cart" className="rounded-full bg-[#ddf27a] px-4 py-2 text-sm font-bold transition hover:-translate-y-0.5">View bag</Link>
+      <header className="vd-header">
+        <div className="vd-header-inner">
+          <Link href="/" className="vd-brand">VERDANT</Link>
+          <nav className="vd-nav"><Link href="/">Home</Link><Link href="/shop">Shop</Link><Link href="/#care">Plant care</Link></nav>
+          <Link href="/cart" className="vd-bag">View bag</Link>
         </div>
       </header>
 
-      <section className="desktop-purchase mx-auto max-w-7xl px-5 py-8 sm:px-8 sm:py-12 lg:py-16">
-        <div className="mb-5 flex flex-wrap items-center gap-2 text-xs text-black/45">
-          <Link href="/shop" className="hover:text-black">Shop</Link><span>→</span><span>{product.category}</span>{product.subcategory && <><span>→</span><span>{product.subcategory}</span></>}
-        </div>
+      <div className="vd-breadcrumb">Shop &nbsp;→&nbsp; {product.category} &nbsp;→&nbsp; {product.subcategory || "Collection"}</div>
 
-        <div className="grid gap-10 lg:grid-cols-[1.08fr_.92fr] lg:gap-16">
-          <div className="product-display relative overflow-hidden rounded-[38px] border border-black/[.07] shadow-[0_30px_80px_rgba(32,45,32,.09)]">
-            <div className="absolute right-5 top-5 z-10">
-              <button type="button" onClick={() => setLiked((value) => !value)} aria-label={liked ? "Remove from wishlist" : "Add to wishlist"} className={`grid h-12 w-12 place-items-center rounded-full backdrop-blur-md transition ${liked ? "bg-[#ddf27a] text-[#202d20]" : "bg-[#f4f5e9]/90 text-[#202d20] hover:bg-[#ddf27a]"}`}><HeartIcon filled={liked} /></button>
-            </div>
-            <PlantRender product={product} />
-          </div>
+      <section className="vd-hero">
+        <div className="vd-gallery"><PlantRender product={product} /></div>
 
-          <div className="flex flex-col justify-center py-3 lg:py-8">
-            <p className="eyebrow text-[#52634b]">{product.category}</p>
-            <h1 className="hero-title mt-4 max-w-[720px] text-6xl font-semibold leading-[.88] tracking-[-.065em]">{product.name}</h1>
-            <p className="mt-4 text-sm font-medium text-black/45">{product.level} <span className="mx-2">·</span> {product.size}</p>
+        <div>
+          <p className="vd-kicker">{product.category}</p>
+          <h1 className="vd-title">{product.name}</h1>
+          <div className="vd-tagline">A little wild. Very at home.</div>
+          <p className="vd-desc">{product.description}</p>
 
-            <div className="mt-8 flex items-end justify-between gap-5">
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-[.17em] text-black/38">A little wild. Very at home.</p>
-                <p className="mt-2 max-w-xl text-base leading-8 text-black/62">{product.description}</p>
-              </div>
-            </div>
+          <div className="vd-price-row"><div className="vd-price">₹{product.price.toLocaleString("en-IN")}</div><div className="vd-tax">Taxes calculated at checkout</div></div>
 
-            <div className="mt-8 flex items-end gap-4 border-t border-black/10 pt-7">
-              <strong className="text-4xl tracking-[-.05em]">₹{product.price.toLocaleString("en-IN")}</strong>
-              <span className="pb-1 text-xs text-black/40">taxes calculated at checkout</span>
-            </div>
-
-            {soldOut ? (
-              <div className="mt-7 rounded-2xl border border-black/10 bg-black/[.03] px-4 py-3 text-sm font-semibold text-black/55">Currently out of stock</div>
-            ) : (
-              <div className="purchase mt-7 rounded-[28px] border border-black/[.08] bg-white/35 p-3">
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <div className="flex h-13 w-fit items-center rounded-full border border-black/10 bg-[#f4f5e9] p-1">
-                    <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} className="h-10 w-10 rounded-full text-lg hover:bg-black/5">−</button>
-                    <span className="w-9 text-center text-sm font-bold">{quantity}</span>
-                    <button type="button" onClick={() => setQuantity((value) => Math.min(maxQuantity, value + 1))} disabled={quantity >= maxQuantity} className="h-10 w-10 rounded-full text-lg hover:bg-black/5 disabled:opacity-30">+</button>
-                  </div>
-                  <button type="button" onClick={handleAdd} className="flex h-12 flex-1 items-center justify-center rounded-full bg-[#202d20] px-6 text-sm font-bold text-[#f4f5e9] transition hover:-translate-y-0.5 hover:bg-[#101510]">{added ? "Added ✓" : "Add to bag"}</button>
+          {soldOut ? (
+            <div className="vd-stock-row"><span>Currently out of stock</span><span>Join the waitlist later</span></div>
+          ) : (
+            <>
+              <div className="vd-buy-row">
+                <div className="vd-qty" aria-label="Quantity">
+                  <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))}>−</button>
+                  <span>{quantity}</span>
+                  <button type="button" disabled={quantity >= maxQuantity} onClick={() => setQuantity((value) => Math.min(maxQuantity, value + 1))}>+</button>
                 </div>
-                <div className="mt-3 flex items-center justify-between px-2 text-xs text-black/40">
-                  <span>{product.stock <= 5 ? `Only ${product.stock} left` : `${product.stock} available`}</span>
-                  <span>Secure checkout</span>
-                </div>
+                <button type="button" onClick={handleAdd} className={`vd-add ${added ? "is-added" : ""}`}>{added ? "Added ✓" : `Add to bag · ₹${total.toLocaleString("en-IN")}`}</button>
               </div>
-            )}
+              <div className="vd-stock-row"><span>{product.stock <= 5 ? `Only ${product.stock} left in stock.` : `${product.stock} available.`}</span><span>Secure checkout · Fast delivery</span></div>
+            </>
+          )}
 
-            <div className="mt-8 grid grid-cols-3 gap-2">
-              <div className="stat-card soft-card rounded-2xl p-4"><p className="eyebrow text-black/35">LIGHT</p><p className="mt-2 text-sm font-semibold">{careRows.find(([label]) => label.toLowerCase() === "light")?.[1] || "Bright indirect"}</p></div>
-              <div className="stat-card soft-card rounded-2xl p-4"><p className="eyebrow text-black/35">CARE</p><p className="mt-2 text-sm font-semibold">{product.level}</p></div>
-              <div className="stat-card soft-card rounded-2xl p-4"><p className="eyebrow text-black/35">SIZE</p><p className="mt-2 text-sm font-semibold">{product.size}</p></div>
-            </div>
+          <div className="vd-facts">{facts.map(([label, value]) => <div className="vd-fact" key={label}><div className="vd-fact-label">{label}</div><div className="vd-fact-value">{value}</div></div>)}</div>
 
-            <div className="mt-9 border-t border-black/10">
-              <div className="flex gap-7 border-b border-black/10">
-                <button type="button" onClick={() => setActiveTab("about")} className={`py-4 text-sm font-bold ${activeTab === "about" ? "border-b-2 border-[#202d20]" : "text-black/45"}`}>About</button>
-                <button type="button" onClick={() => setActiveTab("care")} className={`py-4 text-sm font-bold ${activeTab === "care" ? "border-b-2 border-[#202d20]" : "text-black/45"}`}>Plant care</button>
-              </div>
-              {activeTab === "about" ? (
-                <div className="py-6">
-                  <p className="max-w-2xl text-sm leading-7 text-black/58">Selected for character, resilience and that little feeling of life a room gets when something green takes root.</p>
-                  <div className="mt-5 flex flex-wrap gap-2"><span className="rounded-full bg-[#202d20] px-3 py-1.5 text-[10px] font-bold text-[#f4f5e9]">Easy to live with</span><span className="rounded-full border border-black/10 bg-white/40 px-3 py-1.5 text-[10px] font-bold">Good indoor presence</span><span className="rounded-full border border-black/10 bg-white/40 px-3 py-1.5 text-[10px] font-bold">Chosen for character</span></div>
-                </div>
-              ) : (
-                <div className="py-2">{careRows.map(([label, value]) => <div key={label} className="grid grid-cols-[110px_1fr] border-b border-black/7 py-4 text-sm last:border-0"><span className="text-black/42">{label}</span><span className="font-medium">{value}</span></div>)}</div>
-              )}
-            </div>
+          <div className="vd-tabs">
+            <div className="vd-tab-nav"><button type="button" className={`vd-tab ${activeTab === "about" ? "is-active" : ""}`} onClick={() => setActiveTab("about")}>About</button><button type="button" className={`vd-tab ${activeTab === "care" ? "is-active" : ""}`} onClick={() => setActiveTab("care")}>Plant care</button><button type="button" className="vd-tab" onClick={() => setLiked((value) => !value)}>{liked ? "Saved ♥" : "Save ♡"}</button></div>
+            {activeTab === "about" ? <p className="vd-tab-copy">Selected for character, resilience and that little feeling of life a room gets when something green takes root.</p> : <div className="vd-tab-copy">{product.details.length ? product.details.map(([label, value]) => <div key={`${label}-${value}`} className="vd-detail-row"><span>{label}</span><span>{value}</span></div>) : <p>Bright filtered light, steady watering and a little room to grow.</p>}</div>}
           </div>
         </div>
       </section>
 
-      <section className="bg-[#202d20] px-5 py-16 text-[#f4f5e9] sm:px-8 sm:py-24">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-12 lg:grid-cols-[.75fr_1.25fr] lg:items-end">
-            <div>
-              <p className="eyebrow text-[#ddf27a]">WHY YOU'LL LOVE IT</p>
-              <h2 className="mt-4 max-w-xl text-5xl font-semibold leading-[.94] tracking-[-.055em] sm:text-6xl">A little piece of <em>life</em> for your space.</h2>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-3">
-              {[
-                ["01", "Character", "A distinct silhouette that gives a room something to talk about."],
-                ["02", "Presence", "Designed to make shelves, corners and desks feel more alive."],
-                ["03", "Routine", "Simple care rhythms that fit everyday life rather than fight it."],
-              ].map(([num, title, copy]) => (
-                <div key={num} className="rounded-[28px] border border-white/10 bg-white/[.05] p-6 transition hover:-translate-y-1 hover:bg-white/[.07]">
-                  <p className="text-xs text-white/38">{num}</p><p className="mt-10 text-lg font-semibold">{title}</p><p className="mt-2 text-sm leading-6 text-white/58">{copy}</p>
-                </div>
-              ))}
-            </div>
+      <section className="vd-story">
+        <div className="vd-story-inner">
+          <div className="vd-story-kicker">WHY YOU'LL LOVE IT</div>
+          <div className="vd-story-grid">
+            <h2 className="vd-story-title">Bring a little <em>life</em> into the room.</h2>
+            <p className="vd-story-copy">Verdant pieces are chosen to make a space feel calmer, more considered and a little more alive. This one brings shape, texture and an easy sense of character without asking for perfection.</p>
+          </div>
+          <div className="vd-story-cards">
+            <article className="vd-story-card"><small>01 / LIGHT</small><h3>Bright, filtered spaces</h3><p>Place it near a generous window where daylight is soft rather than harsh.</p></article>
+            <article className="vd-story-card"><small>02 / RHYTHM</small><h3>Simple routines</h3><p>Water thoughtfully, let the soil breathe and adjust with the seasons.</p></article>
+            <article className="vd-story-card"><small>03 / PRESENCE</small><h3>Made to be seen</h3><p>A sculptural focal point for desks, corners, shelves and slower spaces.</p></article>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-24">
-        <div className="grid gap-10 lg:grid-cols-[.6fr_1.4fr] lg:items-end">
-          <div>
-            <p className="eyebrow text-[#52634b]">WHERE IT THRIVES</p>
-            <h2 className="mt-4 text-5xl font-semibold leading-[.94] tracking-[-.055em]">Made for spaces that feel <em>lived in.</em></h2>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-4">
-            {["Bedroom", "Desk", "Living room", "Bright corner"].map((place, index) => (
-              <div key={place} className="soft-card rounded-[26px] p-5"><span className="text-[9px] font-black tracking-[.16em] text-black/35">0{index + 1}</span><p className="mt-10 text-base font-semibold">{place}</p><p className="mt-2 text-xs leading-5 text-black/45">A natural place for this plant to become part of the room.</p></div>
-            ))}
-          </div>
+      <section className="vd-corner">
+        <div className="vd-corner-inner">
+          <div className="vd-section-head"><div><div className="vd-section-kicker">COMPLETE THE CORNER</div><h2 className="vd-section-title">Build the right little <em>ecosystem.</em></h2></div><p className="vd-section-note">Related products are pulled from the same collection first, then broadened to the category.</p></div>
+          {related.length ? (
+            <div className="vd-related-grid">
+              {related.map((item) => {
+                const image = item.image_url || item.image_urls?.[0] || realProductImages[item.slug];
+                return <Link href={`/shop/${item.slug}`} className="vd-related-card" key={item.slug}>
+                  <div className="vd-related-image">{image ? <img src={image} alt={item.name} loading="lazy" /> : <div className="vd-fallback-related">Verdant</div>}</div>
+                  <div className="vd-related-meta"><div className="vd-related-category">{item.subcategory || item.category}</div><div className="vd-related-name">{item.name}</div><div className="vd-related-price">₹{item.price.toLocaleString("en-IN")}</div></div>
+                </Link>;
+              })}
+            </div>
+          ) : <p className="vd-section-note" style={{ marginTop: 32 }}>Related products will appear here as the catalogue grows.</p>}
         </div>
       </section>
 
-      {related.length > 0 && (
-        <section className="border-t border-black/10 bg-[#eef1e3] px-5 py-16 sm:px-8 sm:py-24">
-          <div className="mx-auto max-w-7xl">
-            <div className="flex items-end justify-between gap-5"><div><p className="eyebrow text-[#52634b]">COMPLETE THE CORNER</p><h2 className="mt-3 text-4xl font-semibold tracking-[-.045em] sm:text-5xl">Goes well with it.</h2><p className="mt-3 max-w-xl text-sm leading-6 text-black/52">Related products from the same part of the Verdant catalogue, chosen to build a more complete plant setup.</p></div><Link href={`/shop${product.subcategory ? `?category=${encodeURIComponent(product.category)}` : ""}`} className="hidden rounded-full border border-black/10 bg-white/50 px-4 py-2 text-xs font-bold sm:inline-flex">Browse more →</Link></div>
-            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">{related.map((item) => <ProductMiniCard key={item.slug} product={item} />)}</div>
-          </div>
-        </section>
-      )}
-
-      <div className="sticky-buy fixed inset-x-0 bottom-0 z-50 hidden border-t border-black/10 bg-[#f4f5e9]/92 px-4 py-3 sm:px-5">
-        <div className="mx-auto flex max-w-xl items-center gap-3"><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{product.name}</p><p className="text-xs text-black/45">₹{product.price.toLocaleString("en-IN")}</p></div><button type="button" disabled={soldOut} onClick={handleAdd} className="rounded-full bg-[#202d20] px-5 py-3 text-xs font-bold text-[#f4f5e9] disabled:opacity-40">{added ? "Added ✓" : "Add to bag"}</button></div>
-      </div>
+      {!soldOut && <div className="vd-mobile-bar"><div className="vd-mobile-price">₹{product.price.toLocaleString("en-IN")}</div><button type="button" onClick={handleAdd} className={`vd-mobile-add ${added ? "is-added" : ""}`}>{added ? "Added ✓" : "Add to bag"}</button></div>}
     </main>
   );
 }
