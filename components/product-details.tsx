@@ -20,78 +20,72 @@ type Product = {
   stock: number;
   active: boolean;
   featured?: boolean;
+  badge_text?: string;
   image_url?: string | null;
   image_urls?: string[];
 };
 
-const realProductImages: Record<string, string> = {
+const fallbackImages: Record<string, string> = {
   "monstera-deliciosa": "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=1400&q=90",
   "snake-plant": "https://images.unsplash.com/photo-1611211232932-da3113c5b960?auto=format&fit=crop&w=1400&q=90",
   "jade-plant": "https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=1400&q=90",
   "bird-of-paradise": "https://images.unsplash.com/photo-1512428813834-c702c7702b78?auto=format&fit=crop&w=1400&q=90",
   "string-of-pearls": "https://images.unsplash.com/photo-1520412099551-62b6bafeb5bb?auto=format&fit=crop&w=1400&q=90",
-  "lavender": "https://images.unsplash.com/photo-1451336819701-5a83f6534292?auto=format&fit=crop&w=1400&q=90",
+  lavender: "https://images.unsplash.com/photo-1451336819701-5a83f6534292?auto=format&fit=crop&w=1400&q=90",
   "fiddle-leaf-fig": "https://images.unsplash.com/photo-1517191434949-5e90cd67d2b6?auto=format&fit=crop&w=1400&q=90",
   "aloe-vera": "https://images.unsplash.com/photo-1513360994626-fc3639d1cc82?auto=format&fit=crop&w=1400&q=90",
 };
 
-const toneStyles = {
-  moss: { glow: "rgba(113,145,80,.26)", accent: "#ddf27a" },
-  sage: { glow: "rgba(143,171,125,.25)", accent: "#d8eea3" },
-  lime: { glow: "rgba(207,232,106,.27)", accent: "#ddf27a" },
-};
+function displayImages(product: Product) {
+  const configured = [product.image_url, ...(product.image_urls || [])].filter(
+    (value): value is string => Boolean(value),
+  );
+  const unique = Array.from(new Set(configured));
+  return unique.length ? unique : fallbackImages[product.slug] ? [fallbackImages[product.slug]] : [];
+}
 
-function PlantRender({ product }: { product: Product }) {
-  const images = Array.from(new Set([product.image_url, ...(product.image_urls || []), realProductImages[product.slug]].filter(Boolean))) as string[];
-  const [active, setActive] = useState(images[0] || "");
-
-  if (images.length) {
-    return (
-      <div className="vd-product-visual-shell">
-        <div className="vd-product-visual-glow" />
-        <div className="vd-product-visual-stage">
-          <img src={active || images[0]} alt={product.name} className="vd-product-main-image" />
-          <div className="vd-product-floor-shadow" />
-        </div>
-        {images.length > 1 && (
-          <div className="vd-product-thumbs">
-            {images.map((url) => (
-              <button
-                type="button"
-                key={url}
-                onClick={() => setActive(url)}
-                className={`vd-thumb ${active === url ? "is-active" : ""}`}
-              >
-                <img src={url} alt="" />
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  const palette = {
-    moss: ["#547342", "#78945b", "#c7c2b5"],
-    sage: ["#607e54", "#98aa88", "#d4cdbf"],
-    lime: ["#8ea64d", "#bbcd67", "#c8c1b0"],
-  } as const;
-  const [a, b, pot] = palette[product.tone];
+function HeartIcon({ filled }: { filled: boolean }) {
   return (
-    <div className="vd-product-visual-shell">
-      <div className="vd-product-visual-glow" />
-      <svg viewBox="0 0 560 560" className="vd-fallback-art" aria-hidden="true">
-        <ellipse cx="280" cy="500" rx="132" ry="28" fill="#101510" fillOpacity=".13" />
-        <path d="M280 445V205" stroke="#30472d" strokeWidth="13" strokeLinecap="round" />
-        <path d="M276 306c-85-78-140-74-187-28 29 80 105 112 187 28Z" fill={a} />
-        <path d="M292 270c41-95 106-120 178-96-12 79-73 130-178 96Z" fill={b} />
-        <path d="M278 360c-73-52-130-36-169 15 37 55 94 69 169-15Z" fill={b} fillOpacity=".9" />
-        <path d="M295 382c59-61 116-64 156-29-28 58-87 82-156 29Z" fill={a} fillOpacity=".92" />
-        <path d="M282 204c-13-69 22-123 83-151 31 63 2 121-83 151Z" fill={product.tone === "lime" ? "#d7ed72" : b} />
-        <path d="M180 443h200l-19 66H199l-19-66Z" fill={pot} />
-        <ellipse cx="280" cy="444" rx="100" ry="18" fill="#9d988a" />
-        <ellipse cx="280" cy="440" rx="78" ry="12" fill="#4e4534" />
-      </svg>
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M20.8 8.8c0 5.1-8.8 10.2-8.8 10.2S3.2 13.9 3.2 8.8A4.8 4.8 0 0 1 12 6.1a4.8 4.8 0 0 1 8.8 2.7Z"
+        fill={filled ? "currentColor" : "none"}
+      />
+    </svg>
+  );
+}
+
+function ProductVisual({ product }: { product: Product }) {
+  const images = displayImages(product);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeImage = images[activeIndex] || images[0] || "";
+
+  return (
+    <div className="vd-pdp-visual">
+      <div className="vd-pdp-visual-glow" />
+      <div className="vd-pdp-visual-stage">
+        {activeImage ? (
+          <img src={activeImage} alt={product.name} className="vd-pdp-main-image" />
+        ) : (
+          <div className="vd-pdp-art-fallback" aria-hidden="true"><span /><span /><span /></div>
+        )}
+        <div className="vd-pdp-floor-shadow" />
+      </div>
+      {images.length > 1 && (
+        <div className="vd-pdp-thumbs" aria-label={`${product.name} images`}>
+          {images.map((image, index) => (
+            <button
+              key={image}
+              type="button"
+              aria-label={`View image ${index + 1}`}
+              onClick={() => setActiveIndex(index)}
+              className={`vd-pdp-thumb ${index === activeIndex ? "is-active" : ""}`}
+            >
+              <img src={image} alt="" />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -99,192 +93,133 @@ function PlantRender({ product }: { product: Product }) {
 export default function ProductDetails({ product }: { product: Product }) {
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState<"about" | "care">("about");
   const [added, setAdded] = useState(false);
   const [liked, setLiked] = useState(false);
+  const [activeTab, setActiveTab] = useState<"about" | "care">("about");
   const [related, setRelated] = useState<Product[]>([]);
-  const addedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const total = useMemo(() => product.price * quantity, [product.price, quantity]);
-  const maxQuantity = Math.min(20, Math.max(0, product.stock));
-  const soldOut = !product.active || product.stock <= 0;
-  const tone = toneStyles[product.tone] || toneStyles.moss;
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const maxQuantity = Math.min(20, Math.max(1, product.stock));
+  const soldOut = !product.active || product.stock < 1;
 
   useEffect(() => {
     fetch("/api/products", { cache: "no-store" })
-      .then((response) => response.ok ? response.json() : null)
+      .then((response) => (response.ok ? response.json() : null))
       .then((data) => {
         if (!Array.isArray(data?.products)) return;
         const candidates = (data.products as Product[]).filter((item) => item.active && item.slug !== product.slug);
-        const sameSubcategory = candidates.filter((item) => product.subcategory && item.subcategory === product.subcategory);
-        const sameCategory = candidates.filter((item) => item.category === product.category && !sameSubcategory.some((same) => same.slug === item.slug));
-        setRelated([...sameSubcategory, ...sameCategory].slice(0, 4));
+        const sameSub = product.subcategory ? candidates.filter((item) => item.subcategory === product.subcategory) : [];
+        const sameCategory = candidates.filter((item) => item.category === product.category && !sameSub.some((same) => same.slug === item.slug));
+        setRelated([...sameSub, ...sameCategory].slice(0, 4));
       })
-      .catch(() => {});
+      .catch(() => setRelated([]));
   }, [product.category, product.slug, product.subcategory]);
 
-  const handleAdd = () => {
+  const addToBag = () => {
     if (soldOut) return;
-    addItem({ id: product.slug, name: product.name, price: product.price, tone: product.tone, size: product.size, category: product.category, image_url: product.image_url || product.image_urls?.[0] || realProductImages[product.slug] || null }, quantity);
+    addItem(
+      {
+        id: product.slug,
+        name: product.name,
+        price: Number(product.price),
+        tone: product.tone,
+        size: product.size,
+        category: product.category,
+        image_url: product.image_url || product.image_urls?.[0] || fallbackImages[product.slug] || null,
+      },
+      quantity,
+    );
     setAdded(true);
-    if (addedTimerRef.current) clearTimeout(addedTimerRef.current);
-    addedTimerRef.current = setTimeout(() => setAdded(false), 2200);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => setAdded(false), 2200);
   };
 
+  const price = useMemo(() => Number(product.price).toLocaleString("en-IN"), [product.price]);
   const facts = [
     ["LIGHT", product.level.toLowerCase().includes("easy") ? "Bright, indirect light" : "Bright, filtered light"],
-    ["CARE", product.level.replace(/^./, (s) => s.toUpperCase())],
+    ["CARE", product.level.replace(/^./, (letter) => letter.toUpperCase())],
     ["SIZE", product.size],
   ];
+  const careRows = product.details.length
+    ? product.details
+    : [["Light", "Bright, indirect light"], ["Water", "When the top soil layer dries"], ["Humidity", "Medium to high"], ["Pet note", "Keep away from curious pets"]];
 
   return (
-    <main className="vd-product-page" style={{ "--vd-accent": tone.accent, "--vd-glow": tone.glow } as React.CSSProperties}>
+    <main className="vd-pdp">
       <style>{`
-        .vd-product-page{min-height:100vh;background:#f4f5e9;color:#101510;overflow:hidden}
-        .vd-product-page .vd-header{position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(16,21,16,.09);background:rgba(244,245,233,.88);backdrop-filter:blur(18px)}
-        .vd-product-page .vd-header-inner{max-width:1280px;margin:auto;min-height:72px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:20px}
-        .vd-product-page .vd-brand{font-size:14px;font-weight:850;letter-spacing:.16em}
-        .vd-product-page .vd-nav{display:flex;gap:28px;font-size:12px;font-weight:650;color:rgba(16,21,16,.58)}
-        .vd-product-page .vd-nav a:hover{color:#101510}
-        .vd-product-page .vd-bag{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;background:#ddf27a;font-size:12px;font-weight:850}
-        .vd-product-page .vd-breadcrumb{max-width:1280px;margin:0 auto;padding:22px 24px 0;color:rgba(16,21,16,.48);font-size:10px;letter-spacing:.08em}
-        .vd-product-page .vd-hero{max-width:1280px;margin:auto;padding:22px 24px 84px;display:grid;grid-template-columns:minmax(0,1.03fr) minmax(380px,.97fr);gap:72px;align-items:center}
-        .vd-product-page .vd-gallery{min-height:680px;border-radius:36px;background:#e2ead4;position:relative;overflow:hidden;box-shadow:0 24px 70px rgba(32,45,32,.08)}
-        .vd-product-page .vd-gallery::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.12),transparent 35%,rgba(16,21,16,.05));pointer-events:none}
-        .vd-product-page .vd-gallery .vd-product-visual-shell{height:100%;min-height:680px}
-        .vd-product-page .vd-product-visual-shell{position:relative;min-height:560px;height:100%;display:flex;flex-direction:column;justify-content:flex-end}
-        .vd-product-page .vd-product-visual-glow{position:absolute;inset:5% 7% 15%;border-radius:50%;background:radial-gradient(circle,var(--vd-glow),transparent 62%);filter:blur(3px)}
-        .vd-product-page .vd-product-visual-stage{position:relative;min-height:0;flex:1;display:grid;place-items:center;padding:44px 40px 30px}
-        .vd-product-page .vd-product-main-image{position:relative;width:100%;height:100%;max-height:620px;object-fit:contain;mix-blend-mode:multiply;filter:drop-shadow(0 26px 30px rgba(16,21,16,.12));transition:transform .8s cubic-bezier(.2,.7,.2,1)}
-        .vd-product-page .vd-gallery:hover .vd-product-main-image{transform:scale(1.025) translateY(-5px)}
-        .vd-product-page .vd-product-floor-shadow{position:absolute;left:25%;right:25%;bottom:35px;height:42px;border-radius:50%;background:rgba(16,21,16,.12);filter:blur(20px)}
-        .vd-product-page .vd-product-thumbs{position:relative;z-index:2;display:flex;gap:9px;overflow:auto;padding:12px 16px 16px;border-top:1px solid rgba(16,21,16,.08);background:rgba(244,245,233,.5);backdrop-filter:blur(12px)}
-        .vd-product-page .vd-thumb{width:64px;height:64px;flex:0 0 64px;padding:6px;border:1px solid transparent;border-radius:14px;background:rgba(251,252,245,.6)}
-        .vd-product-page .vd-thumb.is-active{border-color:#202d20;box-shadow:0 0 0 2px rgba(221,242,122,.5)}
-        .vd-product-page .vd-thumb img{width:100%;height:100%;object-fit:contain}
-        .vd-product-page .vd-fallback-art{position:relative;width:100%;height:100%;padding:46px;filter:drop-shadow(0 24px 24px rgba(16,21,16,.12))}
-        .vd-product-page .vd-kicker{font-size:10px;font-weight:850;letter-spacing:.22em;color:#52634b;text-transform:uppercase}
-        .vd-product-page .vd-title{margin-top:14px;font-size:clamp(54px,6.3vw,92px);line-height:.86;letter-spacing:-.065em;font-weight:760;max-width:720px}
-        .vd-product-page .vd-title em{font-family:Georgia,'Times New Roman',serif;font-weight:400}
-        .vd-product-page .vd-tagline{margin-top:18px;font-size:11px;font-weight:850;letter-spacing:.17em;text-transform:uppercase;color:#52634b}
-        .vd-product-page .vd-desc{max-width:600px;margin-top:16px;color:rgba(16,21,16,.63);font-size:15px;line-height:1.8}
-        .vd-product-page .vd-price-row{display:flex;align-items:flex-end;gap:13px;margin-top:28px;padding-top:24px;border-top:1px solid rgba(16,21,16,.1)}
-        .vd-product-page .vd-price{font-size:34px;font-weight:800;letter-spacing:-.04em}
-        .vd-product-page .vd-tax{font-size:10px;color:rgba(16,21,16,.4);padding-bottom:5px}
-        .vd-product-page .vd-buy-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;margin-top:16px}
-        .vd-product-page .vd-qty{height:52px;display:flex;align-items:center;border:1px solid rgba(16,21,16,.14);border-radius:999px;background:rgba(255,255,255,.42);padding:5px}
-        .vd-product-page .vd-qty button{width:40px;height:40px;border-radius:50%;font-size:19px;color:#202d20;background:transparent}
-        .vd-product-page .vd-qty button:hover:not(:disabled){background:#e9eddf}.vd-product-page .vd-qty button:disabled{opacity:.25;cursor:not-allowed}
-        .vd-product-page .vd-qty span{width:32px;text-align:center;font-size:13px;font-weight:850}
-        .vd-product-page .vd-add{height:52px;border-radius:999px;background:#202d20;color:#f4f5e9;font-size:13px;font-weight:850;transition:transform .24s ease,background .24s ease,box-shadow .24s ease}
-        .vd-product-page .vd-add:hover:not(:disabled){transform:translateY(-2px);background:#101510;box-shadow:0 12px 28px rgba(16,21,16,.15)}
-        .vd-product-page .vd-add.is-added{background:#ddf27a;color:#101510}
-        .vd-product-page .vd-stock-row{display:flex;justify-content:space-between;gap:12px;margin-top:10px;font-size:10px;color:rgba(16,21,16,.43)}
-        .vd-product-page .vd-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:34px}
-        .vd-product-page .vd-fact{padding:16px 0;border-top:1px solid rgba(16,21,16,.1)}
-        .vd-product-page .vd-fact-label{font-size:9px;font-weight:850;letter-spacing:.17em;color:rgba(16,21,16,.42)}
-        .vd-product-page .vd-fact-value{margin-top:8px;font-size:12px;font-weight:760}
-        .vd-product-page .vd-tabs{margin-top:34px;border-top:1px solid rgba(16,21,16,.1)}
-        .vd-product-page .vd-tab-nav{display:flex;gap:26px;border-bottom:1px solid rgba(16,21,16,.1)}
-        .vd-product-page .vd-tab{padding:16px 0;font-size:12px;font-weight:800;color:rgba(16,21,16,.45);border-bottom:2px solid transparent}.vd-product-page .vd-tab.is-active{color:#101510;border-color:#202d20}
-        .vd-product-page .vd-tab-copy{padding:20px 0;color:rgba(16,21,16,.62);font-size:13px;line-height:1.8}
-        .vd-product-page .vd-detail-row{display:grid;grid-template-columns:120px 1fr;padding:13px 0;border-bottom:1px solid rgba(16,21,16,.07);font-size:12px}.vd-product-page .vd-detail-row span:first-child{color:rgba(16,21,16,.42)}
-        .vd-product-page .vd-story{background:#202d20;color:#f4f5e9;padding:92px 24px}
-        .vd-product-page .vd-story-inner{max-width:1280px;margin:auto}
-        .vd-product-page .vd-story-kicker{font-size:10px;font-weight:850;letter-spacing:.2em;color:#ddf27a;text-transform:uppercase}
-        .vd-product-page .vd-story-grid{margin-top:28px;display:grid;grid-template-columns:.74fr 1.26fr;gap:60px;align-items:end}
-        .vd-product-page .vd-story-title{margin:0;font-size:clamp(42px,5vw,74px);line-height:.93;letter-spacing:-.055em;font-weight:740}.vd-product-page .vd-story-title em{font-family:Georgia,'Times New Roman',serif;font-weight:400}
-        .vd-product-page .vd-story-copy{max-width:650px;color:rgba(244,245,233,.68);font-size:15px;line-height:1.8}
-        .vd-product-page .vd-story-cards{margin-top:54px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-        .vd-product-page .vd-story-card{min-height:178px;padding:22px;border:1px solid rgba(244,245,233,.11);border-radius:26px;background:rgba(255,255,255,.045);transition:transform .25s ease,border-color .25s ease,background .25s ease}.vd-product-page .vd-story-card:hover{transform:translateY(-4px);border-color:rgba(221,242,122,.32);background:rgba(255,255,255,.07)}
-        .vd-product-page .vd-story-card small{font-size:9px;letter-spacing:.18em;color:rgba(244,245,233,.42)}.vd-product-page .vd-story-card h3{margin-top:14px;font-size:18px}.vd-product-page .vd-story-card p{margin-top:10px;color:rgba(244,245,233,.62);font-size:12px;line-height:1.6}
-        .vd-product-page .vd-corner{padding:90px 24px;background:#eef1e2}.vd-product-page .vd-corner-inner{max-width:1280px;margin:auto}.vd-product-page .vd-section-head{display:flex;align-items:end;justify-content:space-between;gap:20px}.vd-product-page .vd-section-kicker{font-size:10px;font-weight:850;letter-spacing:.2em;color:#52634b}.vd-product-page .vd-section-title{margin-top:8px;font-size:clamp(36px,4.2vw,60px);line-height:.95;letter-spacing:-.05em}.vd-product-page .vd-section-note{max-width:360px;color:rgba(16,21,16,.5);font-size:12px;line-height:1.6}
-        .vd-product-page .vd-related-grid{margin-top:32px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.vd-product-page .vd-related-card{min-width:0}.vd-product-page .vd-related-image{position:relative;aspect-ratio:1/.95;overflow:hidden;border-radius:24px;background:#dce5cf}.vd-product-page .vd-related-image img{width:100%;height:100%;object-fit:contain;padding:18px;mix-blend-mode:multiply;transition:transform .55s ease}.vd-product-page .vd-related-card:hover .vd-related-image img{transform:scale(1.045)}.vd-product-page .vd-related-meta{padding-top:13px}.vd-product-page .vd-related-category{font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:rgba(16,21,16,.4)}.vd-product-page .vd-related-name{margin-top:6px;font-size:15px;font-weight:780}.vd-product-page .vd-related-price{margin-top:5px;font-size:13px;font-weight:800}
-        .vd-product-page .vd-mobile-bar{display:none}
-        @media(max-width:1050px){.vd-product-page .vd-hero{gap:46px;grid-template-columns:1fr .9fr}.vd-product-page .vd-title{font-size:clamp(48px,6.4vw,72px)}.vd-product-page .vd-related-grid{grid-template-columns:repeat(3,1fr)}}
-        @media(max-width:760px){.vd-product-page .vd-nav{display:none}.vd-product-page .vd-header-inner{min-height:62px;padding:0 16px}.vd-product-page .vd-breadcrumb{padding:15px 16px 0}.vd-product-page .vd-hero{display:block;padding:16px 16px 110px}.vd-product-page .vd-gallery{min-height:480px;border-radius:28px}.vd-product-page .vd-gallery .vd-product-visual-shell{min-height:480px}.vd-product-page .vd-product-visual-stage{padding:26px}.vd-product-page .vd-title{font-size:54px}.vd-product-page .vd-desc{font-size:14px}.vd-product-page .vd-facts{margin-top:26px}.vd-product-page .vd-buy-row{grid-template-columns:1fr}.vd-product-page .vd-qty{width:100%;justify-content:center}.vd-product-page .vd-story{padding:70px 16px}.vd-product-page .vd-story-grid{grid-template-columns:1fr;gap:26px}.vd-product-page .vd-story-cards{grid-template-columns:1fr}.vd-product-page .vd-corner{padding:70px 16px}.vd-product-page .vd-section-head{display:block}.vd-product-page .vd-section-note{margin-top:10px}.vd-product-page .vd-related-grid{grid-template-columns:repeat(2,1fr);gap:18px 10px}.vd-product-page .vd-mobile-bar{position:fixed;left:12px;right:12px;bottom:12px;z-index:80;display:flex;align-items:center;gap:10px;padding:8px;border:1px solid rgba(16,21,16,.12);border-radius:20px;background:rgba(244,245,233,.94);backdrop-filter:blur(18px);box-shadow:0 20px 50px rgba(16,21,16,.18)}.vd-product-page .vd-mobile-price{padding:0 8px;font-size:13px;font-weight:850}.vd-product-page .vd-mobile-add{height:44px;flex:1;border-radius:14px;background:#202d20;color:#f4f5e9;font-size:12px;font-weight:850}.vd-product-page .vd-mobile-add.is-added{background:#ddf27a;color:#101510}}
-        @media(prefers-reduced-motion:reduce){.vd-product-page *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-        .verdant-dark .vd-product-page{background:#101510;color:#f4f5e9}.verdant-dark .vd-product-page .vd-header{background:rgba(16,21,16,.9);border-color:rgba(244,245,233,.08)}.verdant-dark .vd-product-page .vd-brand,.verdant-dark .vd-product-page .vd-nav,.verdant-dark .vd-product-page .vd-breadcrumb{color:#f4f5e9}.verdant-dark .vd-product-page .vd-breadcrumb,.verdant-dark .vd-product-page .vd-desc,.verdant-dark .vd-product-page .vd-tax,.verdant-dark .vd-product-page .vd-stock-row,.verdant-dark .vd-product-page .vd-fact-label,.verdant-dark .vd-product-page .vd-tab-copy,.verdant-dark .vd-product-page .vd-detail-row span:first-child{color:rgba(244,245,233,.58)}.verdant-dark .vd-product-page .vd-kicker,.verdant-dark .vd-product-page .vd-tagline,.verdant-dark .vd-product-page .vd-section-kicker{color:#bcd47a}.verdant-dark .vd-product-page .vd-gallery,.verdant-dark .vd-product-page .vd-product-visual-shell{background:#1a241b}.verdant-dark .vd-product-page .vd-product-thumbs{background:rgba(16,21,16,.6);border-color:rgba(244,245,233,.09)}.verdant-dark .vd-product-page .vd-qty{background:rgba(32,45,32,.7);border-color:rgba(244,245,233,.16)}.verdant-dark .vd-product-page .vd-qty button{color:#f4f5e9}.verdant-dark .vd-product-page .vd-tabs,.verdant-dark .vd-product-page .vd-tab-nav,.verdant-dark .vd-product-page .vd-fact,.verdant-dark .vd-product-page .vd-price-row{border-color:rgba(244,245,233,.12)}.verdant-dark .vd-product-page .vd-tab{color:rgba(244,245,233,.5)}.verdant-dark .vd-product-page .vd-tab.is-active{color:#f4f5e9;border-color:#ddf27a}.verdant-dark .vd-product-page .vd-corner{background:#152019}.verdant-dark .vd-product-page .vd-section-note,.verdant-dark .vd-product-page .vd-related-category{color:rgba(244,245,233,.5)}.verdant-dark .vd-product-page .vd-related-image{background:#1d2a1f}.verdant-dark .vd-product-page .vd-related-image img{mix-blend-mode:screen}.verdant-dark .vd-product-page .vd-mobile-bar{background:rgba(20,29,21,.95);border-color:rgba(244,245,233,.1)}.verdant-dark .vd-product-page .vd-mobile-price{color:#f4f5e9}
+        .vd-pdp{--forest:#202d20;--forest-deep:#101510;--cream:#f4f5e9;--lime:#ddf27a;--ink:#101510;--muted:rgba(16,21,16,.58);min-height:100vh;overflow-x:hidden;background:var(--cream);color:var(--ink)}
+        .vd-pdp *,.vd-pdp *::before,.vd-pdp *::after{box-sizing:border-box}.vd-pdp a{text-decoration:none;color:inherit}
+        .vd-pdp .vd-pdp-header{position:sticky;top:0;z-index:60;border-bottom:1px solid rgba(16,21,16,.09);background:rgba(244,245,233,.88);backdrop-filter:blur(18px)}
+        .vd-pdp .vd-pdp-header-inner{max-width:1280px;margin:auto;min-height:72px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:18px}.vd-pdp .vd-brand{font-size:14px;font-weight:900;letter-spacing:.16em}.vd-pdp .vd-nav{display:flex;gap:28px;font-size:12px;font-weight:700;color:rgba(16,21,16,.58)}.vd-pdp .vd-nav a:hover{color:var(--ink)}.vd-pdp .vd-bag{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;background:var(--lime);font-size:12px;font-weight:900}
+        .vd-pdp .vd-crumb{max-width:1280px;margin:auto;padding:20px 24px 0;color:rgba(16,21,16,.48);font-size:10px;letter-spacing:.08em}
+        .vd-pdp .vd-hero{max-width:1280px;margin:auto;padding:20px 24px 76px;display:grid;grid-template-columns:minmax(0,1.02fr) minmax(380px,.98fr);gap:58px;align-items:center}.vd-pdp .vd-gallery{position:relative;min-height:600px;border-radius:36px;overflow:hidden;background:#e1e9d4;box-shadow:0 24px 70px rgba(32,45,32,.08)}
+        .vd-pdp .vd-pdp-visual{height:100%;min-height:600px;position:relative;display:flex;flex-direction:column}.vd-pdp .vd-pdp-visual-glow{position:absolute;inset:7% 8% 18%;border-radius:50%;background:radial-gradient(circle,rgba(188,214,143,.34),transparent 64%);filter:blur(2px)}.vd-pdp .vd-pdp-visual-stage{position:relative;flex:1;min-height:0;display:grid;place-items:center;padding:36px 48px 20px}.vd-pdp .vd-pdp-main-image{position:relative;width:100%;height:100%;max-height:560px;object-fit:contain;filter:drop-shadow(0 28px 24px rgba(16,21,16,.13));transition:transform .65s cubic-bezier(.2,.7,.2,1),filter .65s ease}.vd-pdp .vd-gallery:hover .vd-pdp-main-image{transform:scale(1.02) translateY(-5px);filter:drop-shadow(0 34px 30px rgba(16,21,16,.16))}.vd-pdp .vd-pdp-floor-shadow{position:absolute;left:24%;right:24%;bottom:31px;height:38px;border-radius:50%;background:rgba(16,21,16,.12);filter:blur(18px)}
+        .vd-pdp .vd-pdp-thumbs{position:relative;z-index:3;display:flex;gap:10px;overflow:auto;padding:12px 16px 16px;border-top:1px solid rgba(16,21,16,.08);background:rgba(244,245,233,.56);backdrop-filter:blur(12px)}.vd-pdp .vd-pdp-thumb{width:62px;height:62px;flex:0 0 62px;padding:6px;border-radius:14px;border:1px solid transparent;background:rgba(251,252,245,.66);transition:.22s ease}.vd-pdp .vd-pdp-thumb:hover{transform:translateY(-1px)}.vd-pdp .vd-pdp-thumb.is-active{border-color:var(--forest);box-shadow:0 0 0 2px rgba(221,242,122,.7)}.vd-pdp .vd-pdp-thumb img{width:100%;height:100%;object-fit:contain;border-radius:9px}
+        .vd-pdp .vd-pdp-hero-content{display:flex;flex-direction:column;justify-content:center}.vd-pdp .vd-eyebrow{font-size:10px;font-weight:900;letter-spacing:.22em;text-transform:uppercase;color:#52634b}.vd-pdp .vd-title{margin:15px 0 0;max-width:700px;font-size:clamp(52px,5.8vw,82px);font-weight:780;line-height:.88;letter-spacing:-.065em}.vd-pdp .vd-tagline{margin-top:17px;font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#52634b}.vd-pdp .vd-meta{display:flex;gap:9px;align-items:center;margin-top:9px;font-size:12px;color:var(--muted)}.vd-pdp .vd-description{max-width:610px;margin-top:16px;font-size:15px;line-height:1.8;color:var(--muted)}
+        .vd-pdp .vd-price-row{display:flex;align-items:flex-end;gap:14px;margin-top:24px;padding-top:22px;border-top:1px solid rgba(16,21,16,.1)}.vd-pdp .vd-price{font-size:36px;font-weight:900;letter-spacing:-.045em}.vd-pdp .vd-tax{font-size:10px;color:rgba(16,21,16,.43);padding-bottom:6px}.vd-pdp .vd-buy-box{margin-top:16px;padding:8px;border:1px solid rgba(16,21,16,.12);border-radius:24px;background:rgba(255,255,255,.34);box-shadow:0 18px 46px rgba(32,45,32,.06)}.vd-pdp .vd-buy-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px}.vd-pdp .vd-qty{height:52px;display:flex;align-items:center;padding:5px;border-radius:999px;border:1px solid rgba(16,21,16,.12);background:rgba(244,245,233,.9)}.vd-pdp .vd-qty button{width:40px;height:40px;border:0;border-radius:50%;font-size:19px;color:var(--ink);background:transparent}.vd-pdp .vd-qty button:hover:not(:disabled){background:#e8ecd9}.vd-pdp .vd-qty button:disabled{opacity:.24}.vd-pdp .vd-qty span{width:32px;text-align:center;font-size:13px;font-weight:900}.vd-pdp .vd-add{height:52px;border:0;border-radius:999px;background:var(--forest);color:var(--cream);font-size:13px;font-weight:900;transition:.25s ease}.vd-pdp .vd-add:hover:not(:disabled){transform:translateY(-1px);background:var(--forest-deep);box-shadow:0 12px 26px rgba(16,21,16,.14)}.vd-pdp .vd-add.is-added{background:var(--lime);color:var(--ink)}.vd-pdp .vd-buy-foot{display:flex;justify-content:space-between;gap:12px;margin-top:8px;padding:0 6px;font-size:10px;color:rgba(16,21,16,.44)}.vd-pdp .vd-stock{font-weight:800;color:rgba(16,21,16,.55)}
+        .vd-pdp .vd-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}.vd-pdp .vd-fact{padding-top:15px;border-top:1px solid rgba(16,21,16,.1)}.vd-pdp .vd-fact-label{font-size:9px;font-weight:900;letter-spacing:.16em;color:rgba(16,21,16,.45)}.vd-pdp .vd-fact-value{margin-top:8px;font-size:12px;font-weight:850;line-height:1.35}.vd-pdp .vd-info{max-width:700px;margin-top:30px;border-top:1px solid rgba(16,21,16,.1)}.vd-pdp .vd-tabs{display:flex;align-items:center;gap:26px;border-bottom:1px solid rgba(16,21,16,.09)}.vd-pdp .vd-tab{position:relative;padding:15px 0;border:0;background:none;font-size:12px;font-weight:850;color:rgba(16,21,16,.42)}.vd-pdp .vd-tab.active{color:var(--ink)}.vd-pdp .vd-tab.active::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--forest)}.vd-pdp .vd-save{margin-left:auto;display:inline-flex;align-items:center;gap:5px}.vd-pdp .vd-save svg{width:13px;height:13px}.vd-pdp .vd-info-copy{padding:20px 0;color:var(--muted);font-size:13px;line-height:1.8}.vd-pdp .vd-care-grid{display:grid;grid-template-columns:1fr 1.55fr}.vd-pdp .vd-care-row{display:contents}.vd-pdp .vd-care-label,.vd-pdp .vd-care-value{padding:11px 0;border-bottom:1px solid rgba(16,21,16,.07);font-size:12px}.vd-pdp .vd-care-label{color:rgba(16,21,16,.45)}.vd-pdp .vd-care-value{font-weight:700}
+        .vd-pdp .vd-section-dark{background:var(--forest);color:var(--cream);padding:88px 24px}.vd-pdp .vd-section-inner{max-width:1280px;margin:auto}.vd-pdp .vd-section-kicker{font-size:10px;font-weight:900;letter-spacing:.2em;color:var(--lime)}.vd-pdp .vd-section-title{margin-top:14px;font-size:clamp(36px,4.2vw,62px);line-height:.95;letter-spacing:-.05em;font-weight:760}.vd-pdp .vd-section-title em{font-family:Georgia,'Times New Roman',serif;font-weight:400}.vd-pdp .vd-story-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:40px}.vd-pdp .vd-story-card{min-height:210px;padding:24px;border-radius:24px;border:1px solid rgba(244,245,233,.1);background:linear-gradient(145deg,rgba(244,245,233,.08),rgba(244,245,233,.03))}.vd-pdp .vd-story-number{font-size:10px;color:rgba(244,245,233,.44);letter-spacing:.16em}.vd-pdp .vd-story-card h3{margin-top:36px;font-size:21px;letter-spacing:-.02em}.vd-pdp .vd-story-card p{margin-top:10px;font-size:12px;line-height:1.7;color:rgba(244,245,233,.62)}
+        .vd-pdp .vd-related{padding:84px 24px 96px;background:#eaeee0}.vd-pdp .vd-related-inner{max-width:1280px;margin:auto}.vd-pdp .vd-related-head{display:flex;justify-content:space-between;gap:16px;align-items:end}.vd-pdp .vd-related-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:28px}.vd-pdp .vd-related-card{overflow:hidden;border-radius:26px;background:#f7f8ee;border:1px solid rgba(16,21,16,.09);transition:.3s ease}.vd-pdp .vd-related-card:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(32,45,32,.11)}.vd-pdp .vd-related-image{aspect-ratio:1;background:#dfe7d4;display:grid;place-items:center;overflow:hidden}.vd-pdp .vd-related-image img{width:100%;height:100%;object-fit:contain;padding:20px;transition:.5s ease}.vd-pdp .vd-related-card:hover .vd-related-image img{transform:scale(1.045)}.vd-pdp .vd-related-copy{padding:16px}.vd-pdp .vd-related-meta{font-size:9px;color:rgba(16,21,16,.47);letter-spacing:.13em;text-transform:uppercase}.vd-pdp .vd-related-name{margin-top:6px;font-size:15px;font-weight:850}.vd-pdp .vd-related-bottom{display:flex;justify-content:space-between;gap:10px;margin-top:12px;align-items:center}.vd-pdp .vd-related-price{font-size:13px;font-weight:900}.vd-pdp .vd-related-link{font-size:11px;font-weight:850;color:#52634b}
+        .vd-pdp .vd-mobile-bar{display:none;position:fixed;left:12px;right:12px;bottom:12px;z-index:70;padding:8px;border:1px solid rgba(16,21,16,.12);border-radius:22px;background:rgba(244,245,233,.92);backdrop-filter:blur(18px);box-shadow:0 18px 48px rgba(16,21,16,.18)}.vd-pdp .vd-mobile-bar-inner{display:grid;grid-template-columns:auto 1fr;gap:8px}.vd-pdp .vd-mobile-price{display:flex;align-items:center;padding:0 12px;font-size:13px;font-weight:900}
+        @media(max-width:980px){.vd-pdp .vd-hero{grid-template-columns:1fr;gap:32px;padding-bottom:56px}.vd-pdp .vd-gallery,.vd-pdp .vd-pdp-visual{min-height:560px}.vd-pdp .vd-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+        @media(max-width:680px){.vd-pdp .vd-pdp-header-inner{min-height:64px;padding:0 16px}.vd-pdp .vd-nav{display:none}.vd-pdp .vd-crumb{padding:15px 16px 0;font-size:9px}.vd-pdp .vd-hero{padding:16px 16px 110px;gap:24px}.vd-pdp .vd-gallery,.vd-pdp .vd-pdp-visual{min-height:420px;border-radius:26px}.vd-pdp .vd-pdp-visual-stage{padding:26px 20px 18px}.vd-pdp .vd-title{font-size:54px}.vd-pdp .vd-description{font-size:14px;line-height:1.7}.vd-pdp .vd-buy-row{grid-template-columns:1fr}.vd-pdp .vd-qty{justify-content:center;width:100%}.vd-pdp .vd-facts{gap:10px}.vd-pdp .vd-fact-value{font-size:11px}.vd-pdp .vd-story-grid{grid-template-columns:1fr}.vd-pdp .vd-related{padding:64px 16px 90px}.vd-pdp .vd-related-grid{grid-template-columns:1fr 1fr;gap:10px}.vd-pdp .vd-related-copy{padding:12px}.vd-pdp .vd-related-name{font-size:13px}.vd-pdp .vd-mobile-bar{display:block}}
+        .verdant-dark .vd-pdp{background:#101510;color:#f4f5e9}.verdant-dark .vd-pdp .vd-pdp-header{background:rgba(16,21,16,.9);border-color:rgba(244,245,233,.08)}.verdant-dark .vd-pdp .vd-brand,.verdant-dark .vd-pdp .vd-nav,.verdant-dark .vd-pdp .vd-crumb{color:#f4f5e9}.verdant-dark .vd-pdp .vd-crumb,.verdant-dark .vd-pdp .vd-description,.verdant-dark .vd-pdp .vd-tax,.verdant-dark .vd-pdp .vd-buy-foot,.verdant-dark .vd-pdp .vd-fact-label,.verdant-dark .vd-pdp .vd-tab,.verdant-dark .vd-pdp .vd-care-label{color:rgba(244,245,233,.58)}.verdant-dark .vd-pdp .vd-eyebrow,.verdant-dark .vd-pdp .vd-tagline{color:#bcd47a}.verdant-dark .vd-pdp .vd-gallery{background:#1a241b}.verdant-dark .vd-pdp .vd-pdp-thumbs{background:rgba(16,21,16,.6);border-color:rgba(244,245,233,.09)}.verdant-dark .vd-pdp .vd-pdp-thumb{background:rgba(244,245,233,.05)}.verdant-dark .vd-pdp .vd-qty{background:rgba(32,45,32,.7);border-color:rgba(244,245,233,.16)}.verdant-dark .vd-pdp .vd-qty button{color:#f4f5e9}.verdant-dark .vd-pdp .vd-price-row,.verdant-dark .vd-pdp .vd-fact,.verdant-dark .vd-pdp .vd-info,.verdant-dark .vd-pdp .vd-tabs,.verdant-dark .vd-pdp .vd-care-label,.verdant-dark .vd-pdp .vd-care-value{border-color:rgba(244,245,233,.12)}.verdant-dark .vd-pdp .vd-tab.active{color:#f4f5e9}.verdant-dark .vd-pdp .vd-related{background:#152019}.verdant-dark .vd-pdp .vd-related-card{background:rgba(244,245,233,.04);border-color:rgba(244,245,233,.09)}.verdant-dark .vd-pdp .vd-related-image{background:#1d2a1f}.verdant-dark .vd-pdp .vd-related-image img{mix-blend-mode:screen}.verdant-dark .vd-pdp .vd-mobile-bar{background:rgba(20,29,21,.95);border-color:rgba(244,245,233,.1)}.verdant-dark .vd-pdp .vd-mobile-price{color:#f4f5e9}
       `}</style>
 
-      <header className="vd-header">
-        <div className="vd-header-inner">
+      <header className="vd-pdp-header">
+        <div className="vd-pdp-header-inner">
           <Link href="/" className="vd-brand">VERDANT</Link>
           <nav className="vd-nav"><Link href="/">Home</Link><Link href="/shop">Shop</Link><Link href="/#care">Plant care</Link></nav>
           <Link href="/cart" className="vd-bag">View bag</Link>
         </div>
       </header>
 
-      <div className="vd-breadcrumb">Shop &nbsp;→&nbsp; {product.category} &nbsp;→&nbsp; {product.subcategory || "Collection"}</div>
+      <div className="vd-crumb">Shop&nbsp; → &nbsp;{product.category}&nbsp; → &nbsp;{product.subcategory || product.name}</div>
 
       <section className="vd-hero">
-        <div className="vd-gallery"><PlantRender product={product} /></div>
-
-        <div>
-          <p className="vd-kicker">{product.category}</p>
+        <div className="vd-gallery"><ProductVisual product={product} /></div>
+        <div className="vd-pdp-hero-content">
+          <p className="vd-eyebrow">{product.category}</p>
           <h1 className="vd-title">{product.name}</h1>
-          <div className="vd-tagline">A little wild. Very at home.</div>
-          <p className="vd-desc">{product.description}</p>
+          <div className="vd-meta"><span>{product.level}</span><span>·</span><span>{product.size}</span></div>
+          <p className="vd-tagline">A little wild. Very at home.</p>
+          <p className="vd-description">{product.description}</p>
 
-          <div className="vd-price-row"><div className="vd-price">₹{product.price.toLocaleString("en-IN")}</div><div className="vd-tax">Taxes calculated at checkout</div></div>
-
-          {soldOut ? (
-            <div className="vd-stock-row"><span>Currently out of stock</span><span>Join the waitlist later</span></div>
-          ) : (
-            <>
-              <div className="vd-buy-row">
-                <div className="vd-qty" aria-label="Quantity">
-                  <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))}>−</button>
-                  <span>{quantity}</span>
-                  <button type="button" disabled={quantity >= maxQuantity} onClick={() => setQuantity((value) => Math.min(maxQuantity, value + 1))}>+</button>
-                </div>
-                <button type="button" onClick={handleAdd} className={`vd-add ${added ? "is-added" : ""}`}>{added ? "Added ✓" : `Add to bag · ₹${total.toLocaleString("en-IN")}`}</button>
+          <div className="vd-price-row"><strong className="vd-price">₹{price}</strong><span className="vd-tax">taxes calculated at checkout</span></div>
+          <div className="vd-buy-box">
+            <div className="vd-buy-row">
+              <div className="vd-qty" aria-label="Quantity">
+                <button type="button" aria-label="Decrease quantity" onClick={() => setQuantity((value) => Math.max(1, value - 1))} disabled={quantity <= 1}>−</button>
+                <span>{quantity}</span>
+                <button type="button" aria-label="Increase quantity" onClick={() => setQuantity((value) => Math.min(maxQuantity, value + 1))} disabled={quantity >= maxQuantity}>+</button>
               </div>
-              <div className="vd-stock-row"><span>{product.stock <= 5 ? `Only ${product.stock} left in stock.` : `${product.stock} available.`}</span><span>Secure checkout · Fast delivery</span></div>
-            </>
-          )}
+              <button type="button" className={`vd-add ${added ? "is-added" : ""}`} onClick={addToBag} disabled={soldOut}>{soldOut ? "Out of stock" : added ? "Added ✓" : `Add to bag · ₹${price}`}</button>
+            </div>
+            <div className="vd-buy-foot"><span className="vd-stock">{product.stock <= 5 && product.stock > 0 ? `Only ${product.stock} left` : product.stock > 0 ? `${product.stock} available` : "Unavailable"}</span><span>Secure checkout · Fast delivery</span></div>
+          </div>
 
           <div className="vd-facts">{facts.map(([label, value]) => <div className="vd-fact" key={label}><div className="vd-fact-label">{label}</div><div className="vd-fact-value">{value}</div></div>)}</div>
 
-          <div className="vd-tabs">
-            <div className="vd-tab-nav"><button type="button" className={`vd-tab ${activeTab === "about" ? "is-active" : ""}`} onClick={() => setActiveTab("about")}>About</button><button type="button" className={`vd-tab ${activeTab === "care" ? "is-active" : ""}`} onClick={() => setActiveTab("care")}>Plant care</button><button type="button" className="vd-tab" onClick={() => setLiked((value) => !value)}>{liked ? "Saved ♥" : "Save ♡"}</button></div>
-            {activeTab === "about" ? <p className="vd-tab-copy">Selected for character, resilience and that little feeling of life a room gets when something green takes root.</p> : <div className="vd-tab-copy">{product.details.length ? product.details.map(([label, value]) => <div key={`${label}-${value}`} className="vd-detail-row"><span>{label}</span><span>{value}</span></div>) : <p>Bright filtered light, steady watering and a little room to grow.</p>}</div>}
-          </div>
-        </div>
-      </section>
-
-      <section className="vd-story">
-        <div className="vd-story-inner">
-          <div className="vd-story-kicker">WHY YOU'LL LOVE IT</div>
-          <div className="vd-story-grid">
-            <h2 className="vd-story-title">Bring a little <em>life</em> into the room.</h2>
-            <p className="vd-story-copy">Verdant pieces are chosen to make a space feel calmer, more considered and a little more alive. This one brings shape, texture and an easy sense of character without asking for perfection.</p>
-          </div>
-          <div className="vd-story-cards">
-            <article className="vd-story-card"><small>01 / LIGHT</small><h3>Bright, filtered spaces</h3><p>Place it near a generous window where daylight is soft rather than harsh.</p></article>
-            <article className="vd-story-card"><small>02 / RHYTHM</small><h3>Simple routines</h3><p>Water thoughtfully, let the soil breathe and adjust with the seasons.</p></article>
-            <article className="vd-story-card"><small>03 / PRESENCE</small><h3>Made to be seen</h3><p>A sculptural focal point for desks, corners, shelves and slower spaces.</p></article>
-          </div>
-        </div>
-      </section>
-
-      <section className="vd-corner">
-        <div className="vd-corner-inner">
-          <div className="vd-section-head"><div><div className="vd-section-kicker">COMPLETE THE CORNER</div><h2 className="vd-section-title">Build the right little <em>ecosystem.</em></h2></div><p className="vd-section-note">Related products are pulled from the same collection first, then broadened to the category.</p></div>
-          {related.length ? (
-            <div className="vd-related-grid">
-              {related.map((item) => {
-                const image = item.image_url || item.image_urls?.[0] || realProductImages[item.slug];
-                return <Link href={`/shop/${item.slug}`} className="vd-related-card" key={item.slug}>
-                  <div className="vd-related-image">{image ? <img src={image} alt={item.name} loading="lazy" /> : <div className="vd-fallback-related">Verdant</div>}</div>
-                  <div className="vd-related-meta"><div className="vd-related-category">{item.subcategory || item.category}</div><div className="vd-related-name">{item.name}</div><div className="vd-related-price">₹{item.price.toLocaleString("en-IN")}</div></div>
-                </Link>;
-              })}
+          <div className="vd-info">
+            <div className="vd-tabs">
+              <button type="button" className={`vd-tab ${activeTab === "about" ? "active" : ""}`} onClick={() => setActiveTab("about")}>About</button>
+              <button type="button" className={`vd-tab ${activeTab === "care" ? "active" : ""}`} onClick={() => setActiveTab("care")}>Plant care</button>
+              <button type="button" className="vd-tab vd-save" onClick={() => setLiked((value) => !value)}>Save <HeartIcon filled={liked} /></button>
             </div>
-          ) : <p className="vd-section-note" style={{ marginTop: 32 }}>Related products will appear here as the catalogue grows.</p>}
+            {activeTab === "about" ? <p className="vd-info-copy">Selected for character, resilience and that little feeling of life a room gets when something green takes root.</p> : <div className="vd-care-grid">{careRows.map(([label, value]) => <div className="vd-care-row" key={`${label}-${value}`}><div className="vd-care-label">{label}</div><div className="vd-care-value">{value}</div></div>)}</div>}
+          </div>
         </div>
       </section>
 
-      {!soldOut && <div className="vd-mobile-bar"><div className="vd-mobile-price">₹{product.price.toLocaleString("en-IN")}</div><button type="button" onClick={handleAdd} className={`vd-mobile-add ${added ? "is-added" : ""}`}>{added ? "Added ✓" : "Add to bag"}</button></div>}
+      <section className="vd-section-dark"><div className="vd-section-inner"><p className="vd-section-kicker">WHY YOU&apos;LL LOVE IT</p><h2 className="vd-section-title">Make room for a little <em>life.</em></h2><div className="vd-story-grid">
+        <article className="vd-story-card"><p className="vd-story-number">01 / PRESENCE</p><h3>Designed to be noticed.</h3><p>Strong foliage and an unmistakable silhouette give your space a confident green focal point.</p></article>
+        <article className="vd-story-card"><p className="vd-story-number">02 / RHYTHM</p><h3>Simple routines win.</h3><p>A little consistent care is all it asks in return for months of fresh growth.</p></article>
+        <article className="vd-story-card"><p className="vd-story-number">03 / HOME</p><h3>Built for lived-in spaces.</h3><p>Bedrooms, living rooms and work corners all get a little more character with something growing nearby.</p></article>
+      </div></div></section>
+
+      {related.length > 0 && <section className="vd-related"><div className="vd-related-inner"><div className="vd-related-head"><div><p className="vd-eyebrow">COMPLETE THE CORNER</p><h2 className="vd-section-title" style={{ color: "#101510", marginBottom: 0 }}>Things that belong <em>together.</em></h2></div><Link href="/shop" className="vd-related-link">Browse all →</Link></div><div className="vd-related-grid">{related.map((item) => { const image = displayImages(item)[0]; return <Link key={item.slug} href={`/shop/${item.slug}`} className="vd-related-card"><div className="vd-related-image">{image ? <img src={image} alt={item.name} loading="lazy" /> : <span />}</div><div className="vd-related-copy"><div className="vd-related-meta">{item.subcategory || item.category}</div><div className="vd-related-name">{item.name}</div><div className="vd-related-bottom"><div className="vd-related-price">₹{Number(item.price).toLocaleString("en-IN")}</div><div className="vd-related-link">View →</div></div></div></Link>; })}</div></div></section>}
+
+      <div className="vd-mobile-bar"><div className="vd-mobile-bar-inner"><div className="vd-mobile-price">₹{price}</div><button type="button" className={`vd-add ${added ? "is-added" : ""}`} onClick={addToBag} disabled={soldOut}>{soldOut ? "Out of stock" : added ? "Added ✓" : "Add to bag"}</button></div></div>
     </main>
   );
 }
