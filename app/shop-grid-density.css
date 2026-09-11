@@ -1,0 +1,47 @@
+/* Verdant Shop: denser desktop product grid. */
+@media (min-width: 1280px) {
+  .verdant-shop-page .grid.grid-cols-1.gap-x-5.gap-y-10.sm\:grid-cols-2.xl\:grid-cols-4 {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    column-gap: 14px !important;
+    row-gap: 34px !important;
+  }
+
+  .verdant-shop-page .group.min-w-0 > .relative > a > div {
+    border-radius: 22px !important;
+  }
+
+  .verdant-shop-page .group.min-w-0 > .pt-4 {
+    padding-top: 12px !important;
+  }
+
+  .verdant-shop-page .group.min-w-0 > .pt-4 h3 {
+    font-size: 15px !important;
+  }
+
+  .verdant-shop-page .group.min-w-0 > .pt-4 > p,
+  .verdant-shop-page .group.min-w-0 > .pt-4 .text-sm {
+    font-size: 12px !important;
+    line-height: 1.55 !important;
+  }
+
+  .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 {
+    gap: 6px !important;
+  }
+
+  .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > a {
+    height: 42px !important;
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 1279px) and (min-width: 768px) {
+  .verdant-shop-page .grid.grid-cols-1.gap-x-5.gap-y-10.sm\:grid-cols-2.xl\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .verdant-shop-page .grid.grid-cols-1.gap-x-5.gap-y-10.sm\:grid-cols-2.xl\:grid-cols-4 {
+    grid-template-columns: 1fr !important;
+  }
+}
