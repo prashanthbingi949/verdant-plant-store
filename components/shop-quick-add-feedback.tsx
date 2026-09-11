@@ -2,34 +2,29 @@
 
 import { useEffect } from "react";
 
-/** Keeps the circular quick-add control visually in sync with its React label. */
+const BUTTON_SELECTOR = ".verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button";
+
+/** Makes Quick Add feedback explicit and independent of focus/hover state. */
 export default function ShopQuickAddFeedback() {
   useEffect(() => {
-    const update = () => {
-      const buttons = document.querySelectorAll<HTMLElement>(
-        ".verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button"
-      );
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      const button = target?.closest<HTMLButtonElement>(BUTTON_SELECTOR);
+      if (!button || button.disabled) return;
 
-      buttons.forEach((button) => {
-        const isAdded = button.textContent?.includes("Added") ?? false;
-        button.classList.toggle("is-quick-added", isAdded);
-        button.setAttribute(
-          "aria-label",
-          isAdded ? "Added to cart" : "Add to cart"
-        );
-      });
+      button.classList.remove("is-quick-added");
+      void button.offsetWidth;
+      button.classList.add("is-quick-added");
+      button.setAttribute("aria-label", "Added to cart");
+
+      window.setTimeout(() => {
+        button.classList.remove("is-quick-added");
+        button.setAttribute("aria-label", "Add to cart");
+      }, 1800);
     };
 
-    update();
-
-    const observer = new MutationObserver(update);
-    observer.observe(document.body, {
-      subtree: true,
-      childList: true,
-      characterData: true,
-    });
-
-    return () => observer.disconnect();
+    document.addEventListener("click", handleClick, true);
+    return () => document.removeEventListener("click", handleClick, true);
   }, []);
 
   return null;
