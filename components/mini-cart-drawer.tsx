@@ -21,6 +21,9 @@ export default function MiniCartDrawer() {
       const target = event.target as HTMLElement | null;
       const link = target?.closest<HTMLAnchorElement>('a[href="/cart"]');
       if (!link) return;
+      // Only intercept the site's cart icon/navigation links. The drawer's own
+      // View cart action uses goToCart() so it never gets trapped here.
+      if (link.closest("aside")) return;
       event.preventDefault();
       setOpen(true);
     };
@@ -42,6 +45,11 @@ export default function MiniCartDrawer() {
       document.body.style.overflow = previous;
     };
   }, [open]);
+
+  const goToCart = () => {
+    setOpen(false);
+    router.push("/cart");
+  };
 
   return (
     <>
@@ -112,7 +120,7 @@ export default function MiniCartDrawer() {
           </div>
           <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto]">
             <button type="button" disabled={!items.length} onClick={() => { setOpen(false); router.push("/checkout"); }} className="rounded-full bg-[#202d20] px-5 py-3.5 text-sm font-bold !text-[#f4f5e9] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-black/10 disabled:!text-black/35">Checkout</button>
-            <Link href="/cart" onClick={() => setOpen(false)} className="inline-flex min-h-[54px] items-center justify-center rounded-full border border-[#202d20]/20 bg-white/70 px-5 py-3.5 text-sm font-bold !text-[#202d20] opacity-100 transition hover:-translate-y-0.5 hover:border-[#202d20] hover:bg-[#ddf27a]">View cart</Link>
+            <button type="button" onClick={goToCart} className="inline-flex min-h-[54px] items-center justify-center rounded-full border border-[#202d20]/20 bg-white/70 px-5 py-3.5 text-sm font-bold !text-[#202d20] opacity-100 transition hover:-translate-y-0.5 hover:border-[#202d20] hover:bg-[#ddf27a]">View cart</button>
           </div>
         </div>
       </aside>
