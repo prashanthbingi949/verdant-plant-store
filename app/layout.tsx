@@ -12,6 +12,7 @@ import HomeNavController from "@/components/home-nav-controller";
 import HomeVisualEffects from "@/components/home-visual-effects";
 import SiteUtilities from "@/components/site-utilities";
 import ShopSearchEnhancer from "@/components/shop-search-enhancer";
+import ShopQuickAddFeedback from "@/components/shop-quick-add-feedback";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <HomeVisualEffects />
           <SiteUtilities />
           <ShopSearchEnhancer />
+          <ShopQuickAddFeedback />
           {children}
         </CartProvider>
       </body>
