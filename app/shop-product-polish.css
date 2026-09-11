@@ -83,7 +83,16 @@
 .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button {
   position: relative;
   overflow: hidden;
-  transition: transform .25s cubic-bezier(.2,.7,.2,1), background .25s ease, border-color .25s ease, box-shadow .25s ease;
+  transition: transform .25s cubic-bezier(.2,.7,.2,1), background .25s ease, border-color .25s ease, box-shadow .25s ease, color .25s ease;
+}
+
+/* Keep primary CTA text readable against the dark button, including hover. */
+.verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > a {
+  color: #f4f5e9 !important;
+}
+
+.verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > a:hover {
+  color: #f4f5e9 !important;
 }
 
 .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > a:hover,
@@ -94,6 +103,7 @@
 
 .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button:hover:not(:disabled) {
   background: #ddf27a;
+  color: #202d20;
 }
 
 /* A subtle sheen moves across the image only when the card is explored. */
@@ -123,6 +133,11 @@
   }
 
   .verdant-shop-page .group.min-w-0:hover > .pt-4 {
+    transform: none;
+  }
+
+  .verdant-shop-page .group.min-w-0:hover > .pt-4 > .mt-4 > a:hover,
+  .verdant-shop-page .group.min-w-0:hover > .pt-4 > .mt-4 > button:hover:not(:disabled) {
     transform: none;
   }
 
