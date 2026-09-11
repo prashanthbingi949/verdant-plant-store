@@ -16,6 +16,7 @@ import ShopSearchEnhancer from "@/components/shop-search-enhancer";
 import ShopCartToast from "@/components/shop-cart-toast";
 import MiniCartDrawer from "@/components/mini-cart-drawer";
 import ShopQuickAddFeedback from "@/components/shop-quick-add-feedback";
+import ShopBadgeBridge from "@/components/shop-badge-bridge";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <ShopCartToast />
           <MiniCartDrawer />
           <ShopQuickAddFeedback />
+          <ShopBadgeBridge />
           {children}
         </CartProvider>
       </body>
