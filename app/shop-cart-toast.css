@@ -1,0 +1,89 @@
+/* Verdant Shop: lightweight cart confirmation toast. */
+.verdant-cart-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 250px;
+  max-width: min(360px, calc(100vw - 32px));
+  padding: 10px 12px 10px 10px;
+  border: 1px solid rgba(244,245,233,.16);
+  border-radius: 18px;
+  background: rgba(20,29,21,.94);
+  color: #f4f5e9;
+  box-shadow: 0 20px 50px rgba(16,21,16,.24), 0 8px 24px rgba(16,21,16,.12);
+  backdrop-filter: blur(18px);
+  transform: translate(-50%, 18px) scale(.96);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .28s ease, transform .32s cubic-bezier(.2,.8,.2,1);
+}
+
+.verdant-cart-toast.is-visible {
+  transform: translate(-50%, 0) scale(1);
+  opacity: 1;
+}
+
+.verdant-cart-toast-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  border-radius: 9999px;
+  background: #ddf27a;
+  color: #202d20;
+  font-size: 16px;
+  font-weight: 900;
+  box-shadow: 0 0 0 5px rgba(221,242,122,.08);
+}
+
+.verdant-cart-toast-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.verdant-cart-toast-copy strong {
+  font-size: 12px;
+  line-height: 1.15;
+  letter-spacing: -.01em;
+}
+
+.verdant-cart-toast-copy span {
+  font-size: 10px;
+  line-height: 1.2;
+  color: rgba(244,245,233,.62);
+}
+
+.verdant-cart-toast-count {
+  display: grid;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  place-items: center;
+  border: 1px solid rgba(244,245,233,.12);
+  border-radius: 9999px;
+  color: #ddf27a;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+@media (max-width: 760px) {
+  .verdant-cart-toast {
+    bottom: 18px;
+    min-width: 0;
+    width: calc(100vw - 32px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .verdant-cart-toast {
+    transition: none !important;
+  }
+}
