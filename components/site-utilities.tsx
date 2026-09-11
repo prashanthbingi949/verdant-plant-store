@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const FAV_KEY = "verdant-favorites-v1";
@@ -29,12 +30,11 @@ function HeartIcon() {
 }
 
 export default function SiteUtilities() {
+  const pathname = usePathname();
   const [favoriteCount, setFavoriteCount] = useState(0);
 
   useEffect(() => {
     try {
-      // Verdant is light-mode only now. Clear any previously saved theme state
-      // and remove the old dark-mode class so older sessions cannot re-enable it.
       window.localStorage.removeItem(THEME_KEY);
       document.documentElement.classList.remove("verdant-dark");
       document.documentElement.style.colorScheme = "light";
@@ -43,6 +43,8 @@ export default function SiteUtilities() {
       setFavoriteCount(0);
     }
 
+    if (pathname !== "/shop") return;
+
     const handleFavoriteClick = (event: Event) => {
       const mouseEvent = event as MouseEvent;
       const target = mouseEvent.target as Element | null;
@@ -50,7 +52,7 @@ export default function SiteUtilities() {
       if (!button) return;
 
       window.requestAnimationFrame(() => {
-        const card = button.closest<HTMLElement>(".product-card");
+        const card = button.closest<HTMLElement>("article");
         const link = card?.querySelector<HTMLAnchorElement>('a[href^="/shop/"]');
         const href = link?.getAttribute("href") || "";
         const slug = href.startsWith("/shop/") ? href.slice("/shop/".length).split(/[?#]/)[0] : "";
@@ -74,7 +76,9 @@ export default function SiteUtilities() {
       window.removeEventListener("storage", sync);
       window.removeEventListener("verdant-favorites-change", sync);
     };
-  }, []);
+  }, [pathname]);
+
+  if (pathname !== "/shop") return null;
 
   return (
     <Link
@@ -85,10 +89,10 @@ export default function SiteUtilities() {
       <HeartIcon />
       {favoriteCount > 0 && <span className="verdant-top-favorites-count">{favoriteCount > 99 ? "99+" : favoriteCount}</span>}
       <style>{`
-        .verdant-top-favorites{position:fixed;top:14px;right:102px;z-index:115;width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(16,21,16,.1);border-radius:999px;background:rgba(244,245,233,.94);color:#202d20;box-shadow:0 8px 24px rgba(16,21,16,.08);backdrop-filter:blur(14px);transition:transform .2s ease,background .2s ease,box-shadow .2s ease}
+        .verdant-top-favorites{position:fixed;top:16px;right:102px;z-index:115;width:44px;height:44px;display:grid;place-items:center;border:1px solid rgba(16,21,16,.1);border-radius:999px;background:rgba(244,245,233,.96);color:#202d20;box-shadow:0 8px 24px rgba(16,21,16,.08);backdrop-filter:blur(14px);transition:transform .2s ease,background .2s ease,box-shadow .2s ease}
         .verdant-top-favorites:hover{transform:translateY(-1px);background:#ddf27a;box-shadow:0 12px 28px rgba(32,45,32,.13)}
         .verdant-top-favorites-count{position:absolute;right:-2px;top:-3px;min-width:17px;height:17px;display:grid;place-items:center;padding:0 4px;border-radius:999px;background:#202d20;color:#f4f5e9;font-size:9px;font-weight:900;line-height:1;border:2px solid #f4f5e9}
-        @media(max-width:760px){.verdant-top-favorites{top:10px;right:78px;width:38px;height:38px}.verdant-top-favorites-count{right:-2px;top:-4px}}
+        @media(max-width:760px){.verdant-top-favorites{top:10px;right:74px;width:44px;height:44px}.verdant-top-favorites-count{right:-2px;top:-4px}}
       `}</style>
     </Link>
   );
