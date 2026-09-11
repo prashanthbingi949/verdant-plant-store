@@ -7,12 +7,13 @@ import "./story-overrides.css";
 import "./shop-category-fix.css";
 import "./shop-product-polish.css";
 import "./shop-grid-density.css";
+import "./shop-cart-toast.css";
 import { CartProvider } from "@/components/cart-provider";
 import HomeNavController from "@/components/home-nav-controller";
 import HomeVisualEffects from "@/components/home-visual-effects";
 import SiteUtilities from "@/components/site-utilities";
 import ShopSearchEnhancer from "@/components/shop-search-enhancer";
-import ShopQuickAddFeedback from "@/components/shop-quick-add-feedback";
+import ShopCartToast from "@/components/shop-cart-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,7 +49,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <HomeVisualEffects />
           <SiteUtilities />
           <ShopSearchEnhancer />
-          <ShopQuickAddFeedback />
+          <ShopCartToast />
           {children}
         </CartProvider>
       </body>
