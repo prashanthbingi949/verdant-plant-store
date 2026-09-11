@@ -30,6 +30,18 @@
 .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button:disabled::before { content:"—"; opacity:.45; }
 .verdant-shop-page .group.min-w-0 > .relative > a > div::after { content:""; position:absolute; inset:-30% auto -30% -45%; width:28%; transform:skewX(-15deg) translateX(-220%); background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent); transition:transform .8s cubic-bezier(.2,.7,.2,1); pointer-events:none; }
 .verdant-shop-page .group.min-w-0:hover > .relative > a > div::after { transform:skewX(-15deg) translateX(620%); }
+
+/* Dark-theme legibility for every product-card text element and overlay. */
+.verdant-dark .verdant-shop-page .group.min-w-0 > .pt-4 p:first-child { color:rgba(244,245,233,.62) !important; }
+.verdant-dark .verdant-shop-page .group.min-w-0 > .pt-4 p.mt-2 { color:rgba(244,245,233,.74) !important; }
+.verdant-dark .verdant-shop-page .group.min-w-0 > .pt-4 h3 { color:#f4f5e9 !important; }
+.verdant-dark .verdant-shop-page .group.min-w-0:hover > .pt-4 h3 { color:#ddf27a !important; }
+.verdant-dark .verdant-shop-page .group.min-w-0 > .pt-4 strong { color:#f4f5e9 !important; }
+.verdant-dark .verdant-shop-page .group.min-w-0 > .relative > a > div > span { color:#202d20 !important; background:rgba(244,245,233,.92) !important; border-color:rgba(244,245,233,.26) !important; }
+.verdant-dark .verdant-shop-page .group.min-w-0 > .relative > button { color:#f4f5e9 !important; background:rgba(32,45,32,.84) !important; border-color:rgba(244,245,233,.12) !important; }
+.verdant-dark .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > a { color:#f4f5e9 !important; background:#202d20 !important; }
+.verdant-dark .verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button:not(.is-quick-added) { color:#f4f5e9 !important; background:transparent !important; border-color:rgba(244,245,233,.28) !important; }
+
 @media (max-width:1199px){ .verdant-shop-page .group.min-w-0 > .relative > a > div { aspect-ratio:1 / 1 !important; } }
 @media (max-width:760px){ .verdant-shop-page .group.min-w-0:hover{transform:none;} .verdant-shop-page .group.min-w-0:hover > .relative > a > div{transform:none;box-shadow:0 12px 34px rgba(32,45,32,.055);} .verdant-shop-page .group.min-w-0:hover > .pt-4{transform:none;} .verdant-shop-page .group.min-w-0:hover > .pt-4 > .mt-4 > a:hover,.verdant-shop-page .group.min-w-0:hover > .pt-4 > .mt-4 > button:hover:not(:disabled){transform:none;} .verdant-shop-page .group.min-w-0 > .relative > a > div::after{display:none;} .verdant-shop-page .group.min-w-0 > .pt-4{min-height:0;} }
 @media (prefers-reduced-motion:reduce){ .verdant-shop-page .group.min-w-0,.verdant-shop-page .group.min-w-0 > .relative > a > div,.verdant-shop-page .group.min-w-0 > .relative > a > div::after,.verdant-shop-page .group.min-w-0 > .relative > button,.verdant-shop-page .group.min-w-0 > .pt-4,.verdant-shop-page .group.min-w-0 > .pt-4 h3,.verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > a,.verdant-shop-page .group.min-w-0 > .pt-4 > .mt-4 > button{transition:none !important;} }
