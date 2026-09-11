@@ -9,6 +9,7 @@ import { CartProvider } from "@/components/cart-provider";
 import HomeNavController from "@/components/home-nav-controller";
 import HomeVisualEffects from "@/components/home-visual-effects";
 import SiteUtilities from "@/components/site-utilities";
+import ShopSearchEnhancer from "@/components/shop-search-enhancer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <HomeNavController />
           <HomeVisualEffects />
           <SiteUtilities />
+          <ShopSearchEnhancer />
           {children}
         </CartProvider>
       </body>
