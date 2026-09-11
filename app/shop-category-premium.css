@@ -1,0 +1,160 @@
+/* Verdant Shop category cards — premium interaction layer. */
+.verdant-shop-page .shop-category-rail {
+  scroll-behavior: smooth;
+  scroll-padding-inline: 8px;
+}
+
+.verdant-shop-page .shop-category-card {
+  position: relative;
+  isolation: isolate;
+  transform: translateZ(0);
+  will-change: transform, box-shadow;
+  transition:
+    transform .42s cubic-bezier(.2,.72,.2,1),
+    box-shadow .42s cubic-bezier(.2,.72,.2,1),
+    border-color .3s ease,
+    background .3s ease;
+}
+
+.verdant-shop-page .shop-category-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  border: 1px solid transparent;
+  transition: border-color .3s ease, box-shadow .3s ease;
+}
+
+.verdant-shop-page .shop-category-card::after {
+  content: "↗";
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 5;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(251,252,245,.90);
+  color: #202d20;
+  font-size: 15px;
+  font-weight: 700;
+  opacity: 0;
+  transform: translateY(6px) scale(.9);
+  box-shadow: 0 8px 20px rgba(16,21,16,.14);
+  transition: opacity .28s ease, transform .34s cubic-bezier(.2,.72,.2,1), background .28s ease;
+}
+
+.verdant-shop-page .shop-category-card:hover {
+  transform: translateY(-7px) scale(1.012);
+  box-shadow: 0 24px 48px rgba(32,45,32,.14);
+  border-color: rgba(16,21,16,.16);
+}
+
+.verdant-shop-page .shop-category-card:hover::after,
+.verdant-shop-page .shop-category-card:focus-visible::after {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.verdant-shop-page .shop-category-card:hover::before,
+.verdant-shop-page .shop-category-card:focus-visible::before {
+  border-color: rgba(221,242,122,.42);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.32);
+}
+
+.verdant-shop-page .shop-category-card.active {
+  transform: translateY(-3px);
+  border-color: #202d20;
+  box-shadow: 0 18px 40px rgba(32,45,32,.14), 0 0 0 3px rgba(221,242,122,.28);
+}
+
+.verdant-shop-page .shop-category-card.active::before {
+  border-color: rgba(221,242,122,.72);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.22);
+}
+
+.verdant-shop-page .shop-category-card.active::after {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  background: #ddf27a;
+}
+
+.verdant-shop-page .shop-category-photo {
+  transition: background .35s ease;
+}
+
+.verdant-shop-page .shop-category-photo img {
+  transform: scale(1.001);
+  transition: transform .75s cubic-bezier(.2,.72,.2,1), filter .45s ease;
+}
+
+.verdant-shop-page .shop-category-card:hover .shop-category-photo img,
+.verdant-shop-page .shop-category-card:focus-visible .shop-category-photo img {
+  transform: scale(1.075);
+  filter: saturate(1.05) contrast(1.02);
+}
+
+.verdant-shop-page .shop-category-card.active .shop-category-photo img {
+  transform: scale(1.045);
+}
+
+.verdant-shop-page .shop-category-copy {
+  position: relative;
+  padding-right: 42px;
+}
+
+.verdant-shop-page .shop-category-copy strong {
+  transform: translateX(0);
+  transition: transform .3s cubic-bezier(.2,.72,.2,1), letter-spacing .3s ease;
+}
+
+.verdant-shop-page .shop-category-card:hover .shop-category-copy strong,
+.verdant-shop-page .shop-category-card:focus-visible .shop-category-copy strong {
+  transform: translateX(2px);
+  letter-spacing: -.025em;
+}
+
+.verdant-shop-page .shop-category-copy span {
+  transition: color .3s ease, transform .3s cubic-bezier(.2,.72,.2,1);
+}
+
+.verdant-shop-page .shop-category-card:hover .shop-category-copy span,
+.verdant-shop-page .shop-category-card:focus-visible .shop-category-copy span {
+  color: rgba(16,21,16,.64);
+  transform: translateX(2px);
+}
+
+.verdant-shop-page .shop-category-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(221,242,122,.24), 0 18px 40px rgba(32,45,32,.12);
+}
+
+@media (max-width: 760px) {
+  .verdant-shop-page .shop-category-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px rgba(32,45,32,.11);
+  }
+
+  .verdant-shop-page .shop-category-card::after {
+    width: 27px;
+    height: 27px;
+    right: 10px;
+    bottom: 10px;
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .verdant-shop-page .shop-category-card,
+  .verdant-shop-page .shop-category-card::before,
+  .verdant-shop-page .shop-category-card::after,
+  .verdant-shop-page .shop-category-photo img,
+  .verdant-shop-page .shop-category-copy strong,
+  .verdant-shop-page .shop-category-copy span {
+    transition-duration: .01ms !important;
+  }
+}
