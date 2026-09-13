@@ -1,32 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "@/components/cart-provider";
 
 export default function ShopCartToast() {
   const { itemCount } = useCart();
   const [visible, setVisible] = useState(false);
-  const previousCount = useRef(itemCount);
-  const firstRender = useRef(true);
 
   useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-      previousCount.current = itemCount;
-      return;
-    }
+    const handleCartAdd = () => {
+      setVisible(true);
+      const timeout = window.setTimeout(() => setVisible(false), 2200);
+      return () => window.clearTimeout(timeout);
+    };
 
-    if (itemCount <= previousCount.current) {
-      previousCount.current = itemCount;
-      return;
-    }
-
-    previousCount.current = itemCount;
-    setVisible(true);
-
-    const timeout = window.setTimeout(() => setVisible(false), 2200);
-    return () => window.clearTimeout(timeout);
-  }, [itemCount]);
+    window.addEventListener("verdant-cart-add", handleCartAdd);
+    return () => window.removeEventListener("verdant-cart-add", handleCartAdd);
+  }, []);
 
   return (
     <div
