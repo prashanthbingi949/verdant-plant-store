@@ -1,0 +1,150 @@
+/* Verdant premium experience layer. Shared, lightweight, reduced-motion aware. */
+
+:root {
+  --vd-ink: #101510;
+  --vd-forest: #202d20;
+  --vd-forest-deep: #101510;
+  --vd-cream: #f4f5e9;
+  --vd-sage: #e3ead7;
+  --vd-lime: #ddf27a;
+  --vd-line: rgba(16, 21, 16, .1);
+  --vd-muted: rgba(16, 21, 16, .56);
+}
+
+html { scroll-behavior: smooth; }
+body { background: var(--vd-cream); color: var(--vd-ink); }
+::selection { background: var(--vd-lime); color: var(--vd-ink); }
+
+/* Page chrome gets a quieter, more editorial feel while retaining the existing layout. */
+.verdant-site,
+.verdant-shop-page,
+.verdant-favorites-page,
+.vd-pdp {
+  isolation: isolate;
+}
+
+/* Scroll reveal is attached by components/verdant-premium-motion.tsx. */
+.vd-premium-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .7s cubic-bezier(.2,.75,.2,1), transform .7s cubic-bezier(.2,.75,.2,1);
+  will-change: opacity, transform;
+}
+.vd-premium-reveal.is-visible { opacity: 1; transform: none; }
+
+/* Product cards: tactile, editorial, but deliberately restrained. */
+.product-card,
+.verdant-favorite-card,
+.vd-pdp .vd-related-card,
+.shop-category-card {
+  transform: translateZ(0);
+  transition: transform .32s cubic-bezier(.2,.75,.2,1), box-shadow .32s ease, border-color .32s ease;
+}
+
+.product-card:hover { transform: translateY(-5px); }
+.product-card .product-image {
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow .35s ease, border-color .35s ease;
+}
+.product-card .product-image::after {
+  content: "";
+  position: absolute;
+  inset: auto 12% 5% 12%;
+  height: 16%;
+  pointer-events: none;
+  background: radial-gradient(ellipse, rgba(16,21,16,.12), transparent 68%);
+  filter: blur(14px);
+  opacity: .55;
+  transform: translateY(5px);
+  transition: opacity .35s ease, transform .35s ease;
+}
+.product-card:hover .product-image::after { opacity: .8; transform: translateY(1px); }
+.product-card .product-buy button,
+.product-card .wish,
+.verdant-favorite-buy button {
+  transition: transform .2s ease, background-color .2s ease, box-shadow .2s ease;
+}
+.product-card .product-buy button:hover,
+.verdant-favorite-buy button:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(32,45,32,.12); }
+.product-card .wish:hover { transform: scale(1.05); }
+.product-card .wish.is-liked { background: var(--vd-forest); color: var(--vd-lime); }
+
+/* Homepage category cards feel more like editorial tiles. */
+.premium-category-card { overflow: hidden; border-radius: 28px; }
+.premium-category-card .premium-category-image { overflow: hidden; }
+.premium-category-card .premium-category-image img { transition: transform .85s cubic-bezier(.2,.7,.2,1), filter .5s ease; }
+.premium-category-card:hover .premium-category-image img { transform: scale(1.055); filter: saturate(1.04) contrast(1.02); }
+
+/* Shared premium buttons. */
+.button,
+.vd-pdp .vd-add,
+.vd-pdp .vd-bag,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Product-detail page becomes a more deliberate editorial layout. */
+@media (min-width: 981px) {
+  .vd-pdp .vd-pdp-hero-content {
+    position: sticky;
+    top: 96px;
+    align-self: start;
+    padding-top: 28px;
+  }
+}
+.vd-pdp .vd-gallery,
+.vd-pdp .vd-buy-box {
+  transition: box-shadow .35s ease, transform .35s ease, border-color .35s ease;
+}
+.vd-pdp .vd-gallery:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 30px 82px rgba(32,45,32,.1);
+}
+.vd-pdp .vd-related-card:hover { box-shadow: 0 20px 46px rgba(32,45,32,.12); }
+.vd-pdp .vd-section-dark { position: relative; overflow: hidden; }
+.vd-pdp .vd-section-dark::before {
+  content: "";
+  position: absolute;
+  width: 38vw;
+  height: 38vw;
+  right: -18vw;
+  top: -20vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(221,242,122,.11), transparent 68%);
+  pointer-events: none;
+}
+
+/* Shop search feels like a command surface. */
+.verdant-shop-page .shop-search {
+  transition: box-shadow .3s ease, border-color .3s ease, transform .25s ease;
+}
+.verdant-shop-page .shop-search:focus { transform: translateY(-1px); }
+
+/* Order/checkout blocks gain just enough depth to feel intentionally designed. */
+.vd-wow-product,
+.verdant-favorite-card,
+.verdant-cart-toast,
+.verdant-free-delivery,
+.checkout-polish-summary,
+.checkout-polish-section {
+  transform: translateZ(0);
+}
+
+/* Keep mobile calm: no sticky P​​DP content and no excessive hover transforms. */
+@media (max-width: 680px) {
+  .vd-pdp .vd-pdp-hero-content { position: static; }
+  .product-card:hover,
+  .premium-category-card:hover { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .vd-premium-reveal { opacity: 1; transform: none; }
+}
