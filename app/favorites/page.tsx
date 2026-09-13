@@ -50,6 +50,7 @@ export default function FavoritesPage() {
   const { addItem } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [added, setAdded] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const sync = () => setFavorites(readFavorites());
@@ -72,6 +73,24 @@ export default function FavoritesPage() {
     setFavorites(next);
     window.localStorage.setItem(FAV_KEY, JSON.stringify(next));
     window.dispatchEvent(new CustomEvent("verdant-favorites-change"));
+  };
+
+  const addToCart = (product: Product, image: string | undefined) => {
+    if (product.stock < 1) return;
+    addItem({
+      id: product.slug,
+      name: product.name,
+      price: Number(product.price),
+      tone: product.tone,
+      size: product.size,
+      category: product.category,
+      image_url: image || null,
+    }, 1);
+    window.dispatchEvent(new CustomEvent("verdant-cart-change", { detail: { id: product.slug, name: product.name } }));
+    setAdded((current) => ({ ...current, [product.slug]: true }));
+    window.setTimeout(() => {
+      setAdded((current) => ({ ...current, [product.slug]: false }));
+    }, 1400);
   };
 
   return (
@@ -97,7 +116,10 @@ export default function FavoritesPage() {
         .verdant-favorite-meta h2{font-size:16px;line-height:1.08;margin:0;}
         .verdant-favorite-buy{display:flex;flex-direction:column;align-items:flex-end;gap:7px;}
         .verdant-favorite-buy strong{font-size:14px;}
-        .verdant-favorite-buy button{border-radius:999px;background:#202d20;color:#f4f5e9;padding:8px 11px;font-size:9px;font-weight:800;}
+        .verdant-favorite-buy button{border-radius:999px;background:#202d20;color:#f4f5e9;padding:8px 11px;font-size:9px;font-weight:800;cursor:pointer;transition:.2s ease;min-width:56px;}
+        .verdant-favorite-buy button:hover:not(:disabled){transform:translateY(-1px);background:#101510;}
+        .verdant-favorite-buy button.added{background:#ddf27a;color:#101510;}
+        .verdant-favorite-buy button:disabled{opacity:.45;cursor:not-allowed;}
         .verdant-favorites-empty{border:1px dashed rgba(16,21,16,.16);border-radius:28px;padding:55px 20px;text-align:center;color:rgba(16,21,16,.58);}
         .verdant-dark .verdant-favorites-page{background:#101510;color:#f4f5e9;}
         .verdant-dark .verdant-favorites-links a{border-color:rgba(244,245,233,.14);color:#f4f5e9;}
@@ -125,6 +147,7 @@ export default function FavoritesPage() {
           <div className="verdant-favorites-grid">
             {items.map((product) => {
               const image = product.image_url || product.image_urls?.[0] || fallbackImages[product.slug];
+              const isAdded = Boolean(added[product.slug]);
               return (
                 <article key={product.slug} className="verdant-favorite-card">
                   <div className="verdant-favorite-image">
@@ -135,7 +158,10 @@ export default function FavoritesPage() {
                   </div>
                   <div className="verdant-favorite-meta">
                     <div><small>{product.category} · {product.level}</small><h2>{product.name}</h2></div>
-                    <div className="verdant-favorite-buy"><strong>₹{Number(product.price).toLocaleString("en-IN")}</strong><button type="button" onClick={() => addItem({ id: product.slug, name: product.name, price: Number(product.price), quantity: 1, tone: product.tone, size: product.size, category: product.category, image_url: image || null }, 1)}>Add +</button></div>
+                    <div className="verdant-favorite-buy">
+                      <strong>₹{Number(product.price).toLocaleString("en-IN")}</strong>
+                      <button type="button" disabled={product.stock < 1} className={isAdded ? "added" : ""} onClick={() => addToCart(product, image)}>{product.stock < 1 ? "Sold out" : isAdded ? "Added ✓" : "Add +"}</button>
+                    </div>
                   </div>
                 </article>
               );
