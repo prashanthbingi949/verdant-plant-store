@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { useCart } from "@/components/cart-provider";
+import VerdantCartRecommendations from "@/components/verdant-cart-recommendations";
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, clearCart, subtotal, delivery, total, itemCount } = useCart();
@@ -82,6 +83,8 @@ export default function CartPage() {
                 </article>
               ))}
             </div>
+
+            <VerdantCartRecommendations />
 
             <div className="vd-cart-bottom-note"><div className="vd-cart-note-card"><strong>Easy delivery</strong><span>Free over ₹1,499.</span></div><div className="vd-cart-note-card"><strong>Secure payment</strong><span>Razorpay handles checkout.</span></div><div className="vd-cart-note-card"><strong>Curated greens</strong><span>Picked to feel good together.</span></div></div>
           </div>
