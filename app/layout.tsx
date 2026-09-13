@@ -10,11 +10,13 @@ import "./shop-grid-density.css";
 import "./shop-cart-toast.css";
 import "./product-detail-visual-polish.css";
 import "./checkout-polish.css";
+import "./verdant-premium.css";
 import { CartProvider } from "@/components/cart-provider";
 import HomeNavController from "@/components/home-nav-controller";
 import HomeVisualEffects from "@/components/home-visual-effects";
 import SiteUtilities from "@/components/site-utilities";
 import HomeWishlistPersistence from "@/components/home-wishlist-persistence";
+import VerdantPremiumMotion from "@/components/verdant-premium-motion";
 import ShopSearchEnhancer from "@/components/shop-search-enhancer";
 import ShopCartToast from "@/components/shop-cart-toast";
 import MiniCartDrawer from "@/components/mini-cart-drawer";
@@ -55,6 +57,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <HomeVisualEffects />
           <SiteUtilities />
           <HomeWishlistPersistence />
+          <VerdantPremiumMotion />
           <ShopSearchEnhancer />
           <ShopCartToast />
           <MiniCartDrawer />
