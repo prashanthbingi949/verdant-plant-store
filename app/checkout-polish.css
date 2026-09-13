@@ -1,0 +1,32 @@
+/* Verdant checkout refinement: keep the order summary readable and available on desktop without creating a second page scrollbar. */
+@media (min-width: 901px) {
+  .vd-checkout-summary {
+    max-height: calc(100vh - 112px);
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .vd-checkout-summary::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .vd-checkout {
+    padding-bottom: 92px;
+  }
+
+  .vd-checkout-mobile-bar {
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vd-checkout-submit:hover:not(:disabled) {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
