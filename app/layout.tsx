@@ -10,6 +10,7 @@ import "./shop-grid-density.css";
 import "./shop-cart-toast.css";
 import "./product-detail-visual-polish.css";
 import "./checkout-polish.css";
+import "./checkout-experience.css";
 import "./verdant-premium.css";
 import "./verdant-discovery.css";
 import "./verdant-cart-recommendations.css";
