@@ -14,6 +14,7 @@ import { CartProvider } from "@/components/cart-provider";
 import HomeNavController from "@/components/home-nav-controller";
 import HomeVisualEffects from "@/components/home-visual-effects";
 import SiteUtilities from "@/components/site-utilities";
+import HomeWishlistPersistence from "@/components/home-wishlist-persistence";
 import ShopSearchEnhancer from "@/components/shop-search-enhancer";
 import ShopCartToast from "@/components/shop-cart-toast";
 import MiniCartDrawer from "@/components/mini-cart-drawer";
@@ -53,6 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <HomeNavController />
           <HomeVisualEffects />
           <SiteUtilities />
+          <HomeWishlistPersistence />
           <ShopSearchEnhancer />
           <ShopCartToast />
           <MiniCartDrawer />
