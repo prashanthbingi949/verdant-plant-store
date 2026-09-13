@@ -31,8 +31,9 @@
 
 /* The Shop-only discovery launcher gets its own premium corner and avoids the dev badge. */
 .vd-wow-launcher { left:auto !important; right:20px !important; }
-/* The new Checkout page has its own delivery progress; avoid the old global duplicate there. */
-body:has(.vd-checkout) .vd-wow-free { display:none !important; }
+
+/* Remove the legacy global delivery strip. Cart and checkout have their own delivery progress. */
+.vd-wow-free { display:none !important; }
 
 /* Keep overlay scrolling fully functional while hiding native scrollbars. */
 .vd-wow-modal,
