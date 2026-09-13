@@ -9,13 +9,26 @@
   --vd-lime: #ddf27a;
   --vd-line: rgba(16, 21, 16, .1);
   --vd-muted: rgba(16, 21, 16, .56);
+  --vd-scroll-progress: 0;
 }
 
 html { scroll-behavior: smooth; }
 body { background: var(--vd-cream); color: var(--vd-ink); }
 ::selection { background: var(--vd-lime); color: var(--vd-ink); }
 
-/* Page chrome gets a quieter, more editorial feel while retaining the existing layout. */
+/* A quiet progress hairline makes long editorial pages feel alive without adding chrome. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 auto auto 0;
+  width: calc(var(--vd-scroll-progress) * 100%);
+  height: 2px;
+  z-index: 2000;
+  background: var(--vd-lime);
+  pointer-events: none;
+  transform-origin: left center;
+}
+
 .verdant-site,
 .verdant-shop-page,
 .verdant-favorites-page,
@@ -26,65 +39,98 @@ body { background: var(--vd-cream); color: var(--vd-ink); }
 /* Scroll reveal is attached by components/verdant-premium-motion.tsx. */
 .vd-premium-reveal {
   opacity: 0;
-  transform: translateY(18px);
-  transition: opacity .7s cubic-bezier(.2,.75,.2,1), transform .7s cubic-bezier(.2,.75,.2,1);
+  transform: translateY(22px) scale(.992);
+  transition: opacity .72s cubic-bezier(.2,.75,.2,1), transform .72s cubic-bezier(.2,.75,.2,1);
+  transition-delay: calc(var(--vd-reveal-delay, 0) * 55ms);
   will-change: opacity, transform;
 }
+.vd-premium-reveal[data-vd-reveal-delay="0"] { --vd-reveal-delay: 0; }
+.vd-premium-reveal[data-vd-reveal-delay="1"] { --vd-reveal-delay: 1; }
+.vd-premium-reveal[data-vd-reveal-delay="2"] { --vd-reveal-delay: 2; }
+.vd-premium-reveal[data-vd-reveal-delay="3"] { --vd-reveal-delay: 3; }
+.vd-premium-reveal[data-vd-reveal-delay="4"] { --vd-reveal-delay: 4; }
+.vd-premium-reveal[data-vd-reveal-delay="5"] { --vd-reveal-delay: 5; }
 .vd-premium-reveal.is-visible { opacity: 1; transform: none; }
 
-/* Product cards: tactile, editorial, but deliberately restrained. */
+/* Product cards: more tactile, with a subtle “object on a surface” feel. */
 .product-card,
 .verdant-favorite-card,
 .vd-pdp .vd-related-card,
 .shop-category-card {
   transform: translateZ(0);
-  transition: transform .32s cubic-bezier(.2,.75,.2,1), box-shadow .32s ease, border-color .32s ease;
+  transition: transform .36s cubic-bezier(.2,.75,.2,1), box-shadow .36s ease, border-color .36s ease;
 }
 
-.product-card:hover { transform: translateY(-5px); }
+.product-card { position: relative; }
+.product-card::after {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: -7px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(16,21,16,.10);
+  filter: blur(14px);
+  opacity: 0;
+  transform: scale(.82);
+  transition: opacity .4s ease, transform .4s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+.product-card:hover { transform: translateY(-7px); }
+.product-card:hover::after { opacity: .72; transform: scale(1); }
 .product-card .product-image {
   position: relative;
   overflow: hidden;
-  transition: box-shadow .35s ease, border-color .35s ease;
+  transition: box-shadow .35s ease, border-color .35s ease, background-color .35s ease;
 }
 .product-card .product-image::after {
   content: "";
   position: absolute;
-  inset: auto 12% 5% 12%;
-  height: 16%;
+  inset: auto 9% 3% 9%;
+  height: 18%;
   pointer-events: none;
-  background: radial-gradient(ellipse, rgba(16,21,16,.12), transparent 68%);
-  filter: blur(14px);
-  opacity: .55;
-  transform: translateY(5px);
-  transition: opacity .35s ease, transform .35s ease;
+  background: radial-gradient(ellipse, rgba(16,21,16,.13), transparent 68%);
+  filter: blur(15px);
+  opacity: .45;
+  transform: translateY(6px) scale(.92);
+  transition: opacity .4s ease, transform .4s ease;
 }
-.product-card:hover .product-image::after { opacity: .8; transform: translateY(1px); }
+.product-card:hover .product-image::after { opacity: .82; transform: translateY(0) scale(1); }
 .product-card .product-buy button,
 .product-card .wish,
 .verdant-favorite-buy button {
-  transition: transform .2s ease, background-color .2s ease, box-shadow .2s ease;
+  transition: transform .22s cubic-bezier(.2,.75,.2,1), background-color .22s ease, box-shadow .22s ease;
 }
 .product-card .product-buy button:hover,
-.verdant-favorite-buy button:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(32,45,32,.12); }
-.product-card .wish:hover { transform: scale(1.05); }
-.product-card .wish.is-liked { background: var(--vd-forest); color: var(--vd-lime); }
+.verdant-favorite-buy button:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(32,45,32,.13); }
+.product-card .wish:hover { transform: scale(1.07) rotate(-2deg); }
+.product-card .wish.is-liked { background: var(--vd-forest); color: var(--vd-lime); box-shadow: 0 9px 24px rgba(32,45,32,.16); }
 
-/* Homepage category cards feel more like editorial tiles. */
+/* Homepage category cards become editorial tiles rather than static image blocks. */
 .premium-category-card { overflow: hidden; border-radius: 28px; }
 .premium-category-card .premium-category-image { overflow: hidden; }
-.premium-category-card .premium-category-image img { transition: transform .85s cubic-bezier(.2,.7,.2,1), filter .5s ease; }
-.premium-category-card:hover .premium-category-image img { transform: scale(1.055); filter: saturate(1.04) contrast(1.02); }
+.premium-category-card .premium-category-image img { transition: transform .9s cubic-bezier(.2,.7,.2,1), filter .5s ease; }
+.premium-category-card:hover .premium-category-image img { transform: scale(1.06); filter: saturate(1.05) contrast(1.025); }
+.premium-category-card .premium-category-copy { transition: transform .35s ease; }
+.premium-category-card:hover .premium-category-copy { transform: translateY(-2px); }
 
-/* Shared premium buttons. */
+/* Buttons feel physical, not generic. */
 .button,
 .vd-pdp .vd-add,
-.vd-pdp .vd-bag,
-button {
+.vd-pdp .vd-bag {
   -webkit-tap-highlight-color: transparent;
+  transition: transform .24s cubic-bezier(.2,.75,.2,1), box-shadow .24s ease, background-color .24s ease;
 }
+.button:hover,
+.vd-pdp .vd-add:hover:not(:disabled),
+.vd-pdp .vd-bag:hover { transform: translateY(-2px); }
+.button:active,
+.vd-pdp .vd-add:active,
+.vd-pdp .vd-bag:active { transform: translateY(0) scale(.985); }
 
-/* Product-detail page becomes a more deliberate editorial layout. */
+/* Product-detail page becomes a deliberately editorial layout. */
 @media (min-width: 981px) {
   .vd-pdp .vd-pdp-hero-content {
     position: sticky;
@@ -95,13 +141,13 @@ button {
 }
 .vd-pdp .vd-gallery,
 .vd-pdp .vd-buy-box {
-  transition: box-shadow .35s ease, transform .35s ease, border-color .35s ease;
+  transition: box-shadow .4s ease, transform .4s cubic-bezier(.2,.75,.2,1), border-color .35s ease;
 }
 .vd-pdp .vd-gallery:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 30px 82px rgba(32,45,32,.1);
+  transform: translateY(-4px);
+  box-shadow: 0 34px 88px rgba(32,45,32,.12);
 }
-.vd-pdp .vd-related-card:hover { box-shadow: 0 20px 46px rgba(32,45,32,.12); }
+.vd-pdp .vd-related-card:hover { box-shadow: 0 22px 50px rgba(32,45,32,.13); transform: translateY(-5px); }
 .vd-pdp .vd-section-dark { position: relative; overflow: hidden; }
 .vd-pdp .vd-section-dark::before {
   content: "";
@@ -115,13 +161,30 @@ button {
   pointer-events: none;
 }
 
-/* Shop search feels like a command surface. */
+/* Shop search feels like a polished command surface. */
 .verdant-shop-page .shop-search {
   transition: box-shadow .3s ease, border-color .3s ease, transform .25s ease;
 }
-.verdant-shop-page .shop-search:focus { transform: translateY(-1px); }
+.verdant-shop-page .shop-search:focus,
+.verdant-shop-page .shop-search.is-search-focused {
+  transform: translateY(-2px);
+}
 
-/* Order/checkout blocks gain just enough depth to feel intentionally designed. */
+.verdant-search-panel {
+  backdrop-filter: blur(20px) saturate(120%);
+}
+.verdant-search-suggestion:active { transform: scale(.985); }
+
+/* Let product imagery gently breathe instead of feeling glued to a rectangle. */
+.product-card .product-image img,
+.verdant-favorite-card img,
+.vd-pdp .vd-pdp-main-image,
+.vd-pdp .vd-related-image img {
+  transition: transform .7s cubic-bezier(.2,.7,.2,1), filter .5s ease;
+}
+.product-card:hover .product-image img { transform: scale(1.035) translateY(-2px); }
+
+/* Commerce blocks keep enough depth without becoming dashboards. */
 .vd-wow-product,
 .verdant-favorite-card,
 .verdant-cart-toast,
@@ -131,11 +194,12 @@ button {
   transform: translateZ(0);
 }
 
-/* Keep mobile calm: no sticky P​​DP content and no excessive hover transforms. */
 @media (max-width: 680px) {
   .vd-pdp .vd-pdp-hero-content { position: static; }
   .product-card:hover,
-  .premium-category-card:hover { transform: none; }
+  .premium-category-card:hover,
+  .vd-pdp .vd-related-card:hover { transform: none; }
+  .product-card::after { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -146,5 +210,6 @@ button {
     transition-duration: .01ms !important;
     scroll-behavior: auto !important;
   }
+  body::before { display: none; }
   .vd-premium-reveal { opacity: 1; transform: none; }
 }
