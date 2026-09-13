@@ -23,6 +23,12 @@ type Product = {
   image_urls?: string[];
 };
 
+type CartSignal = {
+  id: string;
+  category: string;
+  size: string;
+};
+
 const fallbackImages: Record<string, string> = {
   "monstera-deliciosa": "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=900&q=86",
   "snake-plant": "https://images.unsplash.com/photo-1611211232932-da3113c5b960?auto=format&fit=crop&w=900&q=86",
@@ -32,28 +38,72 @@ const fallbackImages: Record<string, string> = {
   lavender: "https://images.unsplash.com/photo-1451336819701-5a83f6534292?auto=format&fit=crop&w=900&q=86",
   "fiddle-leaf-fig": "https://images.unsplash.com/photo-1517191434949-5e90cd67d2b6?auto=format&fit=crop&w=900&q=86",
   "aloe-vera": "https://images.unsplash.com/photo-1513360994626-fc3639d1cc82?auto=format&fit=crop&w=900&q=86",
+  "tools-equipment": "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=900&q=86",
+  "pots-planters": "https://images.unsplash.com/photo-1485955900006-10f4d324a811?auto=format&fit=crop&w=900&q=86",
+  "soil-growing-media": "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=900&q=86",
 };
 
-function imageFor(product: Product) {
-  return product.image_url || product.image_urls?.[0] || fallbackImages[product.slug] || null;
+function normalise(value?: string | null) {
+  return (value || "").trim().toLowerCase();
 }
 
-function recommendationScore(product: Product, cartItems: { category: string; subcategory?: string; id: string }[]) {
-  const categories = cartItems.map((item) => item.category.toLowerCase());
-  const subcategories = cartItems.map((item) => (item.subcategory || "").toLowerCase());
-  const haystack = `${product.name} ${product.category} ${product.subcategory || ""} ${product.description}`.toLowerCase();
+function imageFor(product: Product) {
+  const configured = product.image_url || product.image_urls?.[0];
+  if (configured) {
+    const marker = configured.toLowerCase();
+    if (!/placeholder|default-image|image-not-found|no-image/.test(marker)) return configured;
+  }
+
+  const category = normalise(product.category);
+  const categoryKey = category.includes("tool") ? "tools-equipment" : category.includes("pot") || category.includes("planter") ? "pots-planters" : category.includes("soil") || category.includes("growing") ? "soil-growing-media" : product.slug;
+  return fallbackImages[categoryKey] || fallbackImages[product.slug] || null;
+}
+
+function recommendationScore(product: Product, cartItems: CartSignal[]) {
+  const cartCategories = cartItems.map((item) => normalise(item.category));
+  const haystack = normalise(`${product.name} ${product.category} ${product.subcategory || ""} ${product.description}`);
+  const candidateCategory = normalise(product.category);
+  const isPlant = product.product_type !== "Gardening Supplies" && /plant|succulent|cacti|flower|green/.test(`${candidateCategory} ${haystack}`);
+  const isPot = /pot|planter/.test(haystack);
+  const isSoil = /soil|growing media/.test(haystack);
+  const isNutrient = /fertil|nutrient/.test(haystack);
+  const isTool = /tool|trowel|water|pruner|trellis/.test(haystack);
+  const isSupply = product.product_type === "Gardening Supplies" || !isPlant;
+
   let score = Number(product.featured) || 0;
 
-  if (subcategories.some((value) => value && haystack.includes(value))) score += 7;
-  if (categories.some((value) => value && haystack.includes(value))) score += 5;
+  // Prefer genuine complements instead of recommending three products from the same aisle.
+  if (cartCategories.some((value) => /indoor|succulent|cacti|outdoor|flower|plant/.test(value))) {
+    if (isPot) score += 12;
+    if (isSoil) score += 10;
+    if (isNutrient) score += 7;
+    if (isTool) score += 4;
+  }
 
-  if (categories.some((value) => /indoor/.test(value)) && /pot|planter|soil|fertil|tool/.test(haystack)) score += 6;
-  if (categories.some((value) => /succulent|cacti/.test(value)) && /pot|soil|fertil/.test(haystack)) score += 6;
-  if (categories.some((value) => /outdoor|flower/.test(value)) && /soil|fertil|tool|pot|planter/.test(haystack)) score += 6;
-  if (categories.some((value) => /pot|planter/.test(value)) && /indoor|succulent|outdoor|plant/.test(haystack)) score += 6;
-  if (categories.some((value) => /soil|growing/.test(value)) && /fertil|nutrient|indoor|succulent|outdoor/.test(haystack)) score += 5;
+  if (cartCategories.some((value) => /pot|planter/.test(value)) && isPlant) score += 13;
+  if (cartCategories.some((value) => /soil|growing/.test(value)) && (isPlant || isNutrient)) score += 11;
+  if (cartCategories.some((value) => /fertil|nutrient/.test(value)) && (isPlant || isSoil)) score += 9;
+  if (cartCategories.some((value) => /tool|trowel|water|trellis/.test(value)) && isPlant) score += 12;
+
+  // A supply-heavy bag should get a living green recommendation rather than more tools.
+  if (cartCategories.every((value) => /tool|trowel|water|trellis|equipment/.test(value)) && isPlant) score += 18;
+  if (cartCategories.every((value) => /indoor|succulent|outdoor|plant|flower|green/.test(value)) && isSupply) score += 10;
+
+  // Same exact category is only useful when the candidate fills a complementary role.
+  if (cartCategories.some((value) => value && (candidateCategory === value || haystack.includes(value)))) score -= isPlant === cartCategories.some((value) => /plant|indoor|succulent|outdoor/.test(value)) ? 5 : 2;
 
   return score;
+}
+
+function recommendationReason(product: Product, cartItems: CartSignal[]) {
+  const categories = cartItems.map((item) => normalise(item.category));
+  const haystack = normalise(`${product.name} ${product.category} ${product.subcategory || ""}`);
+  if (categories.some((value) => /pot|planter/.test(value)) && /plant|succulent|outdoor|indoor/.test(haystack)) return "A natural companion for your planter";
+  if (categories.some((value) => /tool|trowel|water|trellis|equipment/.test(value)) && /plant|succulent|outdoor|indoor/.test(haystack)) return "A little life to go with the kit";
+  if (categories.some((value) => /plant|indoor|succulent|outdoor|flower/.test(value)) && /pot|planter/.test(haystack)) return "Gives your plant a home";
+  if (categories.some((value) => /plant|indoor|succulent|outdoor|flower/.test(value)) && /soil|growing/.test(haystack)) return "Useful for the next growing cycle";
+  if (categories.some((value) => /plant|indoor|succulent|outdoor|flower/.test(value)) && /fertil|nutrient/.test(haystack)) return "A care essential for healthy growth";
+  return "Picked to complement your bag";
 }
 
 export default function VerdantCartRecommendations() {
@@ -73,12 +123,24 @@ export default function VerdantCartRecommendations() {
 
   const recommendations = useMemo(() => {
     const ids = new Set(items.map((item) => item.id));
-    return products
+    const signals = items.map((item) => ({ id: item.id, category: item.category, size: item.size }));
+
+    const ranked = products
       .filter((product) => !ids.has(product.slug))
-      .map((product) => ({ product, score: recommendationScore(product, items) }))
-      .sort((a, b) => b.score - a.score || Number(a.product.price) - Number(b.product.price))
-      .slice(0, 3)
-      .map(({ product }) => product);
+      .map((product) => ({ product, score: recommendationScore(product, signals) }))
+      .sort((a, b) => b.score - a.score || Number(a.product.price) - Number(b.product.price));
+
+    const picked: Product[] = [];
+    const categoryCounts = new Map<string, number>();
+    for (const entry of ranked) {
+      const key = normalise(entry.product.category);
+      const count = categoryCounts.get(key) || 0;
+      if (count >= 2) continue;
+      picked.push(entry.product);
+      categoryCounts.set(key, count + 1);
+      if (picked.length === 3) break;
+    }
+    return picked;
   }, [items, products]);
 
   if (!items.length || !recommendations.length) return null;
@@ -114,12 +176,12 @@ export default function VerdantCartRecommendations() {
           return (
             <article key={product.slug} className="vd-cart-rec-card">
               <Link href={`/shop/${product.slug}`} className="vd-cart-rec-image">
-                {image ? <img src={image} alt={product.name} loading="lazy" /> : <span />}
+                {image ? <img src={image} alt={product.name} loading="lazy" /> : <span className="vd-cart-rec-placeholder" aria-hidden="true">VERDANT</span>}
               </Link>
               <div className="vd-cart-rec-copy">
                 <p>{product.subcategory || product.category}</p>
                 <Link href={`/shop/${product.slug}`}><h3>{product.name}</h3></Link>
-                <span>{product.size} · {product.level}</span>
+                <span className="vd-cart-rec-reason">{recommendationReason(product, items)}</span>
                 <div className="vd-cart-rec-foot">
                   <strong>₹{Number(product.price).toLocaleString("en-IN")}</strong>
                   <button type="button" onClick={() => add(product)}>{added === product.slug ? "Added ✓" : "Add"}</button>
