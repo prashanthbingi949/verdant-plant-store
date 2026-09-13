@@ -69,7 +69,7 @@ export default function OrderConfirmationPage() {
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#ddf27a] text-2xl">✓</div>
           <p className="mt-7 text-[10px] font-bold tracking-[.2em] text-black/45">ORDER CONFIRMED</p>
           <h1 className="mt-4 text-5xl font-semibold tracking-[-.055em] sm:text-6xl">Thank you{order.customer_name ? `, ${order.customer_name.split(" ")[0]}` : ""}.</h1>
-          <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-black/55">Your payment has been verified and your order is safely recorded. We've also sent a confirmation email to {order.email || "your email address"}.</p>
+          <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-black/55">Your payment has been verified and your order is safely recorded. Your order details and tracking link are below.</p>
         </div>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-3">
