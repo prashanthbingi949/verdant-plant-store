@@ -34,6 +34,19 @@
 /* The new Checkout page has its own delivery progress; avoid the old global duplicate there. */
 body:has(.vd-checkout) .vd-wow-free { display:none !important; }
 
+/* Keep overlay scrolling fully functional while hiding native scrollbars. */
+.vd-wow-modal,
+aside[aria-hidden] > div.flex-1.overflow-y-auto {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.vd-wow-modal::-webkit-scrollbar,
+aside[aria-hidden] > div.flex-1.overflow-y-auto::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
 @media (max-width:760px) {
   .verdant-cart-toast { bottom:18px; min-width:0; width:calc(100vw - 32px); }
   .vd-wow-launcher { left:auto !important; right:12px !important; bottom:12px !important; }
