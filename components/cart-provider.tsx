@@ -38,31 +38,39 @@ function addOrIncrementCartItem(current: CartItem[], item: Omit<CartItem, "quant
   return [...current, { ...item, quantity }];
 }
 
+function readStoredCart(): CartItem[] {
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    if (!stored) return [];
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-      if (stored) setItems(JSON.parse(stored));
-    } catch {
-      setItems([]);
-    } finally {
-      setReady(true);
-    }
+    const stored = readStoredCart();
+    setItems((current) => {
+      if (!current.length) return stored;
+      return stored.reduce((merged, item) => addOrIncrementCartItem(merged, item, item.quantity), current);
+    });
+    setReady(true);
   }, []);
 
   useEffect(() => {
     if (!ready) return;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    window.dispatchEvent(new CustomEvent("verdant-cart-change", { detail: { items } }));
   }, [items, ready]);
 
   // The discovery modal is rendered globally and its Add + buttons can be
   // clicked while the modal is sitting above the catalogue. Handle those
   // buttons at the cart-provider level as a defensive, DOM-level fallback.
-  // This guarantees the discovery recommendations use the same cart state as
-  // the rest of the store, even if a nested interaction is interrupted.
   useEffect(() => {
     const handleDiscoveryAdd = (event: Event) => {
       const mouseEvent = event as MouseEvent;
@@ -96,7 +104,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       };
 
       setItems((current) => addOrIncrementCartItem(current, item, 1));
-      window.dispatchEvent(new CustomEvent("verdant-cart-change", { detail: { id: slug, name } }));
 
       const originalLabel = button.textContent || "Add +";
       button.textContent = "Added ✓";
