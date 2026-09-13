@@ -104,6 +104,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       };
 
       setItems((current) => addOrIncrementCartItem(current, item, 1));
+      window.dispatchEvent(new CustomEvent("verdant-cart-add", { detail: { id: slug, name } }));
 
       const originalLabel = button.textContent || "Add +";
       button.textContent = "Added ✓";
@@ -123,7 +124,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return {
       items,
       addItem: (item, quantity = 1) => {
+        if (quantity <= 0) return;
         setItems((current) => addOrIncrementCartItem(current, item, quantity));
+        window.dispatchEvent(new CustomEvent("verdant-cart-add", { detail: { id: item.id, name: item.name, quantity } }));
       },
       removeItem: (id) => setItems((current) => current.filter((item) => item.id !== id)),
       updateQuantity: (id, quantity) =>
