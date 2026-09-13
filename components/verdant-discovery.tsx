@@ -138,10 +138,10 @@ export function FindMyPlant() {
 }
 
 const moods = [
-  { slug: "calm-corner", title: "Calm Corner", text: "Soft greens, quiet shapes and low visual noise.", tags: ["Snake Plant", "Jade Plant"], tint: "#dfe8d5" },
-  { slug: "statement-space", title: "Statement Space", text: "Big leaves and confident silhouettes with presence.", tags: ["Monstera", "Bird of Paradise"], tint: "#d4dfca" },
-  { slug: "tiny-jungle", title: "Tiny Jungle", text: "Layerable little greens for shelves and desks.", tags: ["Succulents", "String of Pearls"], tint: "#e7ead4" },
-  { slug: "sunny-balcony", title: "Sunny Balcony", text: "Bright-spot companions that love an open corner.", tags: ["Lavender", "Aloe Vera"], tint: "#e9e6cd" },
+  { slug: "calm-corner", title: "Calm Corner", text: "Soft greens, quiet shapes and low visual noise.", tags: ["Snake Plant", "Jade Plant"], tint: "#dfe8d5", category: "Indoor plants" },
+  { slug: "statement-space", title: "Statement Space", text: "Big leaves and confident silhouettes with presence.", tags: ["Monstera", "Bird of Paradise"], tint: "#d4dfca", category: "Indoor plants" },
+  { slug: "tiny-jungle", title: "Tiny Jungle", text: "Layerable little greens for shelves and desks.", tags: ["Succulents", "String of Pearls"], tint: "#e7ead4", category: "Succulents" },
+  { slug: "sunny-balcony", title: "Sunny Balcony", text: "Bright-spot companions that love an open corner.", tags: ["Lavender", "Aloe Vera"], tint: "#e9e6cd", category: "Outdoor plants" },
 ];
 
 export function ShopByMood() {
@@ -149,7 +149,7 @@ export function ShopByMood() {
     <section className="vd-mood-section">
       <div className="vd-mood-inner">
         <div className="vd-mood-head"><div><p className="vd-discovery-kicker">SHOP BY MOOD</p><h2>Choose the <em>feeling.</em></h2><p>Start with the room you want to create, then let the plants follow.</p></div><Link href="/shop" className="vd-mood-all">Browse the full shop →</Link></div>
-        <div className="vd-mood-grid">{moods.map((mood, index) => <Link key={mood.slug} href={`/shop?mood=${mood.slug}`} className="vd-mood-card" style={{ background: mood.tint }}>
+        <div className="vd-mood-grid">{moods.map((mood, index) => <Link key={mood.slug} href={`/shop?category=${encodeURIComponent(mood.category)}`} className="vd-mood-card" style={{ background: mood.tint }}>
           <span className="vd-mood-index">0{index + 1}</span><div><h3>{mood.title}</h3><p>{mood.text}</p><div className="vd-mood-tags">{mood.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div><span className="vd-mood-arrow" aria-hidden="true">↗</span>
         </Link>)}</div>
       </div>
