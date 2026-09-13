@@ -1,21 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/components/cart-provider";
 
 export default function ShopCartToast() {
   const { itemCount } = useCart();
   const [visible, setVisible] = useState(false);
+  const timeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     const handleCartAdd = () => {
       setVisible(true);
-      const timeout = window.setTimeout(() => setVisible(false), 2200);
-      return () => window.clearTimeout(timeout);
+      if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
+      timeoutRef.current = window.setTimeout(() => {
+        setVisible(false);
+        timeoutRef.current = null;
+      }, 2200);
     };
 
     window.addEventListener("verdant-cart-add", handleCartAdd);
-    return () => window.removeEventListener("verdant-cart-add", handleCartAdd);
+    return () => {
+      window.removeEventListener("verdant-cart-add", handleCartAdd);
+      if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
+    };
   }, []);
 
   return (
