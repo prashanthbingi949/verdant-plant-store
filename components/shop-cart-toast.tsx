@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { CART_ADD_EVENT } from "@/components/cart-provider";
 import { useCart } from "@/components/cart-provider";
 
 export default function ShopCartToast() {
@@ -9,7 +10,10 @@ export default function ShopCartToast() {
   const timeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const handleCartAdd = () => {
+    const handleCartAdd = (event: Event) => {
+      const detail = (event as CustomEvent<{ source?: string }>).detail;
+      if (!detail || (detail.source !== "explicit-add" && detail.source !== "discovery")) return;
+
       setVisible(true);
       if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
       timeoutRef.current = window.setTimeout(() => {
@@ -18,9 +22,9 @@ export default function ShopCartToast() {
       }, 2200);
     };
 
-    window.addEventListener("verdant-cart-add", handleCartAdd);
+    window.addEventListener(CART_ADD_EVENT, handleCartAdd);
     return () => {
-      window.removeEventListener("verdant-cart-add", handleCartAdd);
+      window.removeEventListener(CART_ADD_EVENT, handleCartAdd);
       if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
     };
   }, []);
