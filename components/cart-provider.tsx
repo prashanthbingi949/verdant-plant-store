@@ -28,6 +28,16 @@ type CartContextValue = {
 const CartContext = createContext<CartContextValue | null>(null);
 const STORAGE_KEY = "verdant-cart-v1";
 
+function addOrIncrementCartItem(current: CartItem[], item: Omit<CartItem, "quantity">, quantity = 1) {
+  const existing = current.find((entry) => entry.id === item.id);
+  if (existing) {
+    return current.map((entry) =>
+      entry.id === item.id ? { ...entry, ...item, quantity: entry.quantity + quantity } : entry,
+    );
+  }
+  return [...current, { ...item, quantity }];
+}
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [ready, setReady] = useState(false);
@@ -48,6 +58,57 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items, ready]);
 
+  // The discovery modal is rendered globally and its Add + buttons can be
+  // clicked while the modal is sitting above the catalogue. Handle those
+  // buttons at the cart-provider level as a defensive, DOM-level fallback.
+  // This guarantees the discovery recommendations use the same cart state as
+  // the rest of the store, even if a nested interaction is interrupted.
+  useEffect(() => {
+    const handleDiscoveryAdd = (event: Event) => {
+      const mouseEvent = event as MouseEvent;
+      const target = mouseEvent.target as Element | null;
+      const button = target?.closest<HTMLButtonElement>(".vd-wow-product-actions button");
+      if (!button) return;
+
+      const card = button.closest<HTMLElement>(".vd-wow-product");
+      const productLink = card?.querySelector<HTMLAnchorElement>('a[href^="/shop/"]');
+      const href = productLink?.getAttribute("href") || "";
+      const slug = href.startsWith("/shop/") ? href.slice("/shop/".length).split(/[?#]/)[0] : "";
+      const name = card?.querySelector<HTMLElement>("h4")?.textContent?.trim() || "Verdant plant";
+      const category = card?.querySelector<HTMLElement>(".vd-wow-product-copy p")?.textContent?.trim() || "Plants";
+      const priceText = card?.querySelector<HTMLElement>(".vd-wow-product-copy strong")?.textContent || "0";
+      const price = Number(priceText.replace(/[^0-9.]/g, "")) || 0;
+      const image = card?.querySelector<HTMLImageElement>(".vd-wow-product-media img")?.getAttribute("src") || null;
+
+      if (!slug || !price) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      const item: Omit<CartItem, "quantity"> = {
+        id: slug,
+        name,
+        price,
+        tone: "moss",
+        size: "Standard",
+        category,
+        image_url: image,
+      };
+
+      setItems((current) => addOrIncrementCartItem(current, item, 1));
+      window.dispatchEvent(new CustomEvent("verdant-cart-change", { detail: { id: slug, name } }));
+
+      const originalLabel = button.textContent || "Add +";
+      button.textContent = "Added ✓";
+      window.setTimeout(() => {
+        if (button.isConnected) button.textContent = originalLabel;
+      }, 1100);
+    };
+
+    document.addEventListener("click", handleDiscoveryAdd, true);
+    return () => document.removeEventListener("click", handleDiscoveryAdd, true);
+  }, []);
+
   const value = useMemo<CartContextValue>(() => {
     const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -55,15 +116,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return {
       items,
       addItem: (item, quantity = 1) => {
-        setItems((current) => {
-          const existing = current.find((entry) => entry.id === item.id);
-          if (existing) {
-            return current.map((entry) =>
-              entry.id === item.id ? { ...entry, ...item, quantity: entry.quantity + quantity } : entry,
-            );
-          }
-          return [...current, { ...item, quantity }];
-        });
+        setItems((current) => addOrIncrementCartItem(current, item, quantity));
       },
       removeItem: (id) => setItems((current) => current.filter((item) => item.id !== id)),
       updateQuantity: (id, quantity) =>
