@@ -14,8 +14,13 @@ function readFavorites(): string[] {
   }
 }
 
+function writeFavorites(items: string[]) {
+  window.localStorage.setItem(FAV_KEY, JSON.stringify(items));
+  window.dispatchEvent(new CustomEvent("verdant-favorites-change"));
+}
+
 function getButtons() {
-  return Array.from(document.querySelectorAll<HTMLButtonElement>("main.verdant-shop-page article button[aria-label*='wishlist']"));
+  return Array.from(document.querySelectorAll<HTMLButtonElement>("main.verdant-shop-page article button[aria-label*='wishlist' i]"));
 }
 
 function slugForButton(button: HTMLButtonElement) {
@@ -25,19 +30,23 @@ function slugForButton(button: HTMLButtonElement) {
   return href.startsWith("/shop/") ? href.slice("/shop/".length).split(/[?#]/)[0] : "";
 }
 
+function applyVisualState(button: HTMLButtonElement, liked: boolean) {
+  button.dataset.verdantLiked = liked ? "true" : "false";
+  button.style.background = liked ? "#202d20" : "rgba(244,245,233,.86)";
+  button.style.color = liked ? "#ddf27a" : "#202d20";
+  button.style.borderColor = liked ? "rgba(32,45,32,.08)" : "rgba(16,21,16,.08)";
+  const icon = button.querySelector<SVGElement>("svg");
+  if (icon) icon.style.fill = liked ? "currentColor" : "none";
+  button.setAttribute("aria-pressed", String(liked));
+}
+
 function syncButtons() {
   const favorites = readFavorites();
   getButtons().forEach((button) => {
     const slug = slugForButton(button);
     if (!slug) return;
     const liked = favorites.includes(slug);
-    const label = button.getAttribute("aria-label") || "Wishlist product";
-    const name = label.replace(/^(Add|Remove)\s+/i, "");
-    button.classList.toggle("bg-[#202d20]", liked);
-    button.classList.toggle("text-[#ddf27a]", liked);
-    button.classList.toggle("bg-[#f4f5e9]/86", !liked);
-    button.classList.toggle("text-[#202d20]", !liked);
-    button.setAttribute("aria-label", `${liked ? "Remove" : "Add"} ${name}`);
+    applyVisualState(button, liked);
   });
 }
 
@@ -49,19 +58,18 @@ export default function ShopWishlistBridge() {
 
     const onClick = (event: MouseEvent) => {
       const target = event.target as Element | null;
-      const button = target?.closest<HTMLButtonElement>("main.verdant-shop-page article button[aria-label*='wishlist']");
+      const button = target?.closest<HTMLButtonElement>("main.verdant-shop-page article button[aria-label*='wishlist' i]");
       if (!button) return;
 
-      const liked = button.classList.contains("bg-[#202d20]");
-      const label = button.getAttribute("aria-label") || "Wishlist product";
-      button.classList.toggle("bg-[#202d20]", !liked);
-      button.classList.toggle("text-[#ddf27a]", !liked);
-      button.classList.toggle("bg-[#f4f5e9]/86", liked);
-      button.classList.toggle("text-[#202d20]", liked);
-      button.setAttribute("aria-label", `${!liked ? "Remove" : "Add"} ${label.replace(/^(Add|Remove)\s+/i, "")}`);
+      const slug = slugForButton(button);
+      if (!slug) return;
 
-      // SiteUtilities persists this DOM state after capture. Stop React's local
-      // liked state from fighting the persisted favourite state.
+      const favorites = readFavorites();
+      const liked = favorites.includes(slug);
+      const updated = liked ? favorites.filter((item) => item !== slug) : Array.from(new Set([...favorites, slug]));
+
+      writeFavorites(updated);
+      applyVisualState(button, !liked);
       event.preventDefault();
       event.stopImmediatePropagation();
     };
