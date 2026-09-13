@@ -12,6 +12,7 @@ import "./product-detail-visual-polish.css";
 import "./checkout-polish.css";
 import "./verdant-premium.css";
 import "./verdant-discovery.css";
+import "./verdant-cart-recommendations.css";
 import { CartProvider } from "@/components/cart-provider";
 import HomeNavController from "@/components/home-nav-controller";
 import HomeVisualEffects from "@/components/home-visual-effects";
