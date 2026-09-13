@@ -13,11 +13,6 @@ function readFavorites(): string[] {
   }
 }
 
-function writeFavorites(items: string[]) {
-  window.localStorage.setItem(FAV_KEY, JSON.stringify(items));
-  window.dispatchEvent(new CustomEvent("verdant-favorites-change"));
-}
-
 function getHomeWishlistButtons() {
   return Array.from(document.querySelectorAll<HTMLButtonElement>("main.verdant-site article.product-card button.wish"));
 }
@@ -33,7 +28,9 @@ function syncButtonState(button: HTMLButtonElement, favorites: string[]) {
   const slug = slugForButton(button);
   if (!slug) return;
   button.classList.toggle("is-liked", favorites.includes(slug));
-  button.setAttribute("aria-label", `${favorites.includes(slug) ? "Remove" : "Wishlist"} ${button.getAttribute("aria-label")?.replace(/^(Remove|Wishlist|Add|Wishlist)\s+/i, "") || "product"}`);
+  const currentLabel = button.getAttribute("aria-label") || "product";
+  const productName = currentLabel.replace(/^(Remove|Wishlist|Add)\s+/i, "") || "product";
+  button.setAttribute("aria-label", `${favorites.includes(slug) ? "Remove" : "Wishlist"} ${productName}`);
 }
 
 export default function HomeWishlistPersistence() {
@@ -45,36 +42,15 @@ export default function HomeWishlistPersistence() {
       getHomeWishlistButtons().forEach((button) => syncButtonState(button, favorites));
     };
 
-    const handleClick = (event: Event) => {
-      const target = event.target as Element | null;
-      const button = target?.closest<HTMLButtonElement>("main.verdant-site article.product-card button.wish");
-      if (!button) return;
-
-      const slug = slugForButton(button);
-      if (!slug) return;
-
-      const favorites = readFavorites();
-      const wasLiked = button.classList.contains("is-liked");
-      const updated = wasLiked
-        ? favorites.filter((item) => item !== slug)
-        : Array.from(new Set([...favorites, slug]));
-
-      writeFavorites(updated);
-      syncButtonState(button, updated);
-    };
-
     const observer = new MutationObserver(() => syncAll());
     observer.observe(document.body, { childList: true, subtree: true });
 
-    document.addEventListener("click", handleClick, true);
     window.addEventListener("storage", syncAll);
     window.addEventListener("verdant-favorites-change", syncAll);
-
     syncAll();
 
     return () => {
       observer.disconnect();
-      document.removeEventListener("click", handleClick, true);
       window.removeEventListener("storage", syncAll);
       window.removeEventListener("verdant-favorites-change", syncAll);
     };
