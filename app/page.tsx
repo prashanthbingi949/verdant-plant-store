@@ -11,6 +11,22 @@ type CmsSection = { section_key: string; content: Record<string, any>; active: b
 type CmsProduct = { id: string; slug: string; name: string; category: string; level: string; price: number; size: string; description: string; tone: "moss" | "sage" | "lime"; stock: number; active: boolean; featured: boolean; sort_order: number; badge_text?: string; image_url?: string | null; image_urls?: string[] };
 type LinkItem = { label?: string; title?: string; eyebrow?: string; note?: string; href?: string; number?: string; image?: string; slug?: string };
 
+const FAV_KEY = "verdant-favorites-v1";
+
+function readHomeFavorites(): string[] {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(FAV_KEY) || "[]");
+    return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeHomeFavorites(items: string[]) {
+  window.localStorage.setItem(FAV_KEY, JSON.stringify(items));
+  window.dispatchEvent(new CustomEvent("verdant-favorites-change"));
+}
+
 const fallbackProducts: CmsProduct[] = [
   { id: "jade-plant", slug: "jade-plant", name: "Jade Plant", category: "Succulents", level: "Easy care", price: 649, size: '6" pot', description: "A compact succulent.", tone: "lime", stock: 20, active: true, featured: true, sort_order: 1 },
   { id: "snake-plant", slug: "snake-plant", name: "Snake Plant", category: "Indoor plants", level: "Easy care", price: 899, size: '10" pot', description: "Architectural and resilient.", tone: "sage", stock: 20, active: true, featured: true, sort_order: 2 },
@@ -63,6 +79,18 @@ export default function Home() {
   const [added, setAdded] = useState<string[]>([]);
 
   useEffect(() => {
+    const syncFavorites = () => setLiked(readHomeFavorites());
+    syncFavorites();
+    window.addEventListener("storage", syncFavorites);
+    window.addEventListener("verdant-favorites-change", syncFavorites);
+
+    return () => {
+      window.removeEventListener("storage", syncFavorites);
+      window.removeEventListener("verdant-favorites-change", syncFavorites);
+    };
+  }, []);
+
+  useEffect(() => {
     Promise.all([
       fetch("/api/cms/home", { cache: "no-store" }).then((r) => r.ok ? r.json() : null),
       fetch("/api/products", { cache: "no-store" }).then((r) => r.ok ? r.json() : null),
@@ -98,6 +126,14 @@ export default function Home() {
     window.setTimeout(() => setAdded((items) => items.filter((slug) => slug !== product.slug)), 1800);
   }
 
+  function toggleFavorite(slug: string) {
+    setLiked((current) => {
+      const next = current.includes(slug) ? current.filter((item) => item !== slug) : [...current, slug];
+      writeHomeFavorites(next);
+      return next;
+    });
+  }
+
   return <main className="verdant-site">
     <style>{`\n      .marquee-flow{animation-duration:42s!important;}\n      .marquee-item{padding-top:8px!important;padding-bottom:8px!important;}\n      .product-grid{grid-template-columns:repeat(4,minmax(0,1fr));}\n      @media(max-width:980px){.product-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}\n      @media(max-width:640px){.product-grid{grid-template-columns:1fr;}}\n    `}</style>
     <VerdantSpotlightHero />
@@ -106,7 +142,7 @@ export default function Home() {
 
     {visible("collections") && <section className="section collections-section" id="collections"><div className="section-heading"><div><p className="eyebrow">{content("collections").eyebrow || "EXPLORE OUR COLLECTION"}</p><h2>{content("collections").title || "Everything"} <em>{content("collections").emphasized_title || "you need to grow."}</em></h2></div><p>{content("collections").description || "Thoughtfully chosen plants, planters and gardening essentials for every greener space."}</p></div><div className="premium-category-grid">{collections.map((item: LinkItem, index: number) => <motion.a href={item.href || "/shop"} className="premium-category-card" key={`${item.slug || item.title || "category"}-${index}`} whileHover={{ y: -6 }} transition={{ type: "spring", stiffness: 280, damping: 24 }}><div className="premium-category-image"><img src={item.image} alt={item.title || "Category"} loading={index < 3 ? "eager" : "lazy"} /></div><div className="premium-category-copy"><span>{item.eyebrow}</span><h3>{item.title}</h3><p>{item.note}</p><span className="premium-category-link">Explore <Icon name="arrow" /></span></div></motion.a>)}</div></section>}
 
-    {visible("featured") && <section className="section shop-section" id="shop"><div className="section-heading compact"><div><p className="eyebrow">{content("featured").eyebrow || "MOST LOVED"}</p><h2>{content("featured").title || "Little"} <em>{content("featured").emphasized_title || "legends."}</em></h2></div><Link className="text-link" href={content("featured").link_href || "/shop"}>{content("featured").link_label || "View all plants"} <Icon name="arrow" /></Link></div><div className="product-grid">{featuredProducts.map((product) => <article className="product-card" key={product.slug}><div className="product-image"><button type="button" className={`wish ${liked.includes(product.slug) ? "is-liked" : ""}`} onClick={() => setLiked((items) => items.includes(product.slug) ? items.filter((item) => item !== product.slug) : [...items, product.slug])} aria-label={`Wishlist ${product.name}`}><Icon name="heart" /></button><Link href={`/shop/${product.slug}`} className="block h-full"><BotanicalShape tone={product.tone} image={product.image_url || product.image_urls?.[0] || realPlantImages[product.slug]} alt={product.name} /></Link>{product.badge_text && <span className="product-badge">{product.badge_text}</span>}</div><div className="product-info"><div><p>{product.category} · {product.level}</p><Link href={`/shop/${product.slug}`}><h3>{product.name}</h3></Link></div><div className="product-buy"><strong>₹{Number(product.price).toLocaleString("en-IN")}</strong><button type="button" onClick={() => handleAdd(product)}>{added.includes(product.slug) ? "Added ✓" : "Add +"}</button></div></div></article>)}</div></section>}
+    {visible("featured") && <section className="section shop-section" id="shop"><div className="section-heading compact"><div><p className="eyebrow">{content("featured").eyebrow || "MOST LOVED"}</p><h2>{content("featured").title || "Little"} <em>{content("featured").emphasized_title || "legends."}</em></h2></div><Link className="text-link" href={content("featured").link_href || "/shop"}>{content("featured").link_label || "View all plants"} <Icon name="arrow" /></Link></div><div className="product-grid">{featuredProducts.map((product) => <article className="product-card" key={product.slug}><div className="product-image"><button type="button" className={`wish ${liked.includes(product.slug) ? "is-liked" : ""}`} onClick={() => toggleFavorite(product.slug)} aria-label={`${liked.includes(product.slug) ? "Remove" : "Wishlist"} ${product.name}`}><Icon name="heart" /></button><Link href={`/shop/${product.slug}`} className="block h-full"><BotanicalShape tone={product.tone} image={product.image_url || product.image_urls?.[0] || realPlantImages[product.slug]} alt={product.name} /></Link>{product.badge_text && <span className="product-badge">{product.badge_text}</span>}</div><div className="product-info"><div><p>{product.category} · {product.level}</p><Link href={`/shop/${product.slug}`}><h3>{product.name}</h3></Link></div><div className="product-buy"><strong>₹{Number(product.price).toLocaleString("en-IN")}</strong><button type="button" onClick={() => handleAdd(product)}>{added.includes(product.slug) ? "Added ✓" : "Add +"}</button></div></div></article>)}</div></section>}
 
     {visible("story") && <section className="story-section" id="story"><div className="story-art"><div className="story-card"><span>{story.established || "EST. 2026"}</span><div className="story-circle"><LeafMark /></div><strong>{(story.card_line || "Good things take root.").split(" ").slice(0, 2).join(" ")}<br />{(story.card_line || "Good things take root.").split(" ").slice(2).join(" ")}</strong></div><span className="story-stem" /></div><div className="story-copy"><p className="eyebrow">{story.eyebrow || "THE VERDANT WAY"}</p><h2>{story.title || "More than a store."}<br /><em>{story.emphasized_title || "A little ritual."}</em></h2><p>{story.body || "We believe plants change a room, then slowly change the way the room feels."}</p><a className="button button-dark" href={story.button_href || "#care"}>{story.button_label || "Explore plant care"} <Icon name="arrow" /></a></div></section>}
 
