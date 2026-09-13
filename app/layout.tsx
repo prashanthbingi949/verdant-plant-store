@@ -26,6 +26,7 @@ import MiniCartDrawer from "@/components/mini-cart-drawer";
 import ShopQuickAddFeedback from "@/components/shop-quick-add-feedback";
 import ShopBadgeBridge from "@/components/shop-badge-bridge";
 import VerdantDiscoveryMount from "@/components/verdant-discovery-mount";
+import ShopWishlistBridge from "@/components/shop-wishlist-bridge";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -68,6 +69,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <ShopQuickAddFeedback />
           <ShopBadgeBridge />
           <VerdantDiscoveryMount />
+          <ShopWishlistBridge />
           {children}
         </CartProvider>
       </body>
