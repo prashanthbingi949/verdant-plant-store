@@ -9,6 +9,7 @@ import "./shop-product-polish.css";
 import "./shop-grid-density.css";
 import "./shop-cart-toast.css";
 import "./product-detail-visual-polish.css";
+import "./checkout-polish.css";
 import { CartProvider } from "@/components/cart-provider";
 import HomeNavController from "@/components/home-nav-controller";
 import HomeVisualEffects from "@/components/home-visual-effects";
