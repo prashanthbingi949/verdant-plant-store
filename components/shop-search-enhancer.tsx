@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const POPULAR = [
   "Monstera",
@@ -31,14 +31,29 @@ function setInputValue(input: HTMLInputElement, value: string) {
 }
 
 export default function ShopSearchEnhancer() {
+  const activeCleanup = useRef<(() => void) | null>(null);
+  const activeInput = useRef<HTMLInputElement | null>(null);
+
   useEffect(() => {
     let disposed = false;
-    let cleanup: (() => void) | undefined;
+
+    const teardown = () => {
+      activeCleanup.current?.();
+      activeCleanup.current = null;
+      activeInput.current = null;
+    };
 
     const setup = () => {
-      if (disposed || cleanup) return;
+      if (disposed) return;
       const input = document.querySelector<HTMLInputElement>(".verdant-shop-page .shop-search");
-      if (!input) return;
+      if (!input) {
+        teardown();
+        return;
+      }
+
+      if (activeInput.current === input) return;
+      teardown();
+      activeInput.current = input;
 
       const panel = document.createElement("div");
       panel.className = "verdant-search-panel";
@@ -47,10 +62,12 @@ export default function ShopSearchEnhancer() {
       panel.hidden = true;
       document.body.appendChild(panel);
 
+      let closeTimer: number | null = null;
+
       const updatePosition = () => {
         const rect = input.getBoundingClientRect();
         const viewportPadding = 16;
-        const width = Math.min(rect.width, window.innerWidth - viewportPadding * 2);
+        const width = Math.min(rect.width, Math.max(240, window.innerWidth - viewportPadding * 2));
         const left = Math.max(viewportPadding, Math.min(rect.left, window.innerWidth - width - viewportPadding));
         panel.style.width = `${width}px`;
         panel.style.left = `${left}px`;
@@ -66,12 +83,20 @@ export default function ShopSearchEnhancer() {
             <kbd>ESC</kbd>
           </div>
           <div class="verdant-search-suggestions">
-            ${values.length ? values.map((value) => `<button type="button" class="verdant-search-suggestion" data-value="${value.replaceAll('"', '&quot;')}"><span class="verdant-search-suggestion-icon">⌕</span><span>${value}</span></button>`).join("") : '<div class="verdant-search-empty">No close matches yet — try another plant or garden essential.</div>'}
+            ${values.length
+              ? values
+                  .map((value) => `<button type="button" class="verdant-search-suggestion" data-value="${value.replaceAll('"', '&quot;')}"><span class="verdant-search-suggestion-icon">⌕</span><span>${value}</span></button>`)
+                  .join("")
+              : '<div class="verdant-search-empty">No close matches yet — try another plant or garden essential.</div>'}
           </div>
         `;
       };
 
       const open = () => {
+        if (closeTimer !== null) {
+          window.clearTimeout(closeTimer);
+          closeTimer = null;
+        }
         panel.hidden = false;
         panel.classList.add("is-open");
         input.classList.add("is-search-focused");
@@ -82,19 +107,18 @@ export default function ShopSearchEnhancer() {
       const close = () => {
         panel.classList.remove("is-open");
         input.classList.remove("is-search-focused");
-        window.setTimeout(() => {
+        if (closeTimer !== null) window.clearTimeout(closeTimer);
+        closeTimer = window.setTimeout(() => {
           if (!panel.classList.contains("is-open")) panel.hidden = true;
+          closeTimer = null;
         }, 140);
       };
 
       const onFocus = () => open();
-      const onInput = () => {
-        if (!panel.classList.contains("is-open")) open();
-        render();
-      };
+      const onInput = () => open();
       const onDocumentPointer = (event: PointerEvent) => {
-        const target = event.target as Node;
-        if (panel.contains(target) || input.contains(target)) return;
+        const target = event.target as Node | null;
+        if (target && (panel.contains(target) || input.contains(target))) return;
         close();
       };
       const onKeyDown = (event: KeyboardEvent) => {
@@ -124,7 +148,8 @@ export default function ShopSearchEnhancer() {
       window.addEventListener("resize", onViewportChange, { passive: true });
       window.addEventListener("scroll", onViewportChange, { passive: true });
 
-      cleanup = () => {
+      activeCleanup.current = () => {
+        if (closeTimer !== null) window.clearTimeout(closeTimer);
         input.removeEventListener("focus", onFocus);
         input.removeEventListener("input", onInput);
         input.removeEventListener("keydown", onKeyDown);
@@ -133,7 +158,6 @@ export default function ShopSearchEnhancer() {
         window.removeEventListener("resize", onViewportChange);
         window.removeEventListener("scroll", onViewportChange);
         panel.remove();
-        cleanup = undefined;
       };
     };
 
@@ -144,7 +168,7 @@ export default function ShopSearchEnhancer() {
     return () => {
       disposed = true;
       observer.disconnect();
-      cleanup?.();
+      teardown();
     };
   }, []);
 
