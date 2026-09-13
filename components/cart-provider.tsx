@@ -27,6 +27,7 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | null>(null);
 const STORAGE_KEY = "verdant-cart-v1";
+const CART_ADD_EVENT = "verdant-cart-add-v2";
 
 function addOrIncrementCartItem(current: CartItem[], item: Omit<CartItem, "quantity">, quantity = 1) {
   const existing = current.find((entry) => entry.id === item.id);
@@ -49,6 +50,14 @@ function readStoredCart(): CartItem[] {
   }
 }
 
+function emitCartAdd(item: { id: string; name: string; quantity: number; source?: string }) {
+  window.dispatchEvent(new CustomEvent(CART_ADD_EVENT, {
+    detail: { ...item, source: item.source || "explicit-add" },
+  }));
+}
+
+export { CART_ADD_EVENT };
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [ready, setReady] = useState(false);
@@ -68,9 +77,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     window.dispatchEvent(new CustomEvent("verdant-cart-change", { detail: { items } }));
   }, [items, ready]);
 
-  // The discovery modal is rendered globally and its Add + buttons can be
-  // clicked while the modal is sitting above the catalogue. Handle those
-  // buttons at the cart-provider level as a defensive, DOM-level fallback.
+  // Discovery is global and the recommendation buttons sit above the catalogue.
+  // Keep a DOM-level fallback so those buttons still use the shared cart.
   useEffect(() => {
     const handleDiscoveryAdd = (event: Event) => {
       const mouseEvent = event as MouseEvent;
@@ -104,7 +112,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       };
 
       setItems((current) => addOrIncrementCartItem(current, item, 1));
-      window.dispatchEvent(new CustomEvent("verdant-cart-add", { detail: { id: slug, name } }));
+      emitCartAdd({ id: slug, name, quantity: 1, source: "discovery" });
 
       const originalLabel = button.textContent || "Add +";
       button.textContent = "Added ✓";
@@ -126,7 +134,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       addItem: (item, quantity = 1) => {
         if (quantity <= 0) return;
         setItems((current) => addOrIncrementCartItem(current, item, quantity));
-        window.dispatchEvent(new CustomEvent("verdant-cart-add", { detail: { id: item.id, name: item.name, quantity } }));
+        emitCartAdd({ id: item.id, name: item.name, quantity, source: "explicit-add" });
       },
       removeItem: (id) => setItems((current) => current.filter((item) => item.id !== id)),
       updateQuantity: (id, quantity) =>
