@@ -10,6 +10,9 @@ export default function MiniCartDrawer() {
   const router = useRouter();
   const { items, itemCount, subtotal, delivery, total, updateQuantity, removeItem } = useCart();
   const [open, setOpen] = useState(false);
+  const threshold = 1499;
+  const remaining = Math.max(0, threshold - subtotal);
+  const progress = Math.min(100, Math.round((subtotal / threshold) * 100));
 
   useEffect(() => {
     if (pathname === "/cart") {
@@ -21,8 +24,6 @@ export default function MiniCartDrawer() {
       const target = event.target as HTMLElement | null;
       const link = target?.closest<HTMLAnchorElement>('a[href="/cart"]');
       if (!link) return;
-      // Only intercept the site's cart icon/navigation links. The drawer's own
-      // View cart action uses goToCart() so it never gets trapped here.
       if (link.closest("aside")) return;
       event.preventDefault();
       setOpen(true);
@@ -113,6 +114,7 @@ export default function MiniCartDrawer() {
         </div>
 
         <div className="border-t border-black/10 bg-[#f4f5e9] px-6 py-5 backdrop-blur-xl sm:px-7">
+          {items.length > 0 && <div className="mb-4 rounded-[18px] border border-black/8 bg-white/45 p-3.5"><div className="flex items-center justify-between gap-3 text-[10px]"><span className="text-black/55">{delivery === 0 ? "Free delivery unlocked" : `₹${remaining.toLocaleString("en-IN")} to free delivery`}</span><strong className="text-[#52634b]">{progress}%</strong></div><div className="mt-2 h-1.5 overflow-hidden rounded-full bg-black/8"><div className="h-full rounded-full bg-[#202d20] transition-[width] duration-500" style={{ width: `${progress}%` }} /></div></div>}
           <div className="space-y-2 text-sm">
             <div className="flex items-center justify-between text-black/55"><span>Subtotal</span><strong className="text-[#202d20]">₹{subtotal.toLocaleString("en-IN")}</strong></div>
             <div className="flex items-center justify-between text-black/55"><span>Delivery</span><span>{delivery === 0 ? "Free" : `₹${delivery.toLocaleString("en-IN")}`}</span></div>
