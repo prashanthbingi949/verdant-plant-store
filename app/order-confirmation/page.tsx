@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 type OrderItem = { id: string; name: string; price: number; quantity: number };
 type Order = {
@@ -17,7 +17,7 @@ type Order = {
   items: OrderItem[] | null;
 };
 
-export default function OrderConfirmationPage() {
+function OrderConfirmationContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("order") || "";
   const paymentId = searchParams.get("payment") || "";
@@ -107,6 +107,23 @@ export default function OrderConfirmationPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function OrderConfirmationPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-[#f4f5e9] text-[#101510]">
+          <div className="text-center">
+            <p className="text-[10px] font-bold tracking-[.2em] text-black/40">VERDANT</p>
+            <p className="mt-4 text-sm text-black/50">Loading your order…</p>
+          </div>
+        </main>
+      }
+    >
+      <OrderConfirmationContent />
+    </Suspense>
   );
 }
 
