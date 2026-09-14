@@ -28,7 +28,7 @@ export default async function AdminDashboard() {
             <h1 className="text-5xl font-semibold tracking-[-.055em] sm:text-6xl">Your store, <em className="font-serif font-normal">under control.</em></h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-black/55">One place to manage content, catalog, products, inventory, orders and reusable media.</p>
           </div>
-          <a href="/" className="w-fit rounded-full bg-[#202d20] px-5 py-3 text-sm font-bold text-[#f4f5e9]">View storefront</a>
+          <a href="/" className="w-fit rounded-full border border-[#202d20] bg-[#202d20] px-5 py-3 text-sm font-bold !text-[#f4f5e9] shadow-sm transition hover:bg-[#101510] hover:shadow-md">View storefront</a>
         </div>
         <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {cards.map((card) => (
@@ -36,7 +36,7 @@ export default async function AdminDashboard() {
               <p className="text-[10px] font-black tracking-[.18em] text-[#315233]">CONTROL</p>
               <h2 className="mt-2 text-2xl font-semibold">{card.title}</h2>
               <p className="mt-3 min-h-12 text-sm leading-6 text-black/50">{card.note}</p>
-              <span className="mt-6 inline-flex rounded-full border border-black/10 px-4 py-2 text-xs font-bold">{card.action} →</span>
+              <span className="mt-6 inline-flex rounded-full border border-black/10 bg-white/50 px-4 py-2 text-xs font-bold text-[#101510] transition group-hover:border-[#202d20] group-hover:bg-[#202d20] group-hover:!text-[#f4f5e9]">{card.action} →</span>
             </a>
           ))}
         </div>
