@@ -31,20 +31,21 @@ const LEGACY_STORAGE_KEY = "verdant-cart-v1";
 const CART_ADD_EVENT = "verdant-cart-add-v2";
 const MAX_ITEM_QUANTITY = 99;
 
-function normalizeQuantity(value: unknown) {
+function normalizeQuantity(value: unknown, recoverOversized = false) {
   const quantity = Number(value);
   if (!Number.isFinite(quantity) || quantity <= 0) return 1;
+  if (recoverOversized && quantity > MAX_ITEM_QUANTITY) return 1;
   return Math.min(MAX_ITEM_QUANTITY, Math.max(1, Math.floor(quantity)));
 }
 
-function normalizeStoredCart(value: unknown): CartItem[] {
+function normalizeStoredCart(value: unknown, recoverOversized = false): CartItem[] {
   if (!Array.isArray(value)) return [];
 
   const normalized = value
     .filter((item): item is CartItem => Boolean(item) && typeof item === "object" && typeof (item as CartItem).id === "string")
     .map((item) => ({
       ...item,
-      quantity: normalizeQuantity(item.quantity),
+      quantity: normalizeQuantity(item.quantity, recoverOversized),
     }));
 
   return normalized.reduce<CartItem[]>((items, item) => {
@@ -77,12 +78,13 @@ function readStoredCart(): CartItem[] {
     if (stored) return normalizeStoredCart(JSON.parse(stored));
 
     // One-time migration from v1. The old cart provider could duplicate
-    // persisted quantities during React Strict Mode initialization. Normalize
-    // the legacy data and write it into the fixed v2 store.
+    // persisted quantities during React Strict Mode initialization. Treat
+    // impossible quantities from that broken store as a single item, then
+    // move the cleaned cart to v2.
     const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEY);
     if (!legacy) return [];
 
-    const migrated = normalizeStoredCart(JSON.parse(legacy));
+    const migrated = normalizeStoredCart(JSON.parse(legacy), true);
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
     window.localStorage.removeItem(LEGACY_STORAGE_KEY);
     return migrated;
