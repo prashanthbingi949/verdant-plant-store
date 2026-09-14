@@ -33,10 +33,9 @@ const CATEGORY_IMAGES: Record<string, string> = {
 };
 
 const CATEGORY_BY_TERM: Array<[RegExp, string]> = [
-  [/monstera|peace-lily|peace-lily|zz-plant|money-plant|pothos|philodendron|fiddle/i, "indoor-decorative-greens"],
-  [/snake/i, "indoor-decorative-greens"],
+  [/monstera|peace-lily|zz-plant|money-plant|pothos|philodendron|fiddle|snake/i, "indoor-decorative-greens"],
   [/jade|aloe|haworthia|echeveria|cactus|cacti|succulent/i, "succulents-cacti"],
-  [/bougainvillea|ixora|areca|duranta|frangipani|polyalthia|hedge|tree/i, "outdoor-landscape-plants"],
+  [/bougainvillea|ixora|areca|duranta|frangipani|polyalthia|hedge|large tree|tree/i, "outdoor-landscape-plants"],
   [/lemon tree|guava|tomato|chilli|basil|mint|sapling|vegetable|fruit tree/i, "fruit-vegetable-saplings"],
   [/petunia|marigold|geranium|chrysanthemum|dahlia|calendula|flowering|seasonal/i, "seasonal-flowering-plants"],
   [/pot|planter|grow bag|terracotta|ceramic|plastic pot/i, "pots-planters"],
@@ -53,27 +52,28 @@ function isGenericAsset(value: string | null | undefined) {
 }
 
 export function productImage(product: ProductImageRecord) {
-  const exact = REAL_BY_SLUG[product.slug];
-  if (exact) return exact;
-
   const uploaded = [product.image_url, ...(product.image_urls || [])].find((value) => !isGenericAsset(value));
   if (uploaded) return uploaded;
 
-  const haystack = `${product.slug} ${product.name || ""} ${product.subcategory || ""} ${product.category || ""}`;
-  const categorySlug = Object.entries(CATEGORY_IMAGES).find(([slug]) => product.category?.toLowerCase().includes(slug.replaceAll("-", " ")) || product.category?.toLowerCase().includes(slug.split("-")[0]))?.[0];
-  if (categorySlug && CATEGORY_IMAGES[categorySlug]) return CATEGORY_IMAGES[categorySlug];
+  const exact = REAL_BY_SLUG[product.slug];
+  if (exact) return exact;
 
+  const haystack = `${product.slug} ${product.name || ""} ${product.subcategory || ""} ${product.category || ""}`;
+  const categoryText = (product.category || "").toLowerCase();
   const matched = CATEGORY_BY_TERM.find(([pattern]) => pattern.test(haystack))?.[1];
   if (matched) return CATEGORY_IMAGES[matched];
 
-  const productType = product.product_type === "Gardening Supplies" ? "tools-equipment" : "indoor-decorative-greens";
-  return CATEGORY_IMAGES[productType];
+  for (const [categorySlug, image] of Object.entries(CATEGORY_IMAGES)) {
+    const readable = categorySlug.replaceAll("-", " ");
+    if (categoryText.includes(readable)) return image;
+  }
+
+  return CATEGORY_IMAGES[product.product_type === "Gardening Supplies" ? "tools-equipment" : "indoor-decorative-greens"];
 }
 
 export function productImages(product: ProductImageRecord) {
   const uploaded = [product.image_url, ...(product.image_urls || [])].filter((value): value is string => Boolean(value) && !isGenericAsset(value));
-  const primary = productImage(product);
-  return Array.from(new Set([primary, ...uploaded].filter(Boolean)));
+  return Array.from(new Set([productImage(product), ...uploaded].filter(Boolean)));
 }
 
 export const productImageAssets = {
