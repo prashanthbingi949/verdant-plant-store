@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { adminCookieName, isValidAdminToken } from "@/lib/admin-auth";
-import { supabaseSelect, supabaseUpdate } from "@/lib/supabase-admin";
+import { supabaseRest, supabaseSelect, supabaseUpdate } from "@/lib/supabase-admin";
 
 const publishStatuses = ["published", "draft", "archived"] as const;
 
@@ -14,14 +14,35 @@ function cleanSlugs(value: unknown) {
   return Array.from(new Set(value.filter((item): item is string => typeof item === "string").map((item) => item.trim()).filter(Boolean))).slice(0, 24);
 }
 
+async function callRpc(fn: string, args: Record<string, unknown>) {
+  const response = await supabaseRest(`/rest/v1/rpc/${fn}`, { method: "POST", body: JSON.stringify(args) });
+  if (!response) return { configured: false, response: null, data: null };
+  const data = await response.json().catch(() => null);
+  return { configured: true, response, data };
+}
+
 export async function GET() {
   const cookieStore = await cookies();
   if (!isValidAdminToken(cookieStore.get(adminCookieName())?.value)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const result = await supabaseSelect("products", "select=*&order=sort_order.asc,name.asc");
-  if (!result.configured) return NextResponse.json({ error: "Supabase is not configured." }, { status: 500 });
-  if (!result.response?.ok) return NextResponse.json({ error: "Unable to load products." }, { status: 500 });
-  return NextResponse.json({ products: Array.isArray(result.data) ? result.data : [] });
+  const [products, settings] = await Promise.all([
+    supabaseSelect("products", "select=*&order=sort_order.asc,name.asc"),
+    supabaseSelect("inventory_settings", "select=product_slug,reorder_level,reorder_quantity,updated_at"),
+  ]);
+  if (!products.configured || !settings.configured) return NextResponse.json({ error: "Supabase is not configured. Run the CMS migrations first." }, { status: 500 });
+  const bad = [products, settings].find((result) => !result.response?.ok);
+  if (bad) return NextResponse.json({ error: "Unable to load Product Master data." }, { status: 500 });
+
+  const settingsBySlug = new Map<string, { reorder_level: number; reorder_quantity: number; inventory_settings_updated_at?: string }>();
+  for (const item of (Array.isArray(settings.data) ? settings.data : [])) {
+    settingsBySlug.set(String(item.product_slug), { reorder_level: Number(item.reorder_level || 0), reorder_quantity: Number(item.reorder_quantity || 1), inventory_settings_updated_at: item.updated_at });
+  }
+
+  const merged = (Array.isArray(products.data) ? products.data : []).map((product) => ({
+    ...product,
+    ...(settingsBySlug.get(String(product.slug)) || { reorder_level: 5, reorder_quantity: 10 }),
+  }));
+  return NextResponse.json({ products: merged });
 }
 
 export async function PATCH(request: Request) {
@@ -67,13 +88,23 @@ export async function PATCH(request: Request) {
 
     update.updated_at = new Date().toISOString();
 
-    if (Object.keys(update).length === 1) return NextResponse.json({ error: "No changes supplied." }, { status: 400 });
+    if (Object.keys(update).length > 1) {
+      const result = await supabaseUpdate("products", `slug=eq.${encodeURIComponent(slug)}`, update);
+      if (!result.configured) return NextResponse.json({ error: "Supabase is not configured." }, { status: 500 });
+      if (!result.response?.ok) {
+        const detail = typeof result.data === "object" && result.data && "message" in result.data ? String((result.data as { message?: string }).message || "") : "";
+        return NextResponse.json({ error: detail || "Unable to update product. Run supabase/product-master.sql if the new columns are missing." }, { status: 400 });
+      }
+    }
 
-    const result = await supabaseUpdate("products", `slug=eq.${encodeURIComponent(slug)}`, update);
-    if (!result.configured) return NextResponse.json({ error: "Supabase is not configured." }, { status: 500 });
-    if (!result.response?.ok) {
-      const detail = typeof result.data === "object" && result.data && "message" in result.data ? String((result.data as { message?: string }).message || "") : "";
-      return NextResponse.json({ error: detail || "Unable to update product. Run supabase/product-master.sql if the new columns are missing." }, { status: 400 });
+    const hasInventory = Number.isFinite(Number(body?.reorder_level)) || Number.isFinite(Number(body?.reorder_quantity));
+    if (hasInventory) {
+      const result = await callRpc("set_inventory_settings", {
+        p_slug: slug,
+        p_reorder_level: Math.max(0, Math.round(Number(body?.reorder_level ?? 5))),
+        p_reorder_quantity: Math.max(1, Math.round(Number(body?.reorder_quantity ?? 10))),
+      });
+      if (!result.configured || !result.response?.ok) return NextResponse.json({ error: "Product saved, but inventory reorder settings could not be saved." }, { status: 400 });
     }
 
     const verified = await supabaseSelect("products", `select=*&slug=eq.${encodeURIComponent(slug)}&limit=1`);
