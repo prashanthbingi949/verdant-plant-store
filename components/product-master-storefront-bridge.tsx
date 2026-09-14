@@ -128,22 +128,12 @@ async function applyCuratedRelated(product: ProductMasterView) {
 
 export default function ProductMasterStorefrontBridge({ product }: { product: ProductMasterView }) {
   useEffect(() => {
-    let cancelled = false;
-    const run = () => {
-      if (cancelled) return;
+    const timers = [0, 250, 700].map((delay) => window.setTimeout(() => {
       applyMasterCopy(product);
       void applyCuratedRelated(product);
-    };
+    }, delay));
 
-    run();
-    const observer = new MutationObserver(() => window.requestAnimationFrame(run));
-    const root = document.querySelector(".vd-pdp");
-    if (root) observer.observe(root, { childList: true, subtree: true });
-
-    return () => {
-      cancelled = true;
-      observer.disconnect();
-    };
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
   }, [product]);
 
   return null;
