@@ -8,17 +8,6 @@ export type ProductImageRecord = {
   image_urls?: string[];
 };
 
-const REAL_BY_SLUG: Record<string, string> = {
-  "monstera-deliciosa": "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=1400&q=90",
-  "snake-plant": "https://images.unsplash.com/photo-1611211232932-da3113c5b960?auto=format&fit=crop&w=1400&q=90",
-  "jade-plant": "https://images.unsplash.com/photo-1676089650339-333baa5a7e0b?auto=format&fit=crop&w=1400&q=90",
-  "bird-of-paradise": "https://images.unsplash.com/photo-1677787320811-14c81b24e828?auto=format&fit=crop&w=1400&q=90",
-  "string-of-pearls": "https://images.unsplash.com/photo-1765041425888-39e09e148a80?auto=format&fit=crop&w=1400&q=90",
-  "lavender": "https://images.unsplash.com/photo-1451336819701-5a83f6534292?auto=format&fit=crop&w=1400&q=90",
-  "fiddle-leaf-fig": "https://images.unsplash.com/photo-1517191434949-5e90cd67d2b6?auto=format&fit=crop&w=1400&q=90",
-  "aloe-vera": "https://images.unsplash.com/photo-1513360994626-fc3639d1cc82?auto=format&fit=crop&w=1400&q=90",
-};
-
 const CATEGORY_IMAGES: Record<string, string> = {
   "indoor-decorative-greens": "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=1200&q=88",
   "outdoor-landscape-plants": "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1200&q=88",
@@ -51,32 +40,113 @@ function isGenericAsset(value: string | null | undefined) {
   return normalized.includes("/product-assets/") || /placeholder|default-image|image-not-found|no-image/.test(normalized);
 }
 
+function svgData(svg: string) {
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
+function hash(value: string) {
+  let result = 0;
+  for (let index = 0; index < value.length; index += 1) result = (result * 31 + value.charCodeAt(index)) >>> 0;
+  return result;
+}
+
+function palette(slug: string) {
+  const palettes = [
+    ["#7da05b", "#4f783f", "#d9d3c5"],
+    ["#89ab63", "#5d8447", "#e2ddd1"],
+    ["#719255", "#486b3d", "#cec8ba"],
+    ["#95ae71", "#5f8148", "#ded8cb"],
+  ];
+  return palettes[hash(slug) % palettes.length];
+}
+
+function plantSvg(slug: string) {
+  const [leafA, leafB, pot] = palette(slug);
+  const kind = slug.toLowerCase();
+  const isSnake = kind.includes("snake-plant");
+  const isAloe = kind.includes("aloe");
+  const isCactus = kind.includes("cactus");
+  const isHaworthia = kind.includes("haworthia");
+  const isEcheveria = kind.includes("echeveria");
+  const isPeace = kind.includes("peace-lily");
+  const isZZ = kind.includes("zz-plant");
+  const isMonstera = kind.includes("monstera");
+  const isMoney = kind.includes("money-plant");
+  const isFiddle = kind.includes("fiddle");
+  const isFlowering = /bougainvillea|ixora|petunia|marigold|geranium|chrysanthemum|dahlia|calendula|lavender/.test(kind);
+  const isFruitVeg = /lemon|guava|tomato|chilli|basil|mint/.test(kind);
+  const isPalm = /areca|frangipani|polyalthia/.test(kind);
+  const isDuranta = kind.includes("duranta");
+  const leaves = isSnake
+    ? `<path d="M275 500C226 336 234 164 286 82c42 124 32 279-11 418Z" fill="${leafA}"/><path d="M319 505C299 329 344 160 402 94c24 143-3 283-83 411Z" fill="${leafB}"/><path d="M242 502C188 374 168 264 205 189c67 90 68 210 37 313Z" fill="${leafB}"/>`
+    : isCactus
+      ? `<path d="M286 503V214h38v289Z" fill="${leafB}"/><path d="M286 336h-57c-21 0-37 17-37 38v43h28v-33c0-9 7-17 17-17h49Z" fill="${leafA}"/><path d="M324 286h54c21 0 37 17 37 38v35h-27v-25c0-9-7-16-16-16h-48Z" fill="${leafA}"/>`
+      : isEcheveria || isHaworthia
+        ? `<g fill="${leafA}">${Array.from({ length: 10 }, (_, index) => {
+            const angle = index * 36;
+            return `<ellipse cx="300" cy="356" rx="26" ry="92" transform="rotate(${angle} 300 356)"/>`;
+          }).join("")}</g><circle cx="300" cy="356" r="38" fill="${leafB}"/>`
+        : isAloe
+          ? `<path d="M300 508C269 387 246 205 274 87c42 92 50 260 26 421Z" fill="${leafA}"/><path d="M300 507c28-140 61-307 100-392 12 114-13 269-83 393Z" fill="${leafB}"/><path d="M284 507c-59-124-105-243-105-344 73 68 98 177 105 344Z" fill="${leafB}"/><path d="M311 508c49-110 102-189 160-236-21 114-78 181-151 248Z" fill="${leafA}"/>`
+          : `<g fill="${leafA}">
+              <path d="M300 506V244C228 208 151 221 110 272c58 67 121 88 190 50Z"/>
+              <path d="M307 320c48-83 122-116 202-88-18 91-92 119-202 102Z" fill="${leafB}"/>
+              <path d="M302 394c-66-50-145-41-184 10 50 60 116 65 184 18Z" fill="${leafB}"/>
+              <path d="M303 245c-40-71-24-139 27-184 50 67 44 121-27 184Z" fill="${leafB}"/>
+            </g>`;
+  const flower = isFlowering ? `<g fill="#b47cca"><circle cx="249" cy="205" r="14"/><circle cx="276" cy="190" r="12"/><circle cx="417" cy="257" r="13"/><circle cx="441" cy="243" r="10"/></g>` : "";
+  const monstera = isMonstera ? `<g fill="#f1f1e7"><ellipse cx="181" cy="325" rx="11" ry="30" transform="rotate(-35 181 325)"/><ellipse cx="416" cy="269" rx="12" ry="31" transform="rotate(28 416 269)"/><ellipse cx="393" cy="410" rx="10" ry="26" transform="rotate(35 393 410)"/></g>` : "";
+  const peaceOrFiddle = isPeace || isFiddle ? `<path d="M300 505V168" stroke="#6b573e" stroke-width="10" stroke-linecap="round"/>` : "";
+  const moneyOrDuranta = isMoney || isDuranta ? `<path d="M300 505V190" stroke="#6b573e" stroke-width="9" stroke-linecap="round"/>` : "";
+  const palm = isPalm ? `<path d="M300 505V145" stroke="#6b573e" stroke-width="10"/><path d="M300 214C223 154 151 152 102 188 165 230 229 239 300 214Z" fill="${leafA}"/><path d="M300 214c77-61 147-63 198-25-60 43-124 49-198 25Z" fill="${leafB}"/>` : "";
+  return svgData(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600"><ellipse cx="300" cy="548" rx="135" ry="20" fill="#000" opacity=".08"/>${peaceOrFiddle}${moneyOrDuranta}${palm}${leaves}${flower}${monstera}<path d="M212 505h176l-20 58H232Z" fill="${pot}"/><ellipse cx="300" cy="505" rx="88" ry="15" fill="#786f63"/></svg>`);
+}
+
+function supplySvg(slug: string) {
+  const kind = slug.toLowerCase();
+  const [, accent, base] = palette(slug);
+  const potLike = /pot|planter|grow-bag/.test(kind);
+  const soil = /soil|compost|potting-mix|cocopeat/.test(kind);
+  const fertilizer = /fertilizer|vermicompost|manure|neem-cake|seaweed|pellet|plant-food/.test(kind);
+  const pest = /neem-oil|pesticide|insect|fungicide|pest/.test(kind);
+  const watering = /watering-can/.test(kind);
+  const trowel = /trowel/.test(kind);
+  const pruner = /pruner/.test(kind);
+  const spray = /sprayer|spray-bottle/.test(kind);
+  const stake = /stake/.test(kind);
+  const trellis = /trellis/.test(kind);
+  let art = `<rect x="207" y="176" width="186" height="276" rx="26" fill="${base}" stroke="${accent}" stroke-width="8"/><rect x="225" y="210" width="150" height="70" rx="16" fill="#eef0df"/><rect x="255" y="304" width="90" height="18" rx="9" fill="${accent}"/>`;
+  if (potLike) art = `<path d="M180 205h240l-24 290H204Z" fill="${base}" stroke="${accent}" stroke-width="8"/><path d="M165 205h270" stroke="${accent}" stroke-width="16" stroke-linecap="round"/><path d="M208 260h184" stroke="#eef0df" stroke-width="14" stroke-linecap="round"/>`;
+  if (soil) art = kind.includes("cocopeat-block") ? `<path d="M160 250l230-50 74 86-233 53Z" fill="#a95c33"/><path d="M231 339l233-53v130l-230 54Z" fill="#7f452a"/><path d="M160 250l71 89-1 131-71-88Z" fill="#95502e"/>` : `<path d="M182 208h236l-30 282H212Z" fill="${base}" stroke="${accent}" stroke-width="8"/><path d="M182 236h236" stroke="#eef0df" stroke-width="26"/><path d="M235 316h130" stroke="${accent}" stroke-width="16" stroke-linecap="round"/><path d="M230 363h140" stroke="${accent}" stroke-width="10" stroke-linecap="round"/>`;
+  if (fertilizer || pest) art = `<path d="M215 190h170v300H215Z" fill="${base}" stroke="${accent}" stroke-width="8"/><path d="M250 190v-42h100v42" fill="none" stroke="${accent}" stroke-width="12" stroke-linecap="round"/><rect x="238" y="258" width="124" height="58" rx="12" fill="#eef0df"/><circle cx="300" cy="390" r="42" fill="${accent}" opacity=".82"/>`;
+  if (watering) art = `<path d="M170 244h232c34 0 58 25 58 57v172H170V301c0-32 25-57 57-57Z" fill="${accent}"/><path d="M225 244c-8-71 19-112 75-112s83 41 75 112" fill="none" stroke="#536635" stroke-width="24" stroke-linecap="round"/><path d="M402 330c78-58 132-65 151-42-28 58-81 75-151 76" fill="${accent}"/>`;
+  if (trowel) art = `<path d="M333 342c13 50 18 93 16 123" stroke="#9a6335" stroke-width="34" stroke-linecap="round"/><path d="M308 334L176 124c-16-25 11-55 39-40l148 82c29 16 35 52 11 75L355 339c-10 10-35 10-47-5Z" fill="#737a82"/>`;
+  if (pruner) art = `<path d="M273 314L192 225" stroke="#7b5335" stroke-width="28" stroke-linecap="round"/><path d="M327 314l81-89" stroke="#7b5335" stroke-width="28" stroke-linecap="round"/><path d="M279 309l-87-111" stroke="#70777e" stroke-width="14" stroke-linecap="round"/><path d="M321 309l87-111" stroke="#70777e" stroke-width="14" stroke-linecap="round"/><circle cx="300" cy="310" r="29" fill="#8b9159"/>`;
+  if (spray) art = `<path d="M244 214h112c21 0 37 16 37 37v232H244Z" fill="${base}" stroke="${accent}" stroke-width="8"/><path d="M275 214v-40h70v40" fill="none" stroke="${accent}" stroke-width="10"/><path d="M356 274h82l45-33" stroke="${accent}" stroke-width="14" stroke-linecap="round"/><circle cx="234" cy="213" r="12" fill="${accent}"/>`;
+  if (stake) art = `<path d="M217 170v316M300 170v316M383 170v316" stroke="${accent}" stroke-width="12" stroke-linecap="round"/><path d="M193 486h214" stroke="#7b6b54" stroke-width="14" stroke-linecap="round"/>`;
+  if (trellis) art = `<path d="M186 170v320M414 170v320M186 225h228M186 300h228M186 375h228M186 450h228M186 170L414 490M414 170L186 490" stroke="${accent}" stroke-width="10" stroke-linecap="round"/>`;
+  return svgData(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600"><ellipse cx="300" cy="548" rx="145" ry="20" fill="#000" opacity=".08"/>${art}</svg>`);
+}
+
+function exactPlaceholder(product: ProductImageRecord) {
+  const haystack = `${product.slug} ${product.name || ""}`.toLowerCase();
+  const plantHint = /plant|palm|tree|lily|monstera|snake|aloe|haworthia|echeveria|cactus|bougainvillea|ixora|duranta|frangipani|polyalthia|basil|mint|petunia|marigold|geranium|chrysanthemum|dahlia|calendula|sapling/.test(haystack);
+  return plantHint ? plantSvg(product.slug) : supplySvg(product.slug);
+}
+
 export function productImage(product: ProductImageRecord) {
   const uploaded = [product.image_url, ...(product.image_urls || [])].find((value) => !isGenericAsset(value));
   if (uploaded) return uploaded;
-
-  const exact = REAL_BY_SLUG[product.slug];
-  if (exact) return exact;
-
-  const haystack = `${product.slug} ${product.name || ""} ${product.subcategory || ""} ${product.category || ""}`;
-  const categoryText = (product.category || "").toLowerCase();
-  const matched = CATEGORY_BY_TERM.find(([pattern]) => pattern.test(haystack))?.[1];
-  if (matched) return CATEGORY_IMAGES[matched];
-
-  for (const [categorySlug, image] of Object.entries(CATEGORY_IMAGES)) {
-    const readable = categorySlug.replaceAll("-", " ");
-    if (categoryText.includes(readable)) return image;
-  }
-
-  return CATEGORY_IMAGES[product.product_type === "Gardening Supplies" ? "tools-equipment" : "indoor-decorative-greens"];
+  return exactPlaceholder(product);
 }
 
 export function productImages(product: ProductImageRecord) {
+  const primary = productImage(product);
   const uploaded = [product.image_url, ...(product.image_urls || [])].filter((value): value is string => Boolean(value) && !isGenericAsset(value));
-  return Array.from(new Set([productImage(product), ...uploaded].filter(Boolean)));
+  return Array.from(new Set([primary, ...uploaded].filter(Boolean)));
 }
 
 export const productImageAssets = {
-  realBySlug: REAL_BY_SLUG,
+  exactPlaceholder: true,
   categoryImages: CATEGORY_IMAGES,
 };
