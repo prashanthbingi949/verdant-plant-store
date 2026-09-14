@@ -22,7 +22,7 @@ const CATEGORY_IMAGES: Record<string, string> = {
 };
 
 const CATEGORY_BY_TERM: Array<[RegExp, string]> = [
-  [/monstera|peace-lily|zz-plant|money-plant|pothos|philodendron|fiddle|snake/i, "indoor-decorative-greens"],
+  [/monstera|peace-lily|zz-plant|money-plant|pothos|philodendron|fiddle|snake|bird-of-paradise/i, "indoor-decorative-greens"],
   [/jade|aloe|haworthia|echeveria|cactus|cacti|succulent/i, "succulents-cacti"],
   [/bougainvillea|ixora|areca|duranta|frangipani|polyalthia|hedge|large tree|tree/i, "outdoor-landscape-plants"],
   [/lemon tree|guava|tomato|chilli|basil|mint|sapling|vegetable|fruit tree/i, "fruit-vegetable-saplings"],
@@ -37,7 +37,9 @@ const CATEGORY_BY_TERM: Array<[RegExp, string]> = [
 function isGenericAsset(value: string | null | undefined) {
   if (!value) return true;
   const normalized = value.toLowerCase();
-  return normalized.includes("/product-assets/") || /placeholder|default-image|image-not-found|no-image/.test(normalized);
+  return normalized.includes("/product-assets/")
+    || normalized.startsWith("data:image/svg+xml")
+    || /placeholder|default-image|image-not-found|no-image/.test(normalized);
 }
 
 function svgData(svg: string) {
@@ -69,14 +71,15 @@ function plantSvg(slug: string) {
   const isHaworthia = kind.includes("haworthia");
   const isEcheveria = kind.includes("echeveria");
   const isPeace = kind.includes("peace-lily");
-  const isZZ = kind.includes("zz-plant");
   const isMonstera = kind.includes("monstera");
-  const isMoney = kind.includes("money-plant");
+  const isMoney = kind.includes("money-plant") || kind.includes("money-plant");
   const isFiddle = kind.includes("fiddle");
+  const isBird = kind.includes("bird-of-paradise");
   const isFlowering = /bougainvillea|ixora|petunia|marigold|geranium|chrysanthemum|dahlia|calendula|lavender/.test(kind);
   const isFruitVeg = /lemon|guava|tomato|chilli|basil|mint/.test(kind);
   const isPalm = /areca|frangipani|polyalthia/.test(kind);
   const isDuranta = kind.includes("duranta");
+
   const leaves = isSnake
     ? `<path d="M275 500C226 336 234 164 286 82c42 124 32 279-11 418Z" fill="${leafA}"/><path d="M319 505C299 329 344 160 402 94c24 143-3 283-83 411Z" fill="${leafB}"/><path d="M242 502C188 374 168 264 205 189c67 90 68 210 37 313Z" fill="${leafB}"/>`
     : isCactus
@@ -88,18 +91,23 @@ function plantSvg(slug: string) {
           }).join("")}</g><circle cx="300" cy="356" r="38" fill="${leafB}"/>`
         : isAloe
           ? `<path d="M300 508C269 387 246 205 274 87c42 92 50 260 26 421Z" fill="${leafA}"/><path d="M300 507c28-140 61-307 100-392 12 114-13 269-83 393Z" fill="${leafB}"/><path d="M284 507c-59-124-105-243-105-344 73 68 98 177 105 344Z" fill="${leafB}"/><path d="M311 508c49-110 102-189 160-236-21 114-78 181-151 248Z" fill="${leafA}"/>`
-          : `<g fill="${leafA}">
-              <path d="M300 506V244C228 208 151 221 110 272c58 67 121 88 190 50Z"/>
-              <path d="M307 320c48-83 122-116 202-88-18 91-92 119-202 102Z" fill="${leafB}"/>
-              <path d="M302 394c-66-50-145-41-184 10 50 60 116 65 184 18Z" fill="${leafB}"/>
-              <path d="M303 245c-40-71-24-139 27-184 50 67 44 121-27 184Z" fill="${leafB}"/>
-            </g>`;
+          : isBird
+            ? `<g fill="${leafA}"><path d="M300 505V190c-22-82 6-137 72-167 17 88-4 153-64 191v164Z"/><path d="M315 306c78-61 148-62 204-15-24 83-104 106-204 56Z" fill="${leafB}"/><path d="M292 394c-73-45-137-26-176 29 55 66 120 65 176 12Z" fill="${leafB}"/></g><path d="M371 164c48-83 96-92 141-70-20 61-58 81-126 71Z" fill="#e78d46"/>`
+            : isFiddle
+              ? `<path d="M300 505V168" stroke="#6b573e" stroke-width="10" stroke-linecap="round"/><g fill="${leafA}"><path d="M300 238c-84-28-126-91-95-143 83-4 119 42 95 143Z"/><path d="M307 324c77-30 139-13 160 44-70 44-124 27-160-44Z" fill="${leafB}"/><path d="M297 405c-72-31-124-11-143 42 64 44 115 26 143-42Z" fill="${leafA}"/></g>`
+              : `<g fill="${leafA}">
+                  <path d="M300 506V244C228 208 151 221 110 272c58 67 121 88 190 50Z"/>
+                  <path d="M307 320c48-83 122-116 202-88-18 91-92 119-202 102Z" fill="${leafB}"/>
+                  <path d="M302 394c-66-50-145-41-184 10 50 60 116 65 184 18Z" fill="${leafB}"/>
+                  <path d="M303 245c-40-71-24-139 27-184 50 67 44 121-27 184Z" fill="${leafB}"/>
+                </g>`;
+
   const flower = isFlowering ? `<g fill="#b47cca"><circle cx="249" cy="205" r="14"/><circle cx="276" cy="190" r="12"/><circle cx="417" cy="257" r="13"/><circle cx="441" cy="243" r="10"/></g>` : "";
   const monstera = isMonstera ? `<g fill="#f1f1e7"><ellipse cx="181" cy="325" rx="11" ry="30" transform="rotate(-35 181 325)"/><ellipse cx="416" cy="269" rx="12" ry="31" transform="rotate(28 416 269)"/><ellipse cx="393" cy="410" rx="10" ry="26" transform="rotate(35 393 410)"/></g>` : "";
-  const peaceOrFiddle = isPeace || isFiddle ? `<path d="M300 505V168" stroke="#6b573e" stroke-width="10" stroke-linecap="round"/>` : "";
   const moneyOrDuranta = isMoney || isDuranta ? `<path d="M300 505V190" stroke="#6b573e" stroke-width="9" stroke-linecap="round"/>` : "";
   const palm = isPalm ? `<path d="M300 505V145" stroke="#6b573e" stroke-width="10"/><path d="M300 214C223 154 151 152 102 188 165 230 229 239 300 214Z" fill="${leafA}"/><path d="M300 214c77-61 147-63 198-25-60 43-124 49-198 25Z" fill="${leafB}"/>` : "";
-  return svgData(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600"><ellipse cx="300" cy="548" rx="135" ry="20" fill="#000" opacity=".08"/>${peaceOrFiddle}${moneyOrDuranta}${palm}${leaves}${flower}${monstera}<path d="M212 505h176l-20 58H232Z" fill="${pot}"/><ellipse cx="300" cy="505" rx="88" ry="15" fill="#786f63"/></svg>`);
+
+  return svgData(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600"><ellipse cx="300" cy="548" rx="135" ry="20" fill="#000" opacity=".08"/>${moneyOrDuranta}${palm}${leaves}${flower}${monstera}<path d="M212 505h176l-20 58H232Z" fill="${pot}"/><ellipse cx="300" cy="505" rx="88" ry="15" fill="#786f63"/></svg>`);
 }
 
 function supplySvg(slug: string) {
@@ -129,9 +137,12 @@ function supplySvg(slug: string) {
 }
 
 function exactPlaceholder(product: ProductImageRecord) {
+  const category = `${product.category || ""} ${product.subcategory || ""}`.toLowerCase();
   const haystack = `${product.slug} ${product.name || ""}`.toLowerCase();
-  const plantHint = /plant|palm|tree|lily|monstera|snake|aloe|haworthia|echeveria|cactus|bougainvillea|ixora|duranta|frangipani|polyalthia|basil|mint|petunia|marigold|geranium|chrysanthemum|dahlia|calendula|sapling/.test(haystack);
-  return plantHint ? plantSvg(product.slug) : supplySvg(product.slug);
+  const isPlantRecord = product.product_type === "Plants"
+    || /indoor|decorative|greens|outdoor|landscape|succulent|cacti|flower|sapling|plant|tree|shrub|hedge|herb/.test(`${category} ${haystack}`)
+    || /aloe|jade|monstera|snake|fiddle|bird-of-paradise|peace-lily|zz-plant|money-plant|bougainvillea|ixora|areca|duranta|frangipani|polyalthia|haworthia|echeveria|cactus|lemon|guava|tomato|chilli|basil|mint|petunia|marigold|geranium|chrysanthemum|dahlia|calendula|lavender/.test(haystack);
+  return isPlantRecord ? plantSvg(product.slug) : supplySvg(product.slug);
 }
 
 export function productImage(product: ProductImageRecord) {
