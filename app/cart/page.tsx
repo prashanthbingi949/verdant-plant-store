@@ -1,16 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
 import { useCart } from "@/components/cart-provider";
 import VerdantCartRecommendations from "@/components/verdant-cart-recommendations";
 
+function DeleteIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 7h16" />
+      <path d="M9 7V4.5h6V7" />
+      <path d="M7 7l.7 12.2h8.6L17 7" />
+      <path d="M10 10.5v5.5M14 10.5v5.5" />
+    </svg>
+  );
+}
+
 export default function CartPage() {
-  const { items, updateQuantity, removeItem, clearCart, subtotal, delivery, total, itemCount } = useCart();
+  const { items, updateQuantity, removeItem, clearCart, subtotal, delivery, total } = useCart();
   const threshold = 1499;
   const progress = Math.min(100, Math.round((subtotal / threshold) * 100));
   const remaining = Math.max(0, threshold - subtotal);
-  const itemCountLabel = useMemo(() => `${itemCount} ${itemCount === 1 ? "item" : "items"}`, [itemCount]);
 
   if (items.length === 0) {
     return (
@@ -51,7 +60,8 @@ export default function CartPage() {
         .vd-cart-item-media{aspect-ratio:1;border-radius:22px;background:#e0e8d5;overflow:hidden}.vd-cart-item-media img{width:100%;height:100%;object-fit:contain;padding:10px}.vd-cart-item-body{padding:5px 3px}
         .vd-cart-item-head{display:flex;justify-content:space-between;gap:12px}.vd-cart-item-category{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(16,21,16,.46)}
         .vd-cart-item-name{margin-top:5px;font-size:21px;letter-spacing:-.03em}.vd-cart-item-price{margin-top:8px;font-size:12px;color:rgba(16,21,16,.55)}
-        .vd-cart-remove{border:0;background:none;color:rgba(16,21,16,.42);font-size:10px;font-weight:800;cursor:pointer}.vd-cart-item-bottom{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:28px}
+        .vd-cart-remove{display:grid;place-items:center;width:32px;height:32px;flex:0 0 32px;border:1px solid rgba(16,21,16,.08);border-radius:50%;background:#f4f5e9;color:rgba(16,21,16,.42);cursor:pointer;transition:.2s ease}.vd-cart-remove:hover{border-color:rgba(32,45,32,.2);background:#ddf27a;color:#202d20;transform:translateY(-1px)}
+        .vd-cart-item-bottom{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:28px}
         .vd-cart-qty{display:flex;align-items:center;padding:4px;border-radius:999px;border:1px solid rgba(16,21,16,.1);background:#f4f5e9}.vd-cart-qty button{width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:#202d20;font-size:18px;cursor:pointer}.vd-cart-qty button:hover{background:#fff}.vd-cart-qty span{width:30px;text-align:center;font-size:12px;font-weight:900}.vd-cart-line-total{font-size:15px;font-weight:900}
         .vd-cart-summary{position:sticky;top:94px;align-self:start;max-height:calc(100vh - 112px);overflow:auto;scrollbar-width:none;-ms-overflow-style:none;border-radius:30px;background:var(--forest);color:var(--cream);padding:26px;box-shadow:0 26px 64px rgba(32,45,32,.17)}.vd-cart-summary::-webkit-scrollbar{width:0;height:0;display:none}
         .vd-cart-summary-kicker{font-size:9px;font-weight:900;letter-spacing:.2em;color:var(--lime)}.vd-cart-summary h2{margin-top:8px;font-size:28px;letter-spacing:-.04em}
@@ -65,7 +75,7 @@ export default function CartPage() {
         @media(prefers-reduced-motion:reduce){.vd-cart-item,.vd-cart-checkout{transition:none}.vd-cart-item:hover,.vd-cart-checkout:hover{transform:none}}
       `}</style>
 
-      <header className="vd-cart-header"><div className="vd-cart-header-inner"><Link href="/" className="vd-cart-brand">VERDANT</Link><span className="vd-cart-header-center">{itemCountLabel}</span><Link href="/shop" className="vd-cart-continue">Continue shopping</Link></div></header>
+      <header className="vd-cart-header"><div className="vd-cart-header-inner"><Link href="/" className="vd-cart-brand">VERDANT</Link><span className="vd-cart-header-center" aria-hidden="true"></span><Link href="/shop" className="vd-cart-continue">Continue shopping</Link></div></header>
 
       <section className="vd-cart-wrap">
         <div className="vd-cart-top"><div><p className="vd-cart-kicker">YOUR GREEN CORNER</p><h1 className="vd-cart-title">Things taking <em>root.</em></h1></div><button type="button" className="vd-cart-clear" onClick={clearCart}>Clear bag</button></div>
@@ -77,7 +87,7 @@ export default function CartPage() {
                 <article key={item.id} className="vd-cart-item">
                   <div className="vd-cart-item-media">{item.image_url ? <img src={item.image_url} alt={item.name} /> : null}</div>
                   <div className="vd-cart-item-body">
-                    <div className="vd-cart-item-head"><div><p className="vd-cart-item-category">{item.category} · {item.size}</p><h2 className="vd-cart-item-name">{item.name}</h2><p className="vd-cart-item-price">₹{Number(item.price).toLocaleString("en-IN")} each</p></div><button type="button" className="vd-cart-remove" onClick={() => removeItem(item.id)}>Remove</button></div>
+                    <div className="vd-cart-item-head"><div><p className="vd-cart-item-category">{item.category} · {item.size}</p><h2 className="vd-cart-item-name">{item.name}</h2><p className="vd-cart-item-price">₹{Number(item.price).toLocaleString("en-IN")} each</p></div><button type="button" className="vd-cart-remove" onClick={() => removeItem(item.id)} aria-label={`Remove ${item.name}`} title={`Remove ${item.name}`}><DeleteIcon /></button></div>
                     <div className="vd-cart-item-bottom"><div className="vd-cart-qty"><button type="button" onClick={() => updateQuantity(item.id, item.quantity - 1)} aria-label={`Decrease ${item.name}`}>−</button><span>{item.quantity}</span><button type="button" onClick={() => updateQuantity(item.id, item.quantity + 1)} aria-label={`Increase ${item.name}`}>+</button></div><strong className="vd-cart-line-total">₹{(Number(item.price) * item.quantity).toLocaleString("en-IN")}</strong></div>
                   </div>
                 </article>
