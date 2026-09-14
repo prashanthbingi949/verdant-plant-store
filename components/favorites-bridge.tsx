@@ -66,8 +66,28 @@ function applyButtonState(button: HTMLButtonElement, liked: boolean) {
     button.style.borderColor = liked ? "rgba(32,45,32,.08)" : "rgba(16,21,16,.08)";
   }
 
+  if (button.matches(".vd-save")) {
+    button.setAttribute("aria-label", liked ? "Remove from favourites" : "Save to favourites");
+    button.setAttribute("title", liked ? "Remove from favourites" : "Save to favourites");
+    button.style.color = liked ? "#202d20" : "rgba(16,21,16,.58)";
+    button.style.fontWeight = liked ? "900" : "850";
+    button.style.background = liked ? "rgba(221,242,122,.28)" : "transparent";
+    button.style.borderRadius = liked ? "999px" : "0";
+    button.style.padding = liked ? "8px 12px" : "15px 0";
+    button.style.marginTop = liked ? "7px" : "0";
+    button.style.marginBottom = liked ? "7px" : "0";
+  }
+
   const icon = button.querySelector<SVGElement>("svg");
-  if (icon) icon.style.fill = liked ? "currentColor" : "none";
+  if (icon) {
+    icon.style.fill = liked ? "currentColor" : "none";
+    if (button.matches(".vd-save")) {
+      icon.style.stroke = "currentColor";
+      icon.style.strokeWidth = "1.8";
+      icon.style.strokeLinecap = "round";
+      icon.style.strokeLinejoin = "round";
+    }
+  }
   button.classList.toggle("is-saved", liked);
 }
 
