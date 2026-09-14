@@ -1,0 +1,57 @@
+name: Verdant Release QA
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Build-time placeholders keep CI deterministic. Runtime credentials remain deployment secrets.
+      SUPABASE_URL: https://example.supabase.co
+      SUPABASE_SECRET_KEY: ci-placeholder
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder
+      ADMIN_EMAIL: ci@example.com
+      ADMIN_PASSWORD: ci-placeholder
+      RAZORPAY_KEY_ID: rzp_test_ci
+      RAZORPAY_KEY_SECRET: ci-placeholder
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Start production server
+        run: npm run start > /tmp/verdant-next.log 2>&1 &
+
+      - name: Wait for server
+        run: |
+          for i in {1..30}; do
+            if curl --silent --show-error --fail http://127.0.0.1:3000/ > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat /tmp/verdant-next.log
+          exit 1
+
+      - name: Route smoke checks
+        run: npm run qa:smoke
