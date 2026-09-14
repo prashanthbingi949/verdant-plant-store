@@ -32,6 +32,12 @@ export function toggleFavoriteSlug(slug: string) {
 function slugFromButton(button: HTMLButtonElement): string {
   const explicit = button.getAttribute("data-verdant-favorite-slug")?.trim();
   if (explicit) return explicit;
+
+  if (button.matches(".vd-save")) {
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    return parts[0] === "shop" && parts[1] ? parts[1] : "";
+  }
+
   const card = button.closest<HTMLElement>("article");
   const link = card?.querySelector<HTMLAnchorElement>('a[href^="/shop/"]');
   const href = link?.getAttribute("href") || "";
@@ -39,7 +45,7 @@ function slugFromButton(button: HTMLButtonElement): string {
 }
 
 function favoriteSelector() {
-  return "[data-verdant-favorite-slug], main.verdant-site article.product-card button.wish, main.verdant-shop-page article button[aria-label*='wishlist' i]";
+  return "[data-verdant-favorite-slug], .vd-save, main.verdant-site article.product-card button.wish, main.verdant-shop-page article button[aria-label*='wishlist' i]";
 }
 
 function applyButtonState(button: HTMLButtonElement, liked: boolean) {
