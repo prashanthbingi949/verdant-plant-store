@@ -37,27 +37,45 @@ function normalizeMarquee(section: { section_key: string; content: Record<string
     ? content.items.map((item: unknown) => String(item || "").trim()).filter(Boolean)
     : [];
   let items = rawItems;
-  if (!items.length && typeof content.text === "string") {
-    items = content.text.split("·").map((item: string) => item.trim()).filter(Boolean);
-  }
+  if (!items.length && typeof content.text === "string") items = content.text.split("·").map((item: string) => item.trim()).filter(Boolean);
   if (!items.length) items = ["PLANT MORE JOY"];
   const sequence = `${items.join(" · ")} ·`;
   return { ...section, content: { ...content, items, text: `${sequence} ${sequence}` } };
 }
 
+function canonicalShopHref(label: unknown, href: unknown) {
+  const name = String(label || "").trim().toLowerCase();
+  const current = String(href || "");
+  if (name === "indoor plants" || current.includes("Indoor%20plants")) return "/shop?category=indoor-decorative-greens";
+  if (name === "outdoor plants" || current.includes("Outdoor%20plants")) return "/shop?category=outdoor-landscape-plants";
+  if (name === "succulents" || current.includes("Succulents")) return "/shop?category=succulents-cacti";
+  if (name === "planters" || current.includes("Pots%20%26%20Planters")) return "/shop?category=pots-planters";
+  return current;
+}
+
+function normalizeLinks(section: any) {
+  if (!section?.content) return section;
+  const content = { ...section.content };
+  if (Array.isArray(content.items)) {
+    content.items = content.items.map((item: any) => ({ ...item, href: canonicalShopHref(item?.title, item?.href) }));
+  }
+  if (Array.isArray(content.shop_links)) {
+    content.shop_links = content.shop_links.map((item: any) => ({ ...item, href: canonicalShopHref(item?.label, item?.href) }));
+  }
+  return { ...section, content };
+}
+
 function mergeSection(row: any) {
   const fallback = defaults.find((item) => item.section_key === row.section_key);
-  const merged = { ...(fallback || {}), ...row, content: { ...(fallback?.content || {}), ...(row.content || {}) } };
-  if (merged.section_key === "marquee") return normalizeMarquee(merged);
-  if (merged.section_key === "care" && (!Array.isArray(merged.content.items) || !merged.content.items.length)) {
-    merged.content.items = fallback?.content.items || [];
-  }
+  let merged = { ...(fallback || {}), ...row, content: { ...(fallback?.content || {}), ...(row.content || {}) } };
+  if (merged.section_key === "marquee") merged = normalizeMarquee(merged);
+  if (merged.section_key === "care" && (!Array.isArray(merged.content.items) || !merged.content.items.length)) merged.content.items = fallback?.content.items || [];
   if (merged.section_key === "footer") {
     merged.content = { ...defaultFooter, ...merged.content };
     if (!Array.isArray(merged.content.shop_links) || !merged.content.shop_links.length) merged.content.shop_links = defaultFooter.shop_links;
     if (!Array.isArray(merged.content.about_links) || !merged.content.about_links.length) merged.content.about_links = defaultFooter.about_links;
   }
-  return merged;
+  return normalizeLinks(merged);
 }
 
 export async function GET() {
@@ -66,8 +84,6 @@ export async function GET() {
   const rows = Array.isArray(result.data) ? result.data : [];
   const byKey = new Map(rows.map((row: any) => [String(row.section_key), row]));
   const merged = defaults.map((fallback) => mergeSection(byKey.get(fallback.section_key) || fallback));
-  for (const row of rows as any[]) {
-    if (!defaults.some((fallback) => fallback.section_key === row.section_key)) merged.push(mergeSection(row));
-  }
+  for (const row of rows as any[]) if (!defaults.some((fallback) => fallback.section_key === row.section_key)) merged.push(mergeSection(row));
   return NextResponse.json({ sections: merged.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)) });
 }
