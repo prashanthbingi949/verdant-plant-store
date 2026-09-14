@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { motion, useAnimation, useMotionValue } from "motion/react";
+import { motion, useAnimation, useMotionValue } from "framer-motion";
 import "./CircularText.css";
 
 type CircularTextProps = {
