@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 const POPULAR = [
@@ -33,9 +34,11 @@ function setInputValue(input: HTMLInputElement, value: string) {
 export default function ShopSearchEnhancer() {
   const activeCleanup = useRef<(() => void) | null>(null);
   const activeInput = useRef<HTMLInputElement | null>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     let disposed = false;
+    let setupTimer: number | null = null;
 
     const teardown = () => {
       activeCleanup.current?.();
@@ -50,8 +53,8 @@ export default function ShopSearchEnhancer() {
         teardown();
         return;
       }
-
       if (activeInput.current === input) return;
+
       teardown();
       activeInput.current = input;
 
@@ -78,18 +81,10 @@ export default function ShopSearchEnhancer() {
         const query = input.value.trim().toLowerCase();
         const values = (query ? SEARCH_HINTS.filter((item) => item.toLowerCase().includes(query)) : POPULAR).slice(0, 6);
         panel.innerHTML = `
-          <div class="verdant-search-panel-head">
-            <span>${query ? "Suggestions" : "Popular searches"}</span>
-            <kbd>ESC</kbd>
-          </div>
+          <div class="verdant-search-panel-head"><span>${query ? "Suggestions" : "Popular searches"}</span><kbd>ESC</kbd></div>
           <div class="verdant-search-suggestions">
-            ${values.length
-              ? values
-                  .map((value) => `<button type="button" class="verdant-search-suggestion" data-value="${value.replaceAll('"', '&quot;')}"><span class="verdant-search-suggestion-icon">⌕</span><span>${value}</span></button>`)
-                  .join("")
-              : '<div class="verdant-search-empty">No close matches yet — try another plant or garden essential.</div>'}
-          </div>
-        `;
+            ${values.length ? values.map((value) => `<button type="button" class="verdant-search-suggestion" data-value="${value.replaceAll('"', '&quot;')}"><span class="verdant-search-suggestion-icon">⌕</span><span>${value}</span></button>`).join("") : '<div class="verdant-search-empty">No close matches yet — try another plant or garden essential.</div>'}
+          </div>`;
       };
 
       const open = () => {
@@ -114,35 +109,31 @@ export default function ShopSearchEnhancer() {
         }, 140);
       };
 
-      const onFocus = () => open();
-      const onInput = () => open();
       const onDocumentPointer = (event: PointerEvent) => {
         const target = event.target as Node | null;
         if (target && (panel.contains(target) || input.contains(target))) return;
         close();
       };
-      const onKeyDown = (event: KeyboardEvent) => {
+      const onSuggestionClick = (event: MouseEvent) => {
+        const button = (event.target as HTMLElement).closest<HTMLButtonElement>(".verdant-search-suggestion");
+        if (!button) return;
+        setInputValue(input, button.dataset.value || "");
+        input.focus();
+        render();
+      };
+      const onViewportChange = () => {
+        if (!panel.hidden) updatePosition();
+      };
+
+      input.addEventListener("focus", open);
+      input.addEventListener("input", open);
+      input.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
           event.preventDefault();
           close();
           input.blur();
         }
-      };
-      const onViewportChange = () => {
-        if (!panel.hidden) updatePosition();
-      };
-      const onSuggestionClick = (event: MouseEvent) => {
-        const button = (event.target as HTMLElement).closest<HTMLButtonElement>(".verdant-search-suggestion");
-        if (!button) return;
-        const value = button.dataset.value || "";
-        setInputValue(input, value);
-        input.focus();
-        render();
-      };
-
-      input.addEventListener("focus", onFocus);
-      input.addEventListener("input", onInput);
-      input.addEventListener("keydown", onKeyDown);
+      });
       panel.addEventListener("click", onSuggestionClick);
       document.addEventListener("pointerdown", onDocumentPointer);
       window.addEventListener("resize", onViewportChange, { passive: true });
@@ -150,9 +141,8 @@ export default function ShopSearchEnhancer() {
 
       activeCleanup.current = () => {
         if (closeTimer !== null) window.clearTimeout(closeTimer);
-        input.removeEventListener("focus", onFocus);
-        input.removeEventListener("input", onInput);
-        input.removeEventListener("keydown", onKeyDown);
+        input.removeEventListener("focus", open);
+        input.removeEventListener("input", open);
         panel.removeEventListener("click", onSuggestionClick);
         document.removeEventListener("pointerdown", onDocumentPointer);
         window.removeEventListener("resize", onViewportChange);
@@ -161,16 +151,24 @@ export default function ShopSearchEnhancer() {
       };
     };
 
-    const observer = new MutationObserver(setup);
-    observer.observe(document.body, { childList: true, subtree: true });
-    setup();
+    if (pathname === "/shop") {
+      setupTimer = window.setTimeout(setup, 60);
+      const second = window.setTimeout(setup, 350);
+      return () => {
+        disposed = true;
+        if (setupTimer !== null) window.clearTimeout(setupTimer);
+        window.clearTimeout(second);
+        teardown();
+      };
+    }
 
+    teardown();
     return () => {
       disposed = true;
-      observer.disconnect();
+      if (setupTimer !== null) window.clearTimeout(setupTimer);
       teardown();
     };
-  }, []);
+  }, [pathname]);
 
   return null;
 }
