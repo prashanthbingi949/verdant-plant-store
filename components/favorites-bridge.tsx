@@ -76,6 +76,9 @@ function applyButtonState(button: HTMLButtonElement, liked: boolean) {
     button.style.padding = liked ? "8px 12px" : "15px 0";
     button.style.marginTop = liked ? "7px" : "0";
     button.style.marginBottom = liked ? "7px" : "0";
+
+    const labelNode = Array.from(button.childNodes).find((node) => node.nodeType === Node.TEXT_NODE);
+    if (labelNode) labelNode.nodeValue = liked ? "Saved " : "Save ";
   }
 
   const icon = button.querySelector<SVGElement>("svg");
