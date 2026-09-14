@@ -61,9 +61,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <CartProvider>
           <HomeNavController />
           <HomeVisualEffects />
-          <SiteUtilities />
           <HomeWishlistPersistence />
           <FavoritesBridge />
+          <SiteUtilities />
           <VerdantPremiumMotion />
           <ShopSearchEnhancer />
           <ShopCartToast />
