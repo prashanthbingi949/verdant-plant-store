@@ -6,14 +6,22 @@ export type Product = {
   created_at?: string;
   updated_at?: string;
   slug: string;
+  canonical_slug?: string;
+  sku?: string;
   name: string;
   product_type: "Plants" | "Gardening Supplies";
   category: string;
   subcategory: string;
   level: string;
   price: number;
+  compare_at_price?: number | null;
+  cost_price?: number | null;
+  tax_rate?: number;
+  tax_code?: string;
   size: string;
+  short_description?: string;
   description: string;
+  personality_line?: string;
   details: string[][];
   tone: "moss" | "sage" | "lime";
   stock: number;
@@ -23,6 +31,14 @@ export type Product = {
   badge_text: string;
   image_url?: string | null;
   image_urls?: string[];
+  image_alt_text?: string;
+  image_alt_texts?: string[];
+  related_product_slugs?: string[];
+  complete_corner_slugs?: string[];
+  seo_title?: string;
+  seo_description?: string;
+  publish_status?: "published" | "draft" | "archived";
+  preview_enabled?: boolean;
 };
 
 function normalizeProduct(product: Product): Product {
