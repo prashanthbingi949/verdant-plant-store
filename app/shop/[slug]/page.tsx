@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ProductDetails from "@/components/product-details";
+import ProductMasterStorefrontBridge from "@/components/product-master-storefront-bridge";
 import { getProductBySlug, getProducts } from "@/lib/products";
 
 export async function generateStaticParams() {
@@ -34,6 +35,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
-  if (!product || !product.active) notFound();
-  return <ProductDetails product={product} />;
+  if (!product || !product.active || product.publish_status === "archived" || product.publish_status === "draft") notFound();
+
+  return (
+    <>
+      <ProductDetails product={product} />
+      <ProductMasterStorefrontBridge product={product} />
+    </>
+  );
 }
