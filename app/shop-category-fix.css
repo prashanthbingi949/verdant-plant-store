@@ -88,6 +88,11 @@
   border-radius: 0 0 32px 32px;
 }
 
+/* Shop tiles stay image + name + price + actions. Detail copy belongs on Product Detail. */
+.verdant-shop-page article.product-card p {
+  display: none !important;
+}
+
 /* Premium search suggestions live outside the clipped hero and track the input. */
 .verdant-search-panel {
   position: fixed;
