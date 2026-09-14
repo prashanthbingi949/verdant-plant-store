@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 export const FAV_KEY = "verdant-favorites-v1";
@@ -103,7 +104,19 @@ function syncFavoriteButtons() {
 }
 
 export default function FavoritesBridge() {
+  const pathname = usePathname();
+
   useEffect(() => {
+    let disposed = false;
+    let timer: number | null = null;
+
+    const scheduleSync = () => {
+      if (timer !== null) window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        if (!disposed) syncFavoriteButtons();
+      }, 80);
+    };
+
     const onClick = (event: MouseEvent) => {
       const target = event.target as Element | null;
       const button = target?.closest<HTMLButtonElement>(favoriteSelector());
@@ -117,20 +130,23 @@ export default function FavoritesBridge() {
       event.stopImmediatePropagation();
     };
 
-    const observer = new MutationObserver(syncFavoriteButtons);
-    observer.observe(document.body, { childList: true, subtree: true });
     document.addEventListener("click", onClick, true);
-    window.addEventListener("storage", syncFavoriteButtons);
-    window.addEventListener(FAV_EVENT, syncFavoriteButtons);
+    window.addEventListener("storage", scheduleSync);
+    window.addEventListener(FAV_EVENT, scheduleSync);
+    window.addEventListener("popstate", scheduleSync);
+
     syncFavoriteButtons();
+    scheduleSync();
 
     return () => {
-      observer.disconnect();
+      disposed = true;
+      if (timer !== null) window.clearTimeout(timer);
       document.removeEventListener("click", onClick, true);
-      window.removeEventListener("storage", syncFavoriteButtons);
-      window.removeEventListener(FAV_EVENT, syncFavoriteButtons);
+      window.removeEventListener("storage", scheduleSync);
+      window.removeEventListener(FAV_EVENT, scheduleSync);
+      window.removeEventListener("popstate", scheduleSync);
     };
-  }, []);
+  }, [pathname]);
 
   return null;
 }
