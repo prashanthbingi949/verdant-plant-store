@@ -60,12 +60,24 @@ function applyMasterCopy(product: ProductMasterView) {
   });
 
   const priceRow = root.querySelector<HTMLElement>(".vd-price-row");
-  if (priceRow && product.compare_at_price != null && Number(product.compare_at_price) > Number(product.price) && !priceRow.querySelector(".vd-master-compare")) {
-    const compare = document.createElement("span");
-    compare.className = "vd-master-compare";
-    compare.textContent = formatPrice(Number(product.compare_at_price));
-    compare.style.cssText = "font-size:14px;color:rgba(16,21,16,.42);text-decoration:line-through;padding-bottom:7px;";
-    priceRow.appendChild(compare);
+  if (priceRow) {
+    const compareValue = Number(product.compare_at_price);
+    const sellingValue = Number(product.price);
+    const existing = priceRow.querySelector<HTMLElement>(".vd-master-compare");
+
+    if (Number.isFinite(compareValue) && compareValue > sellingValue && compareValue > 0) {
+      const compare = existing || document.createElement("span");
+      compare.className = "vd-master-compare";
+      compare.textContent = formatPrice(compareValue);
+      compare.style.cssText = "font-size:14px;color:rgba(16,21,16,.42);text-decoration:line-through;padding-bottom:7px;white-space:nowrap;";
+      if (!existing) {
+        const tax = priceRow.querySelector<HTMLElement>(".vd-tax");
+        if (tax) priceRow.insertBefore(compare, tax);
+        else priceRow.appendChild(compare);
+      }
+    } else if (existing) {
+      existing.remove();
+    }
   }
 }
 
@@ -129,9 +141,10 @@ async function applyCuratedRelated(product: ProductMasterView) {
 
 export default function ProductMasterStorefrontBridge({ product }: { product: ProductMasterView }) {
   useEffect(() => {
-    const timers = [0, 700].map((delay) => window.setTimeout(() => {
+    const delays = [0, 350, 900, 1600];
+    const timers = delays.map((delay) => window.setTimeout(() => {
       applyMasterCopy(product);
-      void applyCuratedRelated(product);
+      if (delay === 0) void applyCuratedRelated(product);
     }, delay));
 
     return () => timers.forEach((timer) => window.clearTimeout(timer));
