@@ -40,6 +40,24 @@
   display: none !important;
 }
 
+/* Prevent hidden editorial fields or stretched grid rows from pushing actions down. */
+.verdant-shop-page article.group.min-w-0 {
+  align-self: start !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+.verdant-shop-page article.group.min-w-0 > .pt-4 {
+  display: block !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.verdant-shop-page article.group.min-w-0 > .pt-4 > .flex.items-center.gap-2 {
+  margin-top: 12px !important;
+}
+
 @media (max-width: 1279px) and (min-width: 768px) {
   .verdant-shop-page .grid.grid-cols-1.gap-x-5.gap-y-10.sm\:grid-cols-2.xl\:grid-cols-4 {
     grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
@@ -73,6 +91,7 @@
 
   .verdant-shop-page article.group.min-w-0 .flex.items-center.gap-2 {
     gap: 6px;
+    margin-top: 10px !important;
   }
 
   .verdant-shop-page article.group.min-w-0 .flex.items-center.gap-2 a,
