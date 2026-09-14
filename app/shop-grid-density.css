@@ -1,4 +1,4 @@
-/* Verdant Shop: denser desktop product grid. */
+/* Verdant Shop: denser responsive product grid. */
 @media (min-width: 1280px) {
   .verdant-shop-page .grid.grid-cols-1.gap-x-5.gap-y-10.sm\:grid-cols-2.xl\:grid-cols-4 {
     grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
@@ -42,6 +42,41 @@
 
 @media (max-width: 767px) {
   .verdant-shop-page .grid.grid-cols-1.gap-x-5.gap-y-10.sm\:grid-cols-2.xl\:grid-cols-4 {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    column-gap: 12px !important;
+    row-gap: 28px !important;
+  }
+
+  .verdant-shop-page article.group.min-w-0 .aspect-square {
+    border-radius: 20px;
+  }
+
+  .verdant-shop-page article.group.min-w-0 .pt-4 {
+    padding-top: 10px;
+  }
+
+  .verdant-shop-page article.group.min-w-0 h3 {
+    font-size: 14px;
+    line-height: 1.15;
+  }
+
+  .verdant-shop-page article.group.min-w-0 p {
+    font-size: 11px;
+    line-height: 1.45;
+  }
+
+  .verdant-shop-page article.group.min-w-0 .flex.items-center.gap-2 {
+    gap: 6px;
+  }
+
+  .verdant-shop-page article.group.min-w-0 .flex.items-center.gap-2 a,
+  .verdant-shop-page article.group.min-w-0 .flex.items-center.gap-2 button {
+    height: 40px;
+    font-size: 11px;
+  }
+
+  .verdant-shop-page article.group.min-w-0 .flex.items-center.gap-2 button {
+    padding-left: 10px;
+    padding-right: 10px;
   }
 }
