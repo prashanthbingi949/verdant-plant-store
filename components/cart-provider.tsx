@@ -26,25 +26,66 @@ type CartContextValue = {
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
-const STORAGE_KEY = "verdant-cart-v1";
+const STORAGE_KEY = "verdant-cart-v2";
+const LEGACY_STORAGE_KEY = "verdant-cart-v1";
 const CART_ADD_EVENT = "verdant-cart-add-v2";
+const MAX_ITEM_QUANTITY = 99;
+
+function normalizeQuantity(value: unknown) {
+  const quantity = Number(value);
+  if (!Number.isFinite(quantity) || quantity <= 0) return 1;
+  return Math.min(MAX_ITEM_QUANTITY, Math.max(1, Math.floor(quantity)));
+}
+
+function normalizeStoredCart(value: unknown): CartItem[] {
+  if (!Array.isArray(value)) return [];
+
+  const normalized = value
+    .filter((item): item is CartItem => Boolean(item) && typeof item === "object" && typeof (item as CartItem).id === "string")
+    .map((item) => ({
+      ...item,
+      quantity: normalizeQuantity(item.quantity),
+    }));
+
+  return normalized.reduce<CartItem[]>((items, item) => {
+    const existing = items.find((entry) => entry.id === item.id);
+    if (!existing) return [...items, item];
+    return items.map((entry) =>
+      entry.id === item.id
+        ? { ...entry, ...item, quantity: Math.min(MAX_ITEM_QUANTITY, entry.quantity + item.quantity) }
+        : entry,
+    );
+  }, []);
+}
 
 function addOrIncrementCartItem(current: CartItem[], item: Omit<CartItem, "quantity">, quantity = 1) {
+  const safeQuantity = normalizeQuantity(quantity);
   const existing = current.find((entry) => entry.id === item.id);
   if (existing) {
     return current.map((entry) =>
-      entry.id === item.id ? { ...entry, ...item, quantity: entry.quantity + quantity } : entry,
+      entry.id === item.id
+        ? { ...entry, ...item, quantity: Math.min(MAX_ITEM_QUANTITY, entry.quantity + safeQuantity) }
+        : entry,
     );
   }
-  return [...current, { ...item, quantity }];
+  return [...current, { ...item, quantity: safeQuantity }];
 }
 
 function readStoredCart(): CartItem[] {
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (!stored) return [];
-    const parsed = JSON.parse(stored);
-    return Array.isArray(parsed) ? parsed : [];
+    if (stored) return normalizeStoredCart(JSON.parse(stored));
+
+    // One-time migration from v1. The old cart provider could duplicate
+    // persisted quantities during React Strict Mode initialization. Normalize
+    // the legacy data and write it into the fixed v2 store.
+    const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (!legacy) return [];
+
+    const migrated = normalizeStoredCart(JSON.parse(legacy));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+    window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+    return migrated;
   } catch {
     return [];
   }
@@ -63,11 +104,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const stored = readStoredCart();
-    setItems((current) => {
-      if (!current.length) return stored;
-      return stored.reduce((merged, item) => addOrIncrementCartItem(merged, item, item.quantity), current);
-    });
+    // Initialize exactly once from storage. The previous reducer-style merge
+    // could run twice under React Strict Mode and double every stored quantity.
+    setItems(readStoredCart());
     setReady(true);
   }, []);
 
@@ -126,23 +165,25 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo<CartContextValue>(() => {
-    const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const itemCount = items.reduce((sum, item) => sum + normalizeQuantity(item.quantity), 0);
+    const subtotal = items.reduce((sum, item) => sum + item.price * normalizeQuantity(item.quantity), 0);
     const delivery = subtotal === 0 || subtotal >= 1499 ? 0 : 79;
     return {
       items,
       addItem: (item, quantity = 1) => {
-        if (quantity <= 0) return;
-        setItems((current) => addOrIncrementCartItem(current, item, quantity));
-        emitCartAdd({ id: item.id, name: item.name, quantity, source: "explicit-add" });
+        const safeQuantity = normalizeQuantity(quantity);
+        setItems((current) => addOrIncrementCartItem(current, item, safeQuantity));
+        emitCartAdd({ id: item.id, name: item.name, quantity: safeQuantity, source: "explicit-add" });
       },
       removeItem: (id) => setItems((current) => current.filter((item) => item.id !== id)),
-      updateQuantity: (id, quantity) =>
+      updateQuantity: (id, quantity) => {
+        const safeQuantity = normalizeQuantity(quantity);
         setItems((current) =>
           quantity <= 0
             ? current.filter((item) => item.id !== id)
-            : current.map((item) => (item.id === id ? { ...item, quantity } : item)),
-        ),
+            : current.map((item) => (item.id === id ? { ...item, quantity: safeQuantity } : item)),
+        );
+      },
       clearCart: () => setItems([]),
       itemCount,
       subtotal,
