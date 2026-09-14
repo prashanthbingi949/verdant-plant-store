@@ -21,6 +21,7 @@ type Product = {
   featured?: boolean;
   image_url?: string | null;
   image_urls?: string[];
+  complete_corner_slugs?: string[];
 };
 
 type CartSignal = {
@@ -72,24 +73,18 @@ function recommendationScore(product: Product, cartItems: CartSignal[]) {
 
   let score = Number(product.featured) || 0;
 
-  // Prefer genuine complements instead of recommending three products from the same aisle.
   if (cartCategories.some((value) => /indoor|succulent|cacti|outdoor|flower|plant/.test(value))) {
     if (isPot) score += 12;
     if (isSoil) score += 10;
     if (isNutrient) score += 7;
     if (isTool) score += 4;
   }
-
   if (cartCategories.some((value) => /pot|planter/.test(value)) && isPlant) score += 13;
   if (cartCategories.some((value) => /soil|growing/.test(value)) && (isPlant || isNutrient)) score += 11;
   if (cartCategories.some((value) => /fertil|nutrient/.test(value)) && (isPlant || isSoil)) score += 9;
   if (cartCategories.some((value) => /tool|trowel|water|trellis/.test(value)) && isPlant) score += 12;
-
-  // A supply-heavy bag should get a living green recommendation rather than more tools.
   if (cartCategories.every((value) => /tool|trowel|water|trellis|equipment/.test(value)) && isPlant) score += 18;
   if (cartCategories.every((value) => /indoor|succulent|outdoor|plant|flower|green/.test(value)) && isSupply) score += 10;
-
-  // Same exact category is only useful when the candidate fills a complementary role.
   if (cartCategories.some((value) => value && (candidateCategory === value || haystack.includes(value)))) score -= isPlant === cartCategories.some((value) => /plant|indoor|succulent|outdoor/.test(value)) ? 5 : 2;
 
   return score;
@@ -125,9 +120,18 @@ export default function VerdantCartRecommendations() {
     const ids = new Set(items.map((item) => item.id));
     const signals = items.map((item) => ({ id: item.id, category: item.category, size: item.size }));
 
+    const curatedSlugs = products
+      .filter((product) => product.complete_corner_slugs?.length)
+      .flatMap((product) => product.complete_corner_slugs || []);
+    const curatedRank = new Map<string, number>();
+    curatedSlugs.forEach((slug, index) => { if (!curatedRank.has(slug)) curatedRank.set(slug, index); });
+
     const ranked = products
       .filter((product) => !ids.has(product.slug))
-      .map((product) => ({ product, score: recommendationScore(product, signals) }))
+      .map((product) => ({
+        product,
+        score: recommendationScore(product, signals) + (curatedRank.has(product.slug) ? Math.max(0, 60 - (curatedRank.get(product.slug) || 0)) : 0),
+      }))
       .sort((a, b) => b.score - a.score || Number(a.product.price) - Number(b.product.price));
 
     const picked: Product[] = [];
@@ -146,15 +150,7 @@ export default function VerdantCartRecommendations() {
   if (!items.length || !recommendations.length) return null;
 
   const add = (product: Product) => {
-    addItem({
-      id: product.slug,
-      name: product.name,
-      price: Number(product.price),
-      tone: product.tone,
-      size: product.size,
-      category: product.category,
-      image_url: imageFor(product),
-    }, 1);
+    addItem({ id: product.slug, name: product.name, price: Number(product.price), tone: product.tone, size: product.size, category: product.category, image_url: imageFor(product) }, 1);
     setAdded(product.slug);
     window.setTimeout(() => setAdded((current) => current === product.slug ? null : current), 1800);
   };
@@ -162,33 +158,16 @@ export default function VerdantCartRecommendations() {
   return (
     <section className="vd-cart-recommendations" aria-labelledby="cart-recommendations-title">
       <div className="vd-cart-recommendations-head">
-        <div>
-          <p className="vd-cart-recommendations-kicker">COMPLETE THE CORNER</p>
-          <h2 id="cart-recommendations-title">Good with what you chose.</h2>
-          <p>Useful add-ons picked from the things already in your bag.</p>
-        </div>
+        <div><p className="vd-cart-recommendations-kicker">COMPLETE THE CORNER</p><h2 id="cart-recommendations-title">Good with what you chose.</h2><p>Useful add-ons picked from the things already in your bag.</p></div>
         <Link href="/shop" className="vd-cart-recommendations-link">Browse all →</Link>
       </div>
-
       <div className="vd-cart-recommendations-grid">
         {recommendations.map((product) => {
           const image = imageFor(product);
-          return (
-            <article key={product.slug} className="vd-cart-rec-card">
-              <Link href={`/shop/${product.slug}`} className="vd-cart-rec-image">
-                {image ? <img src={image} alt={product.name} loading="lazy" /> : <span className="vd-cart-rec-placeholder" aria-hidden="true">VERDANT</span>}
-              </Link>
-              <div className="vd-cart-rec-copy">
-                <p>{product.subcategory || product.category}</p>
-                <Link href={`/shop/${product.slug}`}><h3>{product.name}</h3></Link>
-                <span className="vd-cart-rec-reason">{recommendationReason(product, items)}</span>
-                <div className="vd-cart-rec-foot">
-                  <strong>₹{Number(product.price).toLocaleString("en-IN")}</strong>
-                  <button type="button" onClick={() => add(product)}>{added === product.slug ? "Added ✓" : "Add"}</button>
-                </div>
-              </div>
-            </article>
-          );
+          return <article key={product.slug} className="vd-cart-rec-card">
+            <Link href={`/shop/${product.slug}`} className="vd-cart-rec-image">{image ? <img src={image} alt={product.name} loading="lazy" /> : <span className="vd-cart-rec-placeholder" aria-hidden="true">VERDANT</span>}</Link>
+            <div className="vd-cart-rec-copy"><p>{product.subcategory || product.category}</p><Link href={`/shop/${product.slug}`}><h3>{product.name}</h3></Link><span className="vd-cart-rec-reason">{recommendationReason(product, items)}</span><div className="vd-cart-rec-foot"><strong>₹{Number(product.price).toLocaleString("en-IN")}</strong><button type="button" onClick={() => add(product)}>{added === product.slug ? "Added ✓" : "Add"}</button></div></div>
+          </article>;
         })}
       </div>
     </section>
