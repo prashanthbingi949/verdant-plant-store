@@ -5,6 +5,17 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCart } from "@/components/cart-provider";
 
+function DeleteIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 7h16" />
+      <path d="M9 7V4.5h6V7" />
+      <path d="M7 7l.7 12.2h8.6L17 7" />
+      <path d="M10 10.5v5.5M14 10.5v5.5" />
+    </svg>
+  );
+}
+
 export default function MiniCartDrawer() {
   const pathname = usePathname();
   const router = useRouter();
@@ -89,7 +100,7 @@ export default function MiniCartDrawer() {
                         <p className="truncate text-[9px] font-black uppercase tracking-[.14em] text-black/40">{item.category}</p>
                         <p className="mt-1 line-clamp-2 text-sm font-semibold leading-5 text-[#101510]">{item.name}</p>
                       </div>
-                      <button type="button" onClick={() => removeItem(item.id)} aria-label={`Remove ${item.name}`} className="shrink-0 text-lg leading-none text-black/35 transition hover:text-[#202d20]">×</button>
+                      <button type="button" onClick={() => removeItem(item.id)} aria-label={`Remove ${item.name}`} title={`Remove ${item.name}`} className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-black/8 bg-[#f4f5e9] text-black/40 transition hover:border-[#202d20]/20 hover:bg-[#ddf27a] hover:text-[#202d20]"><DeleteIcon /></button>
                     </div>
                     <div className="mt-3 flex items-center justify-between gap-3">
                       <div className="inline-flex items-center rounded-full border border-black/10 bg-[#f4f5e9] p-1">
