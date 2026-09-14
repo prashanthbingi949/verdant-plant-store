@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 const REVEAL_SELECTORS = [
@@ -29,14 +30,14 @@ function markRevealables() {
   const unique = Array.from(new Set(nodes));
   unique.forEach((node, index) => {
     node.classList.add("vd-premium-reveal");
-    if (!node.dataset.vdRevealDelay) {
-      node.dataset.vdRevealDelay = String(Math.min(index % 6, 5));
-    }
+    if (!node.dataset.vdRevealDelay) node.dataset.vdRevealDelay = String(Math.min(index % 6, 5));
   });
   return unique;
 }
 
 export default function VerdantPremiumMotion() {
+  const pathname = usePathname();
+
   useEffect(() => {
     const root = document.documentElement;
     root.classList.add("verdant-premium-ready");
@@ -61,8 +62,7 @@ export default function VerdantPremiumMotion() {
     const syncPageState = () => {
       const scrollY = window.scrollY;
       const scrollable = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-      const progress = Math.min(1, Math.max(0, scrollY / scrollable));
-      root.style.setProperty("--vd-scroll-progress", String(progress));
+      root.style.setProperty("--vd-scroll-progress", String(Math.min(1, Math.max(0, scrollY / scrollable))));
       root.dataset.scrollY = String(scrollY);
       root.classList.toggle("verdant-page-scrolled", scrollY > 18);
     };
@@ -71,23 +71,22 @@ export default function VerdantPremiumMotion() {
     window.addEventListener("scroll", syncPageState, { passive: true });
     window.addEventListener("resize", syncPageState, { passive: true });
 
-    const mutationObserver = new MutationObserver(() => {
+    const timers = [120, 450, 900].map((delay) => window.setTimeout(() => {
       const added = markRevealables();
       added.forEach((node) => observer?.observe(node));
       syncPageState();
-    });
-    mutationObserver.observe(document.body, { childList: true, subtree: true });
+    }, delay));
 
     return () => {
+      timers.forEach((timer) => window.clearTimeout(timer));
       window.removeEventListener("scroll", syncPageState);
       window.removeEventListener("resize", syncPageState);
       observer?.disconnect();
-      mutationObserver.disconnect();
       root.classList.remove("verdant-premium-ready", "verdant-page-scrolled");
       root.style.removeProperty("--vd-scroll-progress");
       delete root.dataset.scrollY;
     };
-  }, []);
+  }, [pathname]);
 
   return null;
 }
