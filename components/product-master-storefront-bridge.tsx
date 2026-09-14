@@ -64,6 +64,7 @@ function applyMasterCopy(product: ProductMasterView) {
     const compare = document.createElement("span");
     compare.className = "vd-master-compare";
     compare.textContent = formatPrice(Number(product.compare_at_price));
+    compare.style.cssText = "font-size:14px;color:rgba(16,21,16,.42);text-decoration:line-through;padding-bottom:7px;";
     priceRow.appendChild(compare);
   }
 }
@@ -128,7 +129,7 @@ async function applyCuratedRelated(product: ProductMasterView) {
 
 export default function ProductMasterStorefrontBridge({ product }: { product: ProductMasterView }) {
   useEffect(() => {
-    const timers = [0, 250, 700].map((delay) => window.setTimeout(() => {
+    const timers = [0, 700].map((delay) => window.setTimeout(() => {
       applyMasterCopy(product);
       void applyCuratedRelated(product);
     }, delay));
