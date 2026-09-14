@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 type ProductBadge = {
   slug: string;
@@ -31,43 +32,37 @@ function syncBadges(products: ProductBadge[]) {
 }
 
 export default function ShopBadgeBridge() {
-  useEffect(() => {
-    let cancelled = false;
-    let observer: MutationObserver | null = null;
-    let products: ProductBadge[] = [];
+  const pathname = usePathname();
 
-    const run = () => {
-      if (!cancelled && products.length) syncBadges(products);
-    };
+  useEffect(() => {
+    if (pathname !== "/shop") return;
+    let cancelled = false;
+    const timers: number[] = [];
 
     fetch("/api/products", { cache: "no-store" })
       .then((response) => (response.ok ? response.json() : null))
       .then((data) => {
         if (cancelled || !Array.isArray(data?.products)) return;
-        products = data.products as ProductBadge[];
-        run();
-
-        const root = document.querySelector(".verdant-shop-page");
-        if (!root) return;
-        observer = new MutationObserver(() => run());
-        observer.observe(root, { childList: true, subtree: true });
+        const products = data.products as ProductBadge[];
+        syncBadges(products);
+        [120, 450, 900].forEach((delay) => {
+          timers.push(window.setTimeout(() => {
+            if (!cancelled) syncBadges(products);
+          }, delay));
+        });
       })
       .catch(() => {});
 
     return () => {
       cancelled = true;
-      observer?.disconnect();
+      timers.forEach((timer) => window.clearTimeout(timer));
     };
-  }, []);
+  }, [pathname]);
 
   return (
     <style>{`
-      .verdant-shop-page .group.min-w-0 > .relative > a > div > span {
-        display: none !important;
-      }
-      .verdant-shop-page .group.min-w-0 > .relative > a > div > span[data-admin-badge="true"][aria-hidden="false"] {
-        display: inline-flex !important;
-      }
+      .verdant-shop-page .group.min-w-0 > .relative > a > div > span { display: none !important; }
+      .verdant-shop-page .group.min-w-0 > .relative > a > div > span[data-admin-badge="true"][aria-hidden="false"] { display: inline-flex !important; }
     `}</style>
   );
 }
