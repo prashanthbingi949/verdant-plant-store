@@ -7,6 +7,7 @@ const cards = [
   { title: "Homepage", note: "Hero, collections, featured products, care, newsletter and footer.", href: "/admin/home", action: "Edit homepage" },
   { title: "Catalog", note: "Plant and gardening-supply categories and subcategories.", href: "/admin/catalog", action: "Manage catalog" },
   { title: "Products", note: "Products, prices, stock, classification and images.", href: "/admin/products", action: "Manage products" },
+  { title: "Inventory", note: "Stock health, reorder rules, manual adjustments and movement history.", href: "/admin/inventory", action: "Manage inventory" },
   { title: "Orders", note: "Payments, customer details, fulfilment status and revenue.", href: "/admin/orders", action: "View orders" },
   { title: "Site settings", note: "Brand, contact details, social links and navigation.", href: "/admin/site", action: "Edit site" },
   { title: "Pages & Journal", note: "Create, edit, publish and unpublish editorial pages.", href: "/admin/pages", action: "Manage pages" },
@@ -25,7 +26,7 @@ export default async function AdminDashboard() {
         <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h1 className="text-5xl font-semibold tracking-[-.055em] sm:text-6xl">Your store, <em className="font-serif font-normal">under control.</em></h1>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-black/55">One place to manage content, catalog, products, orders and reusable media.</p>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-black/55">One place to manage content, catalog, products, inventory, orders and reusable media.</p>
           </div>
           <a href="/" className="w-fit rounded-full bg-[#202d20] px-5 py-3 text-sm font-bold text-[#f4f5e9]">View storefront</a>
         </div>
