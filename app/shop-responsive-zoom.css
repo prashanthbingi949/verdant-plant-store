@@ -1,17 +1,13 @@
-/* Keep the Shop composition visually stable when browser zoom creates a very wide CSS viewport. */
+/* Keep the Shop composition anchored to the same 1280px content rail at reduced browser zoom. */
 @media (min-width: 1450px) {
+  body:has(.verdant-shop-page) {
+    overflow-x: hidden;
+  }
+
   body:has(.verdant-shop-page) .verdant-shop-page > header > div,
   body:has(.verdant-shop-page) .verdant-shop-page > section {
-    max-width: calc(100vw - 80px) !important;
-  }
-
-  body:has(.verdant-shop-page) .verdant-shop-page > header > div {
-    width: calc(100vw - 80px) !important;
-  }
-
-  body:has(.verdant-shop-page) .verdant-shop-page > header > div > a[href="/cart"] {
-    margin-left: auto;
-    margin-right: 56px;
+    max-width: 1280px !important;
+    width: auto !important;
   }
 
   body:has(.verdant-shop-page) .verdant-shop-page > header > div > nav {
@@ -21,9 +17,15 @@
     white-space: nowrap;
   }
 
-  /* At wide CSS viewports the favourites control uses the same header gutter as the cart. */
+  /* The Shop cart remains inside the same header rail. */
+  body:has(.verdant-shop-page) .verdant-shop-page > header > div > a[href="/cart"] {
+    margin-left: auto;
+    margin-right: 56px;
+  }
+
+  /* The global favourites control uses the same rail's right edge. */
   body:has(.verdant-shop-page) .verdant-top-favorites {
-    right: 40px !important;
     top: 16px !important;
+    right: max(40px, calc((100vw - 1280px) / 2)) !important;
   }
 }
