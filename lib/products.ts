@@ -50,7 +50,9 @@ function normalizeProduct(product: Product): Product {
 }
 
 export async function getProducts(includeInactive = false) {
-  const query = includeInactive ? "select=*&order=sort_order.asc,created_at.asc" : "select=*&active=eq.true&order=sort_order.asc,created_at.asc";
+  const query = includeInactive
+    ? "select=*&order=sort_order.asc,created_at.asc"
+    : "select=*&active=eq.true&publish_status=eq.published&order=sort_order.asc,created_at.asc";
   const result = await supabaseSelect("products", query);
   if (!result.configured || !result.response?.ok || !Array.isArray(result.data)) return [] as Product[];
   return (result.data as Product[]).map(normalizeProduct);
