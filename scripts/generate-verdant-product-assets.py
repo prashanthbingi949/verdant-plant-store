@@ -7,8 +7,8 @@ Requirements:
   - Pillow (`python -m pip install pillow`)
 
 The OpenAI image API currently exposes square image sizes such as 1536x1536;
-this script requests 1536x1536 transparent PNGs, then losslessly preserves
-transparency while resizing them to the Verdant delivery standard of 1600x1600.
+this script requests 1536x1536 transparent PNGs, then preserves transparency
+while resizing them to the Verdant delivery standard of 1600x1600.
 """
 from __future__ import annotations
 
@@ -34,9 +34,13 @@ OUT = ROOT / "verdant-product-assets"
 ZIP_NAME = ROOT / "verdant-product-assets.zip"
 API_URL = "https://api.openai.com/v1/images/generations"
 MODEL = "gpt-image-2"
-CONCURRENCY = 4
+# Image generation is intentionally sequential. Four concurrent requests were
+# enough to trigger HTTP 429s on the user's current API limits.
+CONCURRENCY = 1
 SOURCE_SIZE = "1536x1536"
 TARGET_SIZE = (1600, 1600)
+BETWEEN_REQUEST_DELAY = 2.5
+MAX_ATTEMPTS = 8
 
 PRODUCTS = [
     ("batch-1-plants", "golden-money-plant", "Golden Money Plant"),
@@ -193,20 +197,47 @@ def save_png(raw: bytes, destination: Path) -> None:
     tmp.unlink(missing_ok=True)
 
 
+def retry_delay_for(exc: HTTPError, attempt: int) -> float:
+    retry_after = exc.headers.get("Retry-After") if exc.headers else None
+    if retry_after:
+        try:
+            return min(120.0, max(1.0, float(retry_after)))
+        except ValueError:
+            pass
+    # Conservative exponential backoff for rate limits/transient failures.
+    return min(120.0, 8.0 * (2 ** (attempt - 1)))
+
+
 def generate_one(item: tuple[str, str, str]) -> tuple[str, bool, str]:
     batch, slug, name = item
     destination = OUT / batch / f"{slug}.png"
     if destination.exists():
         return slug, True, "exists"
-    for attempt in range(1, 4):
+
+    for attempt in range(1, MAX_ATTEMPTS + 1):
         try:
             raw = api_generate(product_prompt(name))
             save_png(raw, destination)
+            time.sleep(BETWEEN_REQUEST_DELAY)
             return slug, True, "generated"
-        except (HTTPError, URLError, TimeoutError, RuntimeError, OSError) as exc:
-            if attempt == 3:
+        except HTTPError as exc:
+            try:
+                body = exc.read().decode("utf-8", errors="replace")
+            except Exception:
+                body = ""
+            if exc.code == 429 and attempt < MAX_ATTEMPTS:
+                delay = retry_delay_for(exc, attempt)
+                print(f"  {slug}: rate limited (429). Waiting {delay:.0f}s before retry {attempt + 1}/{MAX_ATTEMPTS}…", flush=True)
+                time.sleep(delay)
+                continue
+            detail = f"HTTP {exc.code}: {body[:800]}" if body else f"HTTP {exc.code}: {exc.reason}"
+            return slug, False, detail
+        except (URLError, TimeoutError, RuntimeError, OSError) as exc:
+            if attempt == MAX_ATTEMPTS:
                 return slug, False, str(exc)
-            time.sleep(attempt * 4)
+            delay = min(60.0, 4.0 * attempt)
+            print(f"  {slug}: transient error. Waiting {delay:.0f}s before retry {attempt + 1}/{MAX_ATTEMPTS}…", flush=True)
+            time.sleep(delay)
     return slug, False, "unknown error"
 
 
@@ -240,6 +271,7 @@ def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     write_manifest()
     print(f"Generating {len(PRODUCTS)} exact SKU assets with {MODEL}…")
+    print(f"Mode: sequential / rate-limit safe (delay {BETWEEN_REQUEST_DELAY:.1f}s, max {MAX_ATTEMPTS} attempts)")
     failures = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=CONCURRENCY) as executor:
         futures = [executor.submit(generate_one, item) for item in PRODUCTS]
