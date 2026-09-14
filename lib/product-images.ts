@@ -1,5 +1,3 @@
-import { EXACT_PRODUCT_SVGS } from "@/lib/exact-product-assets";
-
 export type ProductImageRecord = {
   slug: string;
   name?: string | null;
@@ -8,6 +6,17 @@ export type ProductImageRecord = {
   product_type?: "Plants" | "Gardening Supplies" | null;
   image_url?: string | null;
   image_urls?: string[];
+};
+
+const REAL_BY_SLUG: Record<string, string> = {
+  "monstera-deliciosa": "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=1400&q=90",
+  "snake-plant": "https://images.unsplash.com/photo-1611211232932-da3113c5b960?auto=format&fit=crop&w=1400&q=90",
+  "jade-plant": "https://images.unsplash.com/photo-1676089650339-333baa5a7e0b?auto=format&fit=crop&w=1400&q=90",
+  "bird-of-paradise": "https://images.unsplash.com/photo-1677787320811-14c81b24e828?auto=format&fit=crop&w=1400&q=90",
+  "string-of-pearls": "https://images.unsplash.com/photo-1765041425888-39e09e148a80?auto=format&fit=crop&w=1400&q=90",
+  "lavender": "https://images.unsplash.com/photo-1451336819701-5a83f6534292?auto=format&fit=crop&w=1400&q=90",
+  "fiddle-leaf-fig": "https://images.unsplash.com/photo-1517191434949-5e90cd67d2b6?auto=format&fit=crop&w=1400&q=90",
+  "aloe-vera": "https://images.unsplash.com/photo-1513360994626-fc3639d1cc82?auto=format&fit=crop&w=1400&q=90",
 };
 
 const CATEGORY_IMAGES: Record<string, string> = {
@@ -36,11 +45,6 @@ const CATEGORY_BY_TERM: Array<[RegExp, string]> = [
   [/watering|trowel|pruner|sprayer|spray bottle|stake|trellis|tool/i, "tools-equipment"],
 ];
 
-function dataSvg(key: string) {
-  const svg = EXACT_PRODUCT_SVGS[key];
-  return svg ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}` : null;
-}
-
 function isGenericAsset(value: string | null | undefined) {
   if (!value) return true;
   const normalized = value.toLowerCase();
@@ -48,18 +52,11 @@ function isGenericAsset(value: string | null | undefined) {
 }
 
 export function productImage(product: ProductImageRecord) {
-  const exactKey = EXACT_PRODUCT_SVGS[product.slug]
-    ? product.slug
-    : product.slug === "long-spout-watering-can" || product.slug === "compact-watering-can"
-      ? "watering-can"
-      : product.slug === "ergo-trowel" || product.slug === "ergonomic-hand-trowel"
-        ? "steel-hand-trowel"
-        : null;
-
-  if (exactKey) return dataSvg(exactKey);
-
   const uploaded = [product.image_url, ...(product.image_urls || [])].find((value) => !isGenericAsset(value));
   if (uploaded) return uploaded;
+
+  const exact = REAL_BY_SLUG[product.slug];
+  if (exact) return exact;
 
   const haystack = `${product.slug} ${product.name || ""} ${product.subcategory || ""} ${product.category || ""}`;
   const categoryText = (product.category || "").toLowerCase();
@@ -75,12 +72,11 @@ export function productImage(product: ProductImageRecord) {
 }
 
 export function productImages(product: ProductImageRecord) {
-  const primary = productImage(product);
   const uploaded = [product.image_url, ...(product.image_urls || [])].filter((value): value is string => Boolean(value) && !isGenericAsset(value));
-  return Array.from(new Set([primary, ...uploaded].filter(Boolean)));
+  return Array.from(new Set([productImage(product), ...uploaded].filter(Boolean)));
 }
 
 export const productImageAssets = {
-  exactProductSvgs: Object.keys(EXACT_PRODUCT_SVGS),
+  realBySlug: REAL_BY_SLUG,
   categoryImages: CATEGORY_IMAGES,
 };
