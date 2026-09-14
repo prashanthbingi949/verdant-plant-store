@@ -4,9 +4,9 @@ import { supabaseSelect } from "@/lib/supabase-admin";
 const defaultFooter = {
   description: "Thoughtful plants and beautiful objects for a greener everyday.",
   shop_links: [
-    { label: "Indoor plants", href: "/shop?category=Indoor%20plants" },
-    { label: "Succulents", href: "/shop?category=Succulents" },
-    { label: "Planters", href: "/shop?category=Pots%20%26%20Planters" },
+    { label: "Indoor plants", href: "/shop?category=indoor-decorative-greens" },
+    { label: "Succulents", href: "/shop?category=succulents-cacti" },
+    { label: "Planters", href: "/shop?category=pots-planters" },
     { label: "Plant care", href: "/pages/plant-care" },
   ],
   about_links: [
@@ -22,7 +22,7 @@ const defaultFooter = {
 const defaults = [
   { section_key: "hero", content: { eyebrow: "A GREENER EVERYDAY", title: "Bring home a little", emphasized_title: "wild.", description: "Thoughtful plants and beautiful objects for a greener everyday.", primary_label: "Shop plants", primary_href: "/shop", secondary_label: "Explore the collection", secondary_href: "#collections" }, active: true, sort_order: 10 },
   { section_key: "marquee", content: { items: ["PLANT MORE JOY", "GROW SOMETHING GOOD", "GREEN YOUR EVERYDAY"], text: "PLANT MORE JOY · GROW SOMETHING GOOD · GREEN YOUR EVERYDAY ·" }, active: true, sort_order: 20 },
-  { section_key: "collections", content: { eyebrow: "THE VERDANT EDIT", title: "Choose your", emphasized_title: "green.", description: "From first-time plant parents to lifelong gardeners, there is a little something growing here for everyone.", items: [ { eyebrow: "01 / EASY CARE", title: "Indoor plants", note: "Calm, green companions for every room.", href: "/shop?category=Indoor%20plants" }, { eyebrow: "02 / SUN LOVERS", title: "Outdoor plants", note: "Bring a little wildness to balconies and gardens.", href: "/shop?category=Outdoor%20plants" }, { eyebrow: "03 / MINIATURE", title: "Succulents", note: "Small shapes with a lot of personality.", href: "/shop?category=Succulents" } ] }, active: true, sort_order: 30 },
+  { section_key: "collections", content: { eyebrow: "THE VERDANT EDIT", title: "Choose your", emphasized_title: "green.", description: "From first-time plant parents to lifelong gardeners, there is a little something growing here for everyone.", items: [ { eyebrow: "01 / EASY CARE", title: "Indoor plants", note: "Calm, green companions for every room.", href: "/shop?category=indoor-decorative-greens" }, { eyebrow: "02 / SUN LOVERS", title: "Outdoor plants", note: "Bring a little wildness to balconies and gardens.", href: "/shop?category=outdoor-landscape-plants" }, { eyebrow: "03 / MINIATURE", title: "Succulents", note: "Small shapes with a lot of personality.", href: "/shop?category=succulents-cacti" } ] }, active: true, sort_order: 30 },
   { section_key: "featured", content: { eyebrow: "MOST LOVED", title: "Little", emphasized_title: "legends.", link_label: "View all plants", link_href: "/shop", badge: "BEST SELLER" }, active: true, sort_order: 40 },
   { section_key: "story", content: { eyebrow: "THE VERDANT WAY", title: "More than a store.", emphasized_title: "A little ritual.", body: "We believe plants change a room, then slowly change the way the room feels. Verdant is a place for that transformation — one stem, one pot, one sunny corner at a time.", button_label: "Explore plant care", button_href: "#care", established: "EST. 2026", card_line: "Good things take root." }, active: true, sort_order: 50 },
   { section_key: "care", content: { eyebrow: "PLANT CARE, MADE SIMPLE", title: "Less guesswork.", emphasized_title: "More growing.", description: "Practical guides for water, light, soil and everything in between.", items: [ { number: "01", title: "Watering without overthinking", href: "/pages/plant-care" }, { number: "02", title: "Finding the right light", href: "/pages/plant-care" }, { number: "03", title: "Repotting, root to leaf", href: "/pages/plant-care" }, { number: "04", title: "Build your own green corner", href: "/pages/plant-care" } ] }, active: true, sort_order: 60 },
