@@ -43,7 +43,7 @@ const defaultSetting = (slug: string): Setting => ({
   reorder_quantity: 10,
 });
 
-function csvEscape(value: string | number) {
+function csvEscape(value: string | number | boolean) {
   const text = String(value ?? "");
   return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }

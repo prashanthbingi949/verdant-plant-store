@@ -165,7 +165,6 @@ function FinderModal({ onClose }: { onClose: () => void }) {
       id: product.slug,
       name: product.name,
       price: Number(product.price),
-      quantity: 1,
       tone: product.tone || "moss",
       size: product.size,
       category: product.category,

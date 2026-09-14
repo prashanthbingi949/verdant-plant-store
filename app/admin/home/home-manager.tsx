@@ -69,8 +69,20 @@ export default function HomeManager() {
     setSaving("");
   }
 
+  function marqueeText(item: unknown) {
+    if (typeof item === "string") {
+      const value = item.trim();
+      return value === "[object Object]" ? "" : value;
+    }
+    if (item && typeof item === "object") {
+      const value = item as Record<string, unknown>;
+      return String(value.text ?? value.label ?? value.title ?? value.value ?? "").trim();
+    }
+    return "";
+  }
+
   function marqueeItems(section: Section) {
-    const items = Array.isArray(section.content.items) ? section.content.items.map((item: unknown) => String(item || "").trim()).filter(Boolean) : [];
+    const items = Array.isArray(section.content.items) ? section.content.items.map(marqueeText).filter(Boolean) : [];
     if (items.length) return items;
     if (typeof section.content.text === "string") {
       const parsed = section.content.text.split("·").map((item: string) => item.trim()).filter(Boolean);

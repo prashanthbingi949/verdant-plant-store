@@ -30,14 +30,26 @@ const defaults = [
   { section_key: "footer", content: defaultFooter, active: true, sort_order: 80 },
 ];
 
+function marqueeText(item: unknown) {
+  if (typeof item === "string") {
+    const value = item.trim();
+    return value === "[object Object]" ? "" : value;
+  }
+  if (item && typeof item === "object") {
+    const value = item as Record<string, unknown>;
+    return String(value.text ?? value.label ?? value.title ?? value.value ?? "").trim();
+  }
+  return "";
+}
+
 function normalizeMarquee(section: { section_key: string; content: Record<string, any>; active: boolean; sort_order: number }) {
   if (section.section_key !== "marquee") return section;
   const content = section.content || {};
-  const rawItems = Array.isArray(content.items)
-    ? content.items.map((item: unknown) => String(item || "").trim()).filter(Boolean)
-    : [];
+  const rawItems = Array.isArray(content.items) ? content.items.map(marqueeText).filter(Boolean) : [];
   let items = rawItems;
-  if (!items.length && typeof content.text === "string") items = content.text.split("·").map((item: string) => item.trim()).filter(Boolean);
+  if (!items.length && typeof content.text === "string") {
+    items = content.text.split("·").map((item: string) => item.trim()).filter(Boolean).filter((item: string) => item !== "[object Object]");
+  }
   if (!items.length) items = ["PLANT MORE JOY"];
   const sequence = `${items.join(" · ")} ·`;
   return { ...section, content: { ...content, items, text: `${sequence} ${sequence}` } };
@@ -69,7 +81,7 @@ function mergeSection(row: any) {
   const fallback = defaults.find((item) => item.section_key === row.section_key);
   let merged = { ...(fallback || {}), ...row, content: { ...(fallback?.content || {}), ...(row.content || {}) } };
   if (merged.section_key === "marquee") merged = normalizeMarquee(merged);
-  if (merged.section_key === "care" && (!Array.isArray(merged.content.items) || !merged.content.items.length)) merged.content.items = fallback?.content.items || [];
+  if (merged.section_key === "care" && (!Array.isArray(merged.content.items) || !merged.content.items.length)) merged.content.items = (fallback?.content as any)?.items || [];
   if (merged.section_key === "footer") {
     merged.content = { ...defaultFooter, ...merged.content };
     if (!Array.isArray(merged.content.shop_links) || !merged.content.shop_links.length) merged.content.shop_links = defaultFooter.shop_links;
