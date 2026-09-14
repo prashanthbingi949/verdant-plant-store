@@ -135,6 +135,7 @@ export default function ProductDetails({ product }: { product: Product }) {
   };
 
   const price = useMemo(() => Number(product.price).toLocaleString("en-IN"), [product.price]);
+  const addTotal = useMemo(() => (Number(product.price) * quantity).toLocaleString("en-IN"), [product.price, quantity]);
   const facts = [
     ["LIGHT", product.level.toLowerCase().includes("easy") ? "Bright, indirect light" : "Bright, filtered light"],
     ["CARE", product.level.replace(/^./, (letter) => letter.toUpperCase())],
@@ -193,7 +194,7 @@ export default function ProductDetails({ product }: { product: Product }) {
                 <span>{quantity}</span>
                 <button type="button" aria-label="Increase quantity" onClick={() => setQuantity((value) => Math.min(maxQuantity, value + 1))} disabled={quantity >= maxQuantity}>+</button>
               </div>
-              <button type="button" className={`vd-add ${added ? "is-added" : ""}`} onClick={addToBag} disabled={soldOut}>{soldOut ? "Out of stock" : added ? "Added ✓" : `Add to bag · ₹${price}`}</button>
+              <button type="button" className={`vd-add ${added ? "is-added" : ""}`} onClick={addToBag} disabled={soldOut}>{soldOut ? "Out of stock" : added ? "Added ✓" : `Add to bag · ₹${addTotal}`}</button>
             </div>
             <div className="vd-buy-foot"><span className="vd-stock">{product.stock <= 5 && product.stock > 0 ? `Only ${product.stock} left` : product.stock > 0 ? `${product.stock} available` : "Unavailable"}</span><span>Secure checkout · Fast delivery</span></div>
           </div>
