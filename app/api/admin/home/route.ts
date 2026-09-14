@@ -22,6 +22,23 @@ const defaults: HomeSection[] = [
   { section_key: "footer", content: { description: "Thoughtful plants and beautiful objects for a greener everyday.", shop_links: [ { label: "Indoor plants", href: "/shop?category=indoor-decorative-greens" }, { label: "Succulents", href: "/shop?category=succulents-cacti" }, { label: "Planters", href: "/shop?category=pots-planters" }, { label: "Plant care", href: "/pages/plant-care" } ], about_links: [ { label: "Our story", href: "/#story" }, { label: "Care journal", href: "/pages/plant-care" }, { label: "Account", href: "/account" }, { label: "Contact", href: "/#newsletter" } ], copyright: "© 2026 VERDANT", tagline: "MADE FOR SLOW GROWERS" }, active: true, sort_order: 80 }
 ];
 
+function canonicalShopHref(label: unknown, href: unknown) {
+  const name = String(label || "").trim().toLowerCase();
+  const current = String(href || "");
+  if (name === "indoor plants" || current.includes("Indoor%20plants")) return "/shop?category=indoor-decorative-greens";
+  if (name === "outdoor plants" || current.includes("Outdoor%20plants")) return "/shop?category=outdoor-landscape-plants";
+  if (name === "succulents" || current.includes("Succulents")) return "/shop?category=succulents-cacti";
+  if (name === "planters" || current.includes("Pots%20%26%20Planters")) return "/shop?category=pots-planters";
+  return current;
+}
+
+function normalizeSection(section: HomeSection) {
+  const content: any = { ...(section.content || {}) };
+  if (Array.isArray(content.items)) content.items = content.items.map((item: any) => ({ ...item, href: canonicalShopHref(item?.title, item?.href) }));
+  if (Array.isArray(content.shop_links)) content.shop_links = content.shop_links.map((item: any) => ({ ...item, href: canonicalShopHref(item?.label, item?.href) }));
+  return { ...section, content };
+}
+
 async function authorized() {
   const store = await cookies();
   return isValidAdminToken(store.get(adminCookieName())?.value);
@@ -33,7 +50,7 @@ export async function GET() {
   if (!result.configured || !result.response?.ok) return NextResponse.json({ error: "Unable to load homepage content." }, { status: 502 });
   const rows = Array.isArray(result.data) ? result.data as HomeSection[] : [];
   const saved = new Map(rows.map((row) => [row.section_key, row]));
-  const merged = defaults.map((fallback) => ({ ...fallback, ...(saved.get(fallback.section_key) || {}) })).concat(rows.filter((row) => !defaults.some((fallback) => fallback.section_key === row.section_key)));
+  const merged = defaults.map((fallback) => normalizeSection({ ...fallback, ...(saved.get(fallback.section_key) || {}) })).concat(rows.filter((row) => !defaults.some((fallback) => fallback.section_key === row.section_key)).map(normalizeSection));
   return NextResponse.json({ sections: merged.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)) });
 }
 
