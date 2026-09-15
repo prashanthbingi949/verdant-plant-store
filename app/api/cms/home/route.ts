@@ -30,14 +30,16 @@ const defaults = [
   { section_key: "footer", content: defaultFooter, active: true, sort_order: 80 },
 ];
 
-function marqueeText(item: unknown) {
+function marqueeText(item: unknown): string {
   if (typeof item === "string") {
     const value = item.trim();
     return value === "[object Object]" ? "" : value;
   }
   if (item && typeof item === "object") {
     const value = item as Record<string, unknown>;
-    return String(value.text ?? value.label ?? value.title ?? value.value ?? "").trim();
+    const nested = value.text ?? value.label ?? value.title ?? value.value ?? value.name;
+    if (typeof nested === "string") return marqueeText(nested);
+    if (nested && typeof nested === "object") return marqueeText(nested);
   }
   return "";
 }
@@ -91,11 +93,15 @@ function mergeSection(row: any) {
 }
 
 export async function GET() {
-  const result = await supabaseSelect("home_content", "select=*&order=sort_order.asc");
-  if (!result.configured || !result.response?.ok) return NextResponse.json({ sections: defaults.map(mergeSection) });
-  const rows = Array.isArray(result.data) ? result.data : [];
-  const byKey = new Map(rows.map((row: any) => [String(row.section_key), row]));
-  const merged = defaults.map((fallback) => mergeSection(byKey.get(fallback.section_key) || fallback));
-  for (const row of rows as any[]) if (!defaults.some((fallback) => fallback.section_key === row.section_key)) merged.push(mergeSection(row));
-  return NextResponse.json({ sections: merged.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)) });
+  try {
+    const result = await supabaseSelect("home_content", "select=*&order=sort_order.asc");
+    if (!result.configured || !result.response?.ok) return NextResponse.json({ sections: defaults.map(mergeSection) });
+    const rows = Array.isArray(result.data) ? result.data : [];
+    const byKey = new Map(rows.map((row: any) => [String(row.section_key), row]));
+    const merged = defaults.map((fallback) => mergeSection(byKey.get(fallback.section_key) || fallback));
+    for (const row of rows as any[]) if (!defaults.some((fallback) => fallback.section_key === row.section_key)) merged.push(mergeSection(row));
+    return NextResponse.json({ sections: merged.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)) });
+  } catch {
+    return NextResponse.json({ sections: defaults.map(mergeSection) });
+  }
 }

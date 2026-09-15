@@ -1,0 +1,140 @@
+/* Cross-device review fixes. Keep production styling intentionally aligned with the Verdant system. */
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+/* iOS Safari must not auto-zoom into form fields. */
+@media (max-width: 640px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
+  body {
+    -webkit-text-size-adjust: 100%;
+  }
+}
+
+/* Verdant primary action treatment: forest background + cream text. */
+.button.button-lime,
+.newsletter .button-lime {
+  background: var(--forest) !important;
+  color: var(--cream) !important;
+}
+
+.button.button-lime:hover,
+.newsletter .button-lime:hover {
+  background: var(--black) !important;
+  color: var(--cream) !important;
+}
+
+/* Review-safe newsletter UX: full-size, tappable fields on every viewport. */
+.newsletter .email-row {
+  gap: 12px;
+}
+
+.newsletter .email-row input,
+.newsletter .email-row .button {
+  min-height: 56px;
+  height: 56px;
+  font-size: 16px;
+}
+
+.newsletter .email-row input {
+  flex: 1 1 auto;
+}
+
+.newsletter-status {
+  min-height: 18px;
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--forest);
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .newsletter .email-row {
+    gap: 10px;
+  }
+
+  .newsletter .email-row input,
+  .newsletter .email-row .button {
+    width: 100%;
+    min-height: 56px;
+    height: 56px;
+  }
+}
+
+/* The CMS implementation detail is admin-facing, not storefront-facing. */
+body:has(.verdant-shop-page) .verdant-shop-page > section:first-of-type > div > div:last-child {
+  display: none !important;
+}
+
+/* Keep the favourites control visually centered with the mobile cart control. */
+body:has(.verdant-shop-page) .verdant-top-favorites {
+  display: grid !important;
+  place-items: center !important;
+  line-height: 0 !important;
+}
+
+body:has(.verdant-shop-page) .verdant-top-favorites svg {
+  display: block !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+@media (max-width: 760px) {
+  body:has(.verdant-shop-page) .verdant-top-favorites {
+    top: 12px !important;
+    right: 72px !important;
+    width: 44px !important;
+    height: 44px !important;
+  }
+}
+
+/* Discovery questions: replace emoji glyphs with stable monochrome icon artwork. */
+.vd-wow-option > span,
+.vd-wow-mood-card > span {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  font-size: 0 !important;
+  color: var(--forest);
+}
+
+.vd-wow-option > span::before,
+.vd-wow-mood-card > span::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+/* Quick-question icon set, ordered by the existing FinderQuestion options. */
+.vd-wow-options .vd-wow-option:nth-child(1) > span::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23202d20' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2v3M12 19v3M4.93 4.93 7.05 7.05M16.95 16.95l2.12 2.12M2 12h3M19 12h3M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12'/%3E%3C/svg%3E");
+}
+.vd-wow-options .vd-wow-option:nth-child(2) > span::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23202d20' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20c0-6 2.2-10 6-14-5 1-8 3.8-10 8-1-1.5-2.3-2.2-4-2.5C5 16.1 8 19 12 20Z'/%3E%3Cpath d='M12 20c0-3 1-7 6-10'/%3E%3C/svg%3E");
+}
+.vd-wow-options .vd-wow-option:nth-child(3) > span::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23202d20' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M12 20V10M6 20h12M8 10c0-2.2 1.8-4 4-4s4 1.8 4 4'/%3E%3Cpath d='M9 20v-4M15 20v-4'/%3E%3C/svg%3E");
+}
+.vd-wow-options .vd-wow-option:nth-child(4) > span::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23202d20' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 16c0-3 2.5-5 5.5-5 2.2 0 4.2 1.1 5 3 1.1-.8 2.4-1.2 3.8-1.2 2.6 0 4.7 1.7 4.7 4.2H4Z'/%3E%3Cpath d='M17 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z'/%3E%3C/svg%3E");
+}
+
+@media (max-width: 760px) {
+  .vd-wow-option > span,
+  .vd-wow-mood-card > span {
+    width: 24px;
+    height: 24px;
+    flex-basis: 24px;
+  }
+}

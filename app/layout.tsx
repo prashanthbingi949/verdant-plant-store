@@ -15,10 +15,12 @@ import "./verdant-premium.css";
 import "./verdant-discovery.css";
 import "./verdant-cart-recommendations.css";
 import "./shop-responsive-zoom.css";
+import "./qa-review-fixes.css";
 import { CartProvider } from "@/components/cart-provider";
 import HomeNavController from "@/components/home-nav-controller";
 import HomeVisualEffects from "@/components/home-visual-effects";
 import SiteUtilities from "@/components/site-utilities";
+import NewsletterEnhancer from "@/components/newsletter-enhancer";
 import HomeWishlistPersistence from "@/components/home-wishlist-persistence";
 import FavoritesBridge from "@/components/favorites-bridge";
 import VerdantPremiumMotion from "@/components/verdant-premium-motion";
@@ -69,6 +71,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <HomeWishlistPersistence />
           <FavoritesBridge />
           <SiteUtilities />
+          <NewsletterEnhancer />
           <VerdantPremiumMotion />
           <ShopSearchEnhancer />
           <ShopCartToast />
