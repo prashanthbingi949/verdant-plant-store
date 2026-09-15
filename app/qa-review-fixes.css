@@ -138,3 +138,17 @@ body:has(.verdant-shop-page) .verdant-top-favorites svg {
     flex-basis: 24px;
   }
 }
+
+/* Homepage desktop auth CTA: force readable text despite later global anchor rules. */
+@media (min-width: 768px) {
+  .verdant-spotlight nav > a[href="/signup"] {
+    color: #101510 !important;
+    -webkit-text-fill-color: #101510 !important;
+    opacity: 1 !important;
+  }
+
+  .verdant-spotlight nav[class*="text-[#101510]"] > a[href="/signup"] {
+    color: #f4f5e9 !important;
+    -webkit-text-fill-color: #f4f5e9 !important;
+  }
+}
