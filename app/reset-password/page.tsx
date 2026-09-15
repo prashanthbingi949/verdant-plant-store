@@ -1,17 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { FormEvent, useEffect, useState } from "react";
 
 export default function ResetPasswordPage() {
-  const params = useSearchParams();
-  const token = useMemo(() => params.get("token") || "", [params]);
+  const [token, setToken] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const value = new URLSearchParams(window.location.search).get("token") || "";
+    setToken(value);
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -49,7 +52,7 @@ export default function ResetPasswordPage() {
       <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-6xl flex-col">
         <header className="flex items-center justify-between border-b-2 border-[#202d20]/15 pb-5">
           <Link href="/" className="text-sm font-black tracking-[0.2em] text-[#172217]">VERDANT</Link>
-          <Link href="/shop" className="rounded-full bg-[#202d20] px-4 py-2 text-sm font-bold text-[#f4f5e9] transition hover:bg-[#101510]">Shop plants</Link>
+          <Link href="/shop" className="rounded-full bg-[#202d20] px-4 py-2 text-sm font-bold !text-[#f4f5e9] transition hover:bg-[#101510]">Shop plants</Link>
         </header>
 
         <section className="mx-auto flex w-full max-w-5xl flex-1 items-center justify-center py-14">
@@ -69,7 +72,7 @@ export default function ResetPasswordPage() {
               </div>
               {message && <p role="status" className="rounded-2xl border-2 border-emerald-900/10 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900">{message}</p>}
               {error && <p role="alert" className="rounded-2xl border-2 border-red-900/15 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900">{error}</p>}
-              <button type="submit" disabled={loading || !token} className="flex h-12 w-full items-center justify-center rounded-full bg-[#202d20] text-sm font-black text-[#f4f5e9] transition hover:bg-[#101510] disabled:cursor-not-allowed disabled:opacity-60">{loading ? "Resetting…" : "Reset password"}</button>
+              <button type="submit" disabled={loading || !token} className="flex h-12 w-full items-center justify-center rounded-full bg-[#202d20] !text-[#f4f5e9] text-sm font-black transition hover:bg-[#101510] disabled:cursor-not-allowed disabled:opacity-60">{loading ? "Resetting…" : "Reset password"}</button>
             </form>
 
             <div className="mt-6 text-sm font-semibold text-[#263926]"><Link href="/login" className="underline decoration-2 underline-offset-4">Back to log in</Link></div>
