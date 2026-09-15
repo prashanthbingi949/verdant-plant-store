@@ -17,6 +17,7 @@ import "./verdant-cart-recommendations.css";
 import "./shop-responsive-zoom.css";
 import "./qa-review-fixes.css";
 import "./qa-review-polish.css";
+import "./shop-category-repair.css";
 import { CartProvider } from "@/components/cart-provider";
 import HomeNavController from "@/components/home-nav-controller";
 import HomeVisualEffects from "@/components/home-visual-effects";
