@@ -13,11 +13,11 @@ const SECTION_KEYS: Record<string, string> = {
   Footer: "footer",
 };
 
-function textFromAnnouncement(value: unknown) {
+function textFromAnnouncement(value: unknown): string {
   if (typeof value === "string") return value;
   if (value && typeof value === "object") {
     const item = value as Record<string, unknown>;
-    for (const key of ["text", "label", "title", "value"]) {
+    for (const key of ["text", "label", "title", "value", "name"]) {
       if (typeof item[key] === "string") return item[key] as string;
     }
   }
@@ -26,12 +26,21 @@ function textFromAnnouncement(value: unknown) {
 
 function normalizeAnnouncements(content: Record<string, unknown>) {
   const raw = Array.isArray(content.items) ? content.items : [];
-  const items = raw.map(textFromAnnouncement).map((value) => value.replace(/\s+/g, " ").trim()).filter(Boolean);
+  const items = raw
+    .map(textFromAnnouncement)
+    .map((value) => value.replace(/\s+/g, " ").trim())
+    .filter((value) => value && value !== "[object Object]");
+
   if (items.length) return [...new Set(items)];
+
   if (typeof content.text === "string") {
-    const parsed = content.text.split("·").map((value) => value.replace(/\s+/g, " ").trim()).filter(Boolean);
+    const parsed = content.text
+      .split("·")
+      .map((value) => value.replace(/\s+/g, " ").trim())
+      .filter((value) => value && value !== "[object Object]");
     if (parsed.length) return [...new Set(parsed)];
   }
+
   return ["PLANT MORE JOY"];
 }
 
@@ -168,41 +177,71 @@ export default function VerdantAdminReviewFixes() {
 
     function repairHomepageMarquee() {
       if (window.location.pathname !== "/") return () => {};
-      let running = false;
-      async function repair() {
-        if (running) return;
-        const flow = document.querySelector<HTMLElement>(".marquee-flow");
-        if (!flow) return;
-        const hasObjectText = flow.textContent?.includes("[object Object]");
-        if (!hasObjectText) return;
-        running = true;
+
+      let cancelledRepair = false;
+      let items: string[] = ["PLANT MORE JOY"];
+      let dataLoaded = false;
+      let repairTimer = 0;
+      let attempts = 0;
+
+      async function loadItems() {
         try {
-          const response = await fetch("/api/cms/home", { cache: "no-store" });
+          const separator = "/api/cms/home".includes("?") ? "&" : "?";
+          const response = await fetch(`${separator === "?" ? "/api/cms/home" : "/api/cms/home"}${separator}_review=${Date.now()}`, { cache: "no-store" });
           if (!response.ok) return;
           const data = await response.json().catch(() => null);
           const sections = Array.isArray(data?.sections) ? data.sections : [];
           const marquee = sections.find((section: any) => section?.section_key === "marquee");
-          const items = normalizeAnnouncements((marquee?.content || {}) as Record<string, unknown>);
-          const sequence = [...items, ...items, ...items, ...items, ...items, ...items];
-          flow.replaceChildren(...sequence.map((item, index) => {
-            const span = document.createElement("span");
-            span.className = "marquee-item";
-            span.textContent = item;
-            const dot = document.createElement("b");
-            dot.setAttribute("aria-hidden", "true");
-            dot.textContent = "•";
-            span.appendChild(dot);
-            span.setAttribute("data-marquee-index", String(index));
-            return span;
-          }));
+          items = normalizeAnnouncements((marquee?.content || {}) as Record<string, unknown>);
         } finally {
-          running = false;
+          dataLoaded = true;
         }
       }
-      const observer = new MutationObserver(() => void repair());
+
+      function apply(flow: HTMLElement) {
+        const sequence = [...items, ...items, ...items, ...items, ...items, ...items];
+        const expectedText = sequence.map((item) => `${item}•`).join("");
+        if (flow.textContent === expectedText) return;
+
+        flow.replaceChildren(...sequence.map((item, index) => {
+          const span = document.createElement("span");
+          span.className = "marquee-item";
+          span.textContent = item;
+          const dot = document.createElement("b");
+          dot.setAttribute("aria-hidden", "true");
+          dot.textContent = "•";
+          span.appendChild(dot);
+          span.setAttribute("data-marquee-index", String(index));
+          return span;
+        }));
+      }
+
+      async function repair() {
+        if (cancelledRepair) return;
+        const flow = document.querySelector<HTMLElement>(".marquee-flow");
+        if (!flow) return;
+        if (!dataLoaded) await loadItems();
+        if (!cancelledRepair) apply(flow);
+      }
+
+      const observer = new MutationObserver(() => {
+        const flow = document.querySelector<HTMLElement>(".marquee-flow");
+        if (flow) apply(flow);
+      });
       observer.observe(document.body, { subtree: true, childList: true, characterData: true });
+
       void repair();
-      return () => observer.disconnect();
+      repairTimer = window.setInterval(() => {
+        attempts += 1;
+        void repair();
+        if (attempts >= 24) window.clearInterval(repairTimer);
+      }, 250);
+
+      return () => {
+        cancelledRepair = true;
+        observer.disconnect();
+        window.clearInterval(repairTimer);
+      };
     }
 
     const cleanAdmin = bindAdminPage();
