@@ -27,11 +27,16 @@ export async function supabaseRest(
   headers.set("Authorization", `Bearer ${config.key}`);
   headers.set("Content-Type", "application/json");
 
-  return fetch(`${config.url}${path}`, {
-    ...init,
-    headers,
-    cache: "no-store",
-  });
+  try {
+    return await fetch(`${config.url}${path}`, {
+      ...init,
+      headers,
+      cache: "no-store",
+    });
+  } catch {
+    // Keep API routes from crashing when Supabase is unreachable.
+    return null;
+  }
 }
 
 export async function supabaseInsert(table: string, row: Record<string, unknown>) {
