@@ -40,6 +40,13 @@ function findSectionKey(article: HTMLElement) {
   return SECTION_KEYS[heading] || "";
 }
 
+function findSaveButton(article: HTMLElement) {
+  return Array.from(article.querySelectorAll<HTMLButtonElement>("button")).find((button) => {
+    const text = button.textContent?.trim() || "";
+    return text === "Save changes" || text === "Saving…" || text === "Saved";
+  }) || null;
+}
+
 function setSaveButton(button: HTMLButtonElement, mode: "save" | "saving" | "saved") {
   button.textContent = mode === "saving" ? "Saving…" : mode === "saved" ? "Saved" : "Save changes";
   button.disabled = mode === "saved" || mode === "saving";
@@ -58,14 +65,14 @@ export default function VerdantAdminReviewFixes() {
       if (!key) return;
       dirty.add(key);
       saved.delete(key);
-      const button = article.querySelector<HTMLButtonElement>("button");
+      const button = findSaveButton(article);
       if (button?.dataset.reviewSaveState !== "saving") setSaveButton(button, "save");
     }
 
     function markSaved(key: string) {
       const article = Array.from(document.querySelectorAll<HTMLElement>("main article")).find((node) => findSectionKey(node) === key);
       if (!article) return;
-      const button = article.querySelector<HTMLButtonElement>("button");
+      const button = findSaveButton(article);
       if (!button) return;
       dirty.delete(key);
       saved.add(key);
@@ -89,9 +96,10 @@ export default function VerdantAdminReviewFixes() {
         const key = findSectionKey(article);
         if (!key) return;
         const label = button.textContent?.trim() || "";
+        const aria = button.getAttribute("aria-label") || "";
         if (label === "Save changes" && !saved.has(key)) {
           setSaveButton(button, "saving");
-        } else if (["Remove", "+ Add announcement", "+ Add collection", "+ Add care item"].some((value) => label.startsWith(value))) {
+        } else if (aria.startsWith("Enable section") || aria.startsWith("Disable section") || ["Remove", "+ Add announcement", "+ Add collection", "+ Add care item"].some((value) => label.startsWith(value))) {
           markDirty(article);
         }
       };
@@ -104,7 +112,7 @@ export default function VerdantAdminReviewFixes() {
         document.querySelectorAll<HTMLElement>("main article").forEach((article) => {
           const key = findSectionKey(article);
           if (!key) return;
-          const button = article.querySelector<HTMLButtonElement>("button");
+          const button = findSaveButton(article);
           if (!button) return;
           if (saved.has(key)) setSaveButton(button, "saved");
           else if (dirty.has(key) && button.dataset.reviewSaveState !== "saving") setSaveButton(button, "save");
@@ -136,8 +144,11 @@ export default function VerdantAdminReviewFixes() {
           } else {
             window.setTimeout(() => {
               const article = Array.from(document.querySelectorAll<HTMLElement>("main article")).find((node) => findSectionKey(node) === key);
-              const button = article?.querySelector<HTMLButtonElement>("button");
-              if (button) setSaveButton(button, "save");
+              const button = article ? findSaveButton(article) : null;
+              if (button) {
+                dirty.add(key);
+                setSaveButton(button, "save");
+              }
             }, 40);
           }
         }
@@ -172,7 +183,7 @@ export default function VerdantAdminReviewFixes() {
           const marquee = sections.find((section: any) => section?.section_key === "marquee");
           const items = normalizeAnnouncements((marquee?.content || {}) as Record<string, unknown>);
           const sequence = [...items, ...items, ...items, ...items, ...items, ...items];
-          flow.replaceChildren(...sequence.flatMap((item, index) => {
+          flow.replaceChildren(...sequence.map((item, index) => {
             const span = document.createElement("span");
             span.className = "marquee-item";
             span.textContent = item;
@@ -181,7 +192,7 @@ export default function VerdantAdminReviewFixes() {
             dot.textContent = "•";
             span.appendChild(dot);
             span.setAttribute("data-marquee-index", String(index));
-            return [span];
+            return span;
           }));
         } finally {
           running = false;
