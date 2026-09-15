@@ -33,6 +33,7 @@ import ShopQuickAddFeedback from "@/components/shop-quick-add-feedback";
 import ShopBadgeBridge from "@/components/shop-badge-bridge";
 import VerdantDiscoveryMount from "@/components/verdant-discovery-mount";
 import ShopCategoryProductRepair from "@/components/shop-category-product-repair";
+import VerdantAdminReviewFixes from "@/components/verdant-admin-review-fixes";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -66,6 +67,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <ShopBadgeBridge />
           <VerdantDiscoveryMount />
           <ShopCategoryProductRepair />
+          <VerdantAdminReviewFixes />
           {children}
         </CartProvider>
       </body>
