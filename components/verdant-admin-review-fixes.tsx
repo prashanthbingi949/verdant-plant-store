@@ -47,7 +47,8 @@ function findSaveButton(article: HTMLElement) {
   }) || null;
 }
 
-function setSaveButton(button: HTMLButtonElement, mode: "save" | "saving" | "saved") {
+function setSaveButton(button: HTMLButtonElement | null, mode: "save" | "saving" | "saved") {
+  if (!button) return;
   button.textContent = mode === "saving" ? "Saving…" : mode === "saved" ? "Saved" : "Save changes";
   button.disabled = mode === "saved" || mode === "saving";
   button.dataset.reviewSaveState = mode;
