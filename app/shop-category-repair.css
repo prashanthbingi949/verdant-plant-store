@@ -1,0 +1,7 @@
+.verdant-shop-page section:has([data-shop-category-repair].is-visible) > *:not([data-shop-category-repair]) {
+  display: none !important;
+}
+
+.verdant-shop-page section:has([data-shop-category-repair].is-visible) {
+  padding-top: 8px !important;
+}
