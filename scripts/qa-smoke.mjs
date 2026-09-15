@@ -11,6 +11,43 @@ const checks = [
   { path: "/admin/products", expected: [200, 307, 308], label: "admin products auth gate" },
   { path: "/admin/inventory", expected: [200, 307, 308], label: "admin inventory auth gate" },
   { path: "/admin/products/master", expected: [200, 307, 308], label: "product master auth gate" },
+  {
+    path: "/api/auth/me",
+    expected: 200,
+    label: "customer auth status",
+  },
+  {
+    path: "/api/auth/login",
+    method: "POST",
+    body: {},
+    expected: 400,
+    label: "login validation",
+  },
+  {
+    path: "/api/auth/signup",
+    method: "POST",
+    body: {},
+    expected: 400,
+    label: "signup validation",
+  },
+  {
+    path: "/api/auth/signup",
+    method: "POST",
+    body: { name: "QA", email: "invalid", password: "short" },
+    expected: 400,
+    label: "signup input validation",
+  },
+  {
+    path: "/api/order-tracking",
+    expected: 400,
+    label: "order tracking validation",
+  },
+  {
+    path: "/api/auth/logout",
+    method: "POST",
+    expected: 200,
+    label: "customer logout",
+  },
 ];
 
 function expectedStatus(expected) {
@@ -22,7 +59,12 @@ let failed = 0;
 for (const check of checks) {
   const url = new URL(check.path, baseUrl).toString();
   try {
-    const response = await fetch(url, { redirect: "manual" });
+    const response = await fetch(url, {
+      method: check.method || "GET",
+      headers: check.body ? { "Content-Type": "application/json" } : undefined,
+      body: check.body ? JSON.stringify(check.body) : undefined,
+      redirect: "manual",
+    });
     const ok = expectedStatus(check.expected).includes(response.status);
     console.log(`${ok ? "PASS" : "FAIL"} ${check.label}: ${response.status} ${url}`);
     if (!ok) failed += 1;
@@ -37,4 +79,4 @@ if (failed > 0) {
   process.exit(1);
 }
 
-console.log(`\nAll ${checks.length} route smoke checks passed.`);
+console.log(`\nAll ${checks.length} smoke checks passed.`);
