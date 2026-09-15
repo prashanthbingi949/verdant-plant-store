@@ -16,6 +16,7 @@ import "./verdant-discovery.css";
 import "./verdant-cart-recommendations.css";
 import "./shop-responsive-zoom.css";
 import "./qa-review-fixes.css";
+import "./qa-review-polish.css";
 import { CartProvider } from "@/components/cart-provider";
 import HomeNavController from "@/components/home-nav-controller";
 import HomeVisualEffects from "@/components/home-visual-effects";
@@ -31,39 +32,22 @@ import ShopQuickAddFeedback from "@/components/shop-quick-add-feedback";
 import ShopBadgeBridge from "@/components/shop-badge-bridge";
 import VerdantDiscoveryMount from "@/components/verdant-discovery-mount";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "Verdant — Plants, Pots & Garden Life",
-  description:
-    "Thoughtful plants and beautiful objects for spaces that feel more alive.",
+  description: "Thoughtful plants and beautiful objects for spaces that feel more alive.",
 };
 
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  viewportFit: "cover",
-};
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <CartProvider>
           <HomeNavController />

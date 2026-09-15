@@ -13,16 +13,20 @@ export async function POST(request: Request) {
     if (!validEmail(email) || email.length > 254) return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
     if (password.length < 8 || password.length > 128) return NextResponse.json({ error: "Password must be 8 to 128 characters." }, { status: 400 });
 
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SECRET_KEY) {
+      return NextResponse.json({ error: "Account creation is disabled on this review site. The storefront is ready for visual review." }, { status: 503 });
+    }
+
     const result = await createCustomer(name, email, password);
     if (!result.ok) {
       const message = String(result.error || "");
       if (/duplicate|unique/i.test(message)) return NextResponse.json({ error: "An account with that email already exists." }, { status: 409 });
-      return NextResponse.json({ error: "Unable to create your account." }, { status: 500 });
+      return NextResponse.json({ error: "Unable to create your account. Please try again." }, { status: 500 });
     }
     const sessionStarted = await startCustomerSession(String(result.customer.id));
     if (!sessionStarted) return NextResponse.json({ error: "Account created, but we could not start your session. Please log in." }, { status: 500 });
     return NextResponse.json({ ok: true, customer: { name: result.customer.name, email: result.customer.email } });
   } catch {
-    return NextResponse.json({ error: "Unable to create your account." }, { status: 500 });
+    return NextResponse.json({ error: "Unable to create your account. Please try again." }, { status: 500 });
   }
 }
