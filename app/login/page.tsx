@@ -18,7 +18,7 @@ export default function LoginPage() {
       const response = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: form.get("email"), password: form.get("password") }) });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) { setError(data?.error || "Unable to log in."); return; }
-      router.push("/");
+      router.replace("/account");
       router.refresh();
     } catch { setError("Unable to log in. Please try again."); }
     finally { setLoading(false); }
