@@ -1,0 +1,100 @@
+.verdant-site .collections-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:18px;
+  margin-top:30px;
+}
+.verdant-site .collection-card{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  min-height:0;
+  overflow:hidden;
+  border:1px solid rgba(25,42,27,.11);
+  border-radius:26px;
+  background:rgba(255,255,255,.44);
+  box-shadow:0 12px 34px rgba(24,35,25,.07);
+  transition:transform 300ms ease,box-shadow 450ms ease,border-color 450ms ease;
+}
+.verdant-site .collection-card:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(24,35,25,.13);border-color:rgba(25,42,27,.18)}
+.verdant-site .collection-image{position:relative;aspect-ratio:1.38/1;overflow:hidden;background:var(--sage,#e7ebdc)}
+.verdant-site .collection-image img{display:block;width:100%;height:100%;object-fit:cover;transition:transform 700ms cubic-bezier(.2,.7,.2,1)}
+.verdant-site .collection-card:hover .collection-image img{transform:scale(1.055)}
+.verdant-site .collection-copy{padding:18px 18px 16px;display:flex;flex-direction:column;gap:8px;position:relative;z-index:2}
+.verdant-site .collection-copy p{margin:0;font-size:8px;line-height:1;letter-spacing:.17em;text-transform:uppercase;font-weight:800;color:#516255}
+.verdant-site .collection-copy h3{margin:0;font-size:clamp(20px,2vw,28px);line-height:.98;font-weight:650;letter-spacing:-.025em}
+.verdant-site .collection-copy span{font-size:11px;line-height:1.45;color:#657169}
+.verdant-site .collection-card>svg{margin:0 18px 18px;width:16px;height:16px;align-self:flex-start;transition:transform 300ms ease}
+.verdant-site .collection-card:hover>svg{transform:translateX(4px)}
+
+.verdant-site .featured-section{padding-top:18px}
+.verdant-site .featured-section .section-heading{grid-template-columns:1fr auto}
+.verdant-site .featured-section .section-heading>a{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:750}
+.verdant-site .featured-section .product-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.verdant-site .featured-section .product-card{min-width:0}
+.verdant-site .featured-section .product-visual{position:relative;min-height:0;aspect-ratio:1/1;overflow:hidden;border-radius:22px;background:#e5e9d8}
+.verdant-site .featured-section .product-visual .botanical-card{position:absolute;inset:0;overflow:hidden}
+.verdant-site .featured-section .product-visual img{display:block;width:100%;height:100%;object-fit:contain}
+.verdant-site .featured-section .favorite-button{position:absolute;z-index:3;top:12px;right:12px;width:38px;height:38px;display:grid;place-items:center;border-radius:50%;background:rgba(244,245,233,.78);backdrop-filter:blur(10px);color:var(--black);transition:transform .2s ease,background .2s ease}
+.verdant-site .featured-section .favorite-button:hover{transform:scale(1.05)}
+.verdant-site .featured-section .favorite-button.is-liked{background:var(--lime);color:var(--black)}
+.verdant-site .featured-section .product-copy{display:flex;justify-content:space-between;align-items:end;gap:12px;padding:12px 2px 8px}
+.verdant-site .featured-section .product-copy p{margin:0 0 6px;color:var(--muted);font-size:10px}
+.verdant-site .featured-section .product-copy h3{margin:0;font-size:19px;letter-spacing:-.03em}
+.verdant-site .featured-section .product-copy span{display:block;margin-top:4px;color:var(--muted);font-size:10px}
+.verdant-site .featured-section .product-copy strong{font-size:16px;white-space:nowrap}
+.verdant-site .featured-section .product-add{width:100%;min-height:42px;border-radius:999px;background:var(--forest);color:var(--cream);font-size:10px;font-weight:800;transition:transform .2s ease,opacity .2s ease}
+.verdant-site .featured-section .product-add:hover:not(:disabled){transform:translateY(-1px)}
+.verdant-site .featured-section .product-add:disabled{opacity:.55;cursor:not-allowed}
+
+.verdant-site .story-section{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:clamp(32px,5vw,72px);padding:58px clamp(24px,6vw,78px);background:var(--forest);color:var(--cream);border-radius:34px;margin:0 clamp(14px,2vw,28px);overflow:hidden}
+.verdant-site .story-section .story-copy{max-width:540px}
+.verdant-site .story-section .story-copy .eyebrow{color:var(--lime);margin-bottom:10px;font-size:9px}
+.verdant-site .story-section .story-copy h2{font-size:clamp(38px,5vw,66px);line-height:.92;margin-bottom:18px}
+.verdant-site .story-section .story-copy>p:not(.eyebrow){max-width:470px;margin:0 0 18px;color:rgba(244,245,233,.66);font-size:13px;line-height:1.55}
+.verdant-site .story-section .story-copy>a{min-height:40px;display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:0 16px;border-radius:999px;background:var(--forest);color:var(--cream);font-size:11px;font-weight:800}
+.verdant-site .story-section .story-card{position:relative;width:min(76%,330px);aspect-ratio:.82;border-radius:28px;padding:22px;display:flex;flex-direction:column;justify-content:space-between;background:var(--lime);color:var(--black);transform:rotate(-5deg);box-shadow:30px 36px 70px rgba(0,0,0,.18);justify-self:center}
+.verdant-site .story-section .story-card>span{font-size:9px;letter-spacing:.18em;font-weight:850}
+.verdant-site .story-section .story-circle{width:82px;height:82px;display:grid;place-items:center;border:1px solid rgba(16,21,16,.22);border-radius:50%}
+.verdant-site .story-section .story-circle svg{width:44px;height:44px;color:var(--forest);display:block}
+.verdant-site .story-section .story-card strong{font-size:clamp(36px,4vw,58px);line-height:.92;letter-spacing:-.055em}
+
+.verdant-site .care-section{display:block;padding:84px clamp(24px,7vw,100px)}
+.verdant-site .care-section .section-heading{display:block;margin-bottom:28px}
+.verdant-site .care-section .section-heading h2{max-width:620px;margin:0}
+.verdant-site .care-section .section-heading p{max-width:420px;margin:18px 0 0;color:var(--muted);font-size:14px;line-height:1.6}
+.verdant-site .care-grid{border-top:1px solid var(--line);display:grid;grid-template-columns:1fr}
+.verdant-site .care-grid a{display:grid;grid-template-columns:52px 1fr 24px;align-items:center;gap:14px;min-height:78px;border-bottom:1px solid var(--line);transition:padding .25s ease,background .25s ease}
+.verdant-site .care-grid a:hover{padding-inline:12px;background:rgba(221,242,122,.14)}
+.verdant-site .care-grid a span{font-size:10px;color:var(--muted)}
+.verdant-site .care-grid a strong{font-size:clamp(18px,2vw,26px);letter-spacing:-.035em}
+.verdant-site .care-grid a svg{width:18px;height:18px}
+
+.verdant-site .newsletter-section{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:end;padding:84px clamp(24px,7vw,100px);background:var(--lime)}
+.verdant-site .newsletter-section .eyebrow{color:rgba(16,21,16,.6)}
+.verdant-site .newsletter-section h2{margin:0;font-size:clamp(44px,6vw,82px);line-height:.92;letter-spacing:-.055em;font-weight:720}
+.verdant-site .newsletter-section>div:last-child>p{max-width:430px;margin:0 0 12px;color:rgba(16,21,16,.66);font-size:13px;line-height:1.5}
+.verdant-site .newsletter-form{display:flex;align-items:stretch;gap:8px}
+.verdant-site .newsletter-form input{flex:1;min-width:0;height:52px;padding:0 16px;border:1px solid rgba(16,21,16,.16);border-radius:999px;background:rgba(255,255,255,.24);color:var(--black);outline:none}
+.verdant-site .newsletter-form button{min-height:52px;display:inline-flex;align-items:center;justify-content:center;gap:12px;padding:0 20px;border-radius:999px;background:var(--forest);color:var(--cream);font-size:12px;font-weight:800}
+
+@media(max-width:980px){
+  .verdant-site .collections-grid{grid-template-columns:1fr}
+  .verdant-site .featured-section .product-grid{grid-template-columns:1fr}
+  .verdant-site .story-section{grid-template-columns:1fr;gap:40px}
+  .verdant-site .story-section .story-card{justify-self:center}
+  .verdant-site .newsletter-section{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .verdant-site .collections-grid{gap:14px}
+  .verdant-site .featured-section .product-grid{grid-template-columns:1fr}
+  .verdant-site .story-section{padding:42px 20px;gap:28px}
+  .verdant-site .story-section .story-card{width:min(72%,280px);padding:18px;border-radius:24px}
+  .verdant-site .story-section .story-card strong{font-size:clamp(30px,10vw,42px)}
+  .verdant-site .story-section .story-circle{width:54px;height:54px}
+  .verdant-site .story-section .story-circle svg{width:30px;height:30px}
+  .verdant-site .newsletter-section{padding:56px 20px}
+  .verdant-site .newsletter-form{flex-direction:column}
+  .verdant-site .newsletter-form input,.verdant-site .newsletter-form button{width:100%}
+}
