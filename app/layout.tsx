@@ -26,6 +26,7 @@ import SiteUtilities from "@/components/site-utilities";
 import NewsletterEnhancer from "@/components/newsletter-enhancer";
 import HomeWishlistPersistence from "@/components/home-wishlist-persistence";
 import FavoritesBridge from "@/components/favorites-bridge";
+import ProductFavoriteBridge from "@/components/product-favorite-bridge";
 import VerdantPremiumMotion from "@/components/verdant-premium-motion";
 import ShopSearchEnhancer from "@/components/shop-search-enhancer";
 import ShopCartToast from "@/components/shop-cart-toast";
@@ -58,6 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <HomeVisualEffects />
           <HomeWishlistPersistence />
           <FavoritesBridge />
+          <ProductFavoriteBridge />
           <SiteUtilities />
           <NewsletterEnhancer />
           <VerdantPremiumMotion />
