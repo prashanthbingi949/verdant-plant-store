@@ -150,7 +150,7 @@ export function ShopByMood() {
       <div className="vd-mood-inner">
         <div className="vd-mood-head"><div><p className="vd-discovery-kicker">SHOP BY MOOD</p><h2>Choose the <em>feeling.</em></h2><p>Start with the room you want to create, then let the plants follow.</p></div><Link href="/shop" className="vd-mood-all">Browse the full shop →</Link></div>
         <div className="vd-mood-grid">{moods.map((mood, index) => <Link key={mood.slug} href={`/shop?category=${encodeURIComponent(mood.categorySlug)}`} className="vd-mood-card" style={{ background: mood.tint }}>
-          <span className="vd-mood-index">0{index + 1}</span><div><h3>{mood.title}</h3><p>{mood.text}</p><div className="vd-mood-tags">{mood.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div><span className="vd-mood-arrow" aria-hidden="true">↗</span>
+          <span className="vd-mood-index">0{index + 1}</span><div><h3>{mood.title}</h3><p>{mood.text}</p><div className="vd-mood-tags">{mood.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div><span className="vd-mood-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h13M13 6l6 6-6 6" /></svg></span>
         </Link>)}</div>
       </div>
     </section>
