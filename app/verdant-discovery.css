@@ -3,3 +3,10 @@
 @media(max-width:680px){.vd-discovery-find{padding:68px 16px}.vd-discovery-panel{padding:22px;min-height:0}.vd-discovery-result{grid-template-columns:92px minmax(0,1fr);gap:12px}.vd-discovery-result-image{min-height:92px}.vd-discovery-result-copy h4{font-size:16px}.vd-discovery-result-foot button{padding:8px 10px}.vd-discovery-result-foot strong{font-size:12px}.vd-mood-section{padding:44px 16px 82px}.vd-mood-head{align-items:flex-start;flex-direction:column}.vd-mood-grid{grid-template-columns:1fr 1fr;gap:10px}.vd-mood-card{min-height:270px;padding:18px}.vd-mood-card h3{font-size:22px}.vd-mood-card p{font-size:11px}}
 @media(max-width:450px){.vd-mood-grid{grid-template-columns:1fr}.vd-mood-card{min-height:235px}.vd-discovery-results-head{align-items:flex-start;flex-direction:column}}
 @media(prefers-reduced-motion:reduce){.vd-discovery-choice,.vd-discovery-result-image img,.vd-discovery-result-foot button,.vd-mood-card{transition:none}}
+
+/* Shop: keep the Mood section visually close to the preceding product grid. */
+.verdant-shop-page > section:last-of-type { padding-bottom: 0 !important; }
+.verdant-shop-page > [data-verdant-discovery-mount] .vd-mood-section { padding-top: 24px !important; }
+@media (max-width: 680px) {
+  .verdant-shop-page > [data-verdant-discovery-mount] .vd-mood-section { padding-top: 18px !important; }
+}
