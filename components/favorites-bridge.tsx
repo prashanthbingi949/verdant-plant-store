@@ -34,11 +34,6 @@ function slugFromButton(button: HTMLButtonElement): string {
   const explicit = button.getAttribute("data-verdant-favorite-slug")?.trim();
   if (explicit) return explicit;
 
-  if (button.matches(".vd-save")) {
-    const parts = window.location.pathname.split("/").filter(Boolean);
-    return parts[0] === "shop" && parts[1] ? parts[1] : "";
-  }
-
   const card = button.closest<HTMLElement>("article");
   const link = card?.querySelector<HTMLAnchorElement>('a[href^="/shop/"]');
   const href = link?.getAttribute("href") || "";
@@ -46,52 +41,22 @@ function slugFromButton(button: HTMLButtonElement): string {
 }
 
 function favoriteSelector() {
-  return "[data-verdant-favorite-slug], .vd-save, main.verdant-site article.product-card button.wish, main.verdant-shop-page article button[aria-label*='wishlist' i]";
+  // Only bridge legacy/global shop wishlist buttons. Home and PDP own their React state.
+  return "main.verdant-shop-page article button[aria-label*='wishlist' i]";
 }
 
 function applyButtonState(button: HTMLButtonElement, liked: boolean) {
   button.dataset.verdantLiked = liked ? "true" : "false";
   button.setAttribute("aria-pressed", String(liked));
+  button.style.background = liked ? "#202d20" : "rgba(244,245,233,.86)";
+  button.style.color = liked ? "#ddf27a" : "#202d20";
+  button.style.borderColor = liked ? "rgba(32,45,32,.08)" : "rgba(16,21,16,.08)";
 
-  if (button.matches("main.verdant-site article.product-card button.wish")) {
-    button.classList.toggle("is-liked", liked);
-    const label = button.getAttribute("aria-label") || "Wishlist product";
-    const productName = label.replace(/^(Remove|Wishlist|Add)\s+/i, "");
-    button.setAttribute("aria-label", `${liked ? "Remove" : "Wishlist"} ${productName}`);
-    return;
-  }
-
-  if (button.matches("main.verdant-shop-page article button[aria-label*='wishlist' i]")) {
-    button.style.background = liked ? "#202d20" : "rgba(244,245,233,.86)";
-    button.style.color = liked ? "#ddf27a" : "#202d20";
-    button.style.borderColor = liked ? "rgba(32,45,32,.08)" : "rgba(16,21,16,.08)";
-  }
-
-  if (button.matches(".vd-save")) {
-    button.setAttribute("aria-label", liked ? "Remove from favourites" : "Save to favourites");
-    button.setAttribute("title", liked ? "Remove from favourites" : "Save to favourites");
-    button.style.color = liked ? "#202d20" : "rgba(16,21,16,.58)";
-    button.style.fontWeight = liked ? "900" : "850";
-    button.style.background = liked ? "rgba(221,242,122,.28)" : "transparent";
-    button.style.borderRadius = liked ? "999px" : "0";
-    button.style.padding = liked ? "8px 12px" : "15px 0";
-    button.style.marginTop = liked ? "7px" : "0";
-    button.style.marginBottom = liked ? "7px" : "0";
-
-    const labelNode = Array.from(button.childNodes).find((node) => node.nodeType === Node.TEXT_NODE);
-    if (labelNode) labelNode.nodeValue = liked ? "Saved " : "Save ";
-  }
-
+  const label = button.getAttribute("aria-label") || "Wishlist product";
+  const productName = label.replace(/^(Remove|Wishlist|Add)\s+/i, "");
+  button.setAttribute("aria-label", `${liked ? "Remove" : "Wishlist"} ${productName}`);
   const icon = button.querySelector<SVGElement>("svg");
-  if (icon) {
-    icon.style.fill = liked ? "currentColor" : "none";
-    if (button.matches(".vd-save")) {
-      icon.style.stroke = "currentColor";
-      icon.style.strokeWidth = "1.8";
-      icon.style.strokeLinecap = "round";
-      icon.style.strokeLinejoin = "round";
-    }
-  }
+  if (icon) icon.style.fill = liked ? "currentColor" : "none";
   button.classList.toggle("is-saved", liked);
 }
 
